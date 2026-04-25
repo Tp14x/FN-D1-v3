@@ -445,13 +445,12 @@ tr:hover td { background: #f0fdf4; }
             <th>ไมล์</th>
             <th>สาเหตุ</th>
             <th>ระยะทาง</th>
-            <th>วันที่เริ่ม</th>
+            <th>🟢 วัน/เวลาเริ่มใช้รถ</th>
             <th>สถานะ</th>
-            <th>คืนเมื่อ</th>
-            <th>ระยะเวลา</th>
             <th>ปลายทาง</th>
-            <th>คืนรถ</th>
-            <th></th>
+            <th>🔴 วัน/เวลาคืนรถ</th>
+           <th>ตำแหน่งคืนรถ</th>
+            <th>รายละเอียด</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -609,11 +608,10 @@ function renderTable() {
       <td style="color:var(--primary);font-weight:700;white-space:nowrap">
         ${r.totalDistance ? r.totalDistance.toFixed(1)+' กม.' : '-'}
       </td>
-      <td style="white-space:nowrap;font-size:12px">${fmtDate(r.timestamp)}</td>
+      <td style="white-space:nowrap;font-size:12px;color:#16a34a;font-weight:600">${fmtDate(r.timestamp)}</td>
       <td>${statusBadge}</td>
-      <td style="font-size:12px;white-space:nowrap">${r.returnedAt ? fmtDate(r.returnedAt) : '-'}</td>
-      <td style="font-size:13px;color:var(--muted);white-space:nowrap">${esc(r.durationText||'-')}</td>
       <td>${destCell}</td>
+      <td style="white-space:nowrap;font-size:12px;color:#ef4444;font-weight:600">${r.returnedAt ? fmtDate(r.returnedAt) : '-'}</td>
       <td>${retLocCell}</td>
       <td>
         <button class="btn-eye" onclick="openDetail(${globalIdx})" title="ดูรายละเอียด">
