@@ -5,7 +5,7 @@ pages_build_output_dir = "public"
 [[d1_databases]]
 binding = "DB"
 database_name = "car-tracker-db"
-database_id = "YOUR_D1_DATABASE_ID"
+database_id = "35471c6e-8141-4bec-a791-5e971f3a61d1"
 
 [vars]
 ADMIN_USER_ID = "U3e8201d1672346cac5fde4a9bc8d728c"
