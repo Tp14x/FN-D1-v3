@@ -10,6 +10,12 @@ export async function onRequestPost(context) {
     if (!record.userId || !record.car) return err('Missing required fields', 400, o);
 
     const id = `rec_${Date.now()}`;
+
+    // ✅ บันทึก destinations เป็น JSON ลง route_text
+    const routeTextToSave = record.destinations && record.destinations.length > 0
+      ? JSON.stringify(record.destinations)
+      : (record.routeText || '');
+
     await env.DB.prepare(`
       INSERT INTO records
         (id, user_id, name, phone, car, mileage, reason, route_text,
@@ -23,7 +29,7 @@ export async function onRequestPost(context) {
       record.car,
       record.mileage || '0',
       record.reason || '',
-      record.routeText || '',
+      routeTextToSave,
       record.totalDistance || 0,
       record.totalTime || 0,
       record.hasPhoto ? 1 : 0,
