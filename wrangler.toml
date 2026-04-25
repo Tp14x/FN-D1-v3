@@ -7,6 +7,10 @@ binding = "DB"
 database_name = "car-tracker-db"
 database_id = "35471c6e-8141-4bec-a791-5e971f3a61d1"
 
+[[r2_buckets]]
+binding = "PHOTOS"
+bucket_name = "car-tracker-photos"
+
 [vars]
 ADMIN_USER_ID = "U3e8201d1672346cac5fde4a9bc8d728c"
 ALLOWED_ORIGIN = "https://fn-car.pages.dev"
