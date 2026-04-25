@@ -8,5 +8,5 @@ database_name = "car-tracker-db"
 database_id = "YOUR_D1_DATABASE_ID"
 
 [vars]
-ADMIN_USER_ID = "YOUR_LINE_USER_ID_HERE"
-ALLOWED_ORIGIN = "https://your-project.pages.dev"
+ADMIN_USER_ID = "U3e8201d1672346cac5fde4a9bc8d728c"
+ALLOWED_ORIGIN = "https://fn-car.pages.dev"
