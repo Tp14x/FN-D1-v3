@@ -1,6 +1,6 @@
 -- ===================================================
 -- Car Usage Tracker - Cloudflare D1 Schema
--- วิ่งใน D1 Console ก่อน deploy
+-- รันใน D1 Console ก่อน deploy
 -- ===================================================
 
 CREATE TABLE IF NOT EXISTS users (
