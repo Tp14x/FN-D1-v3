@@ -10,10 +10,16 @@ export async function onRequestGet(context) {
     const userId = url.searchParams.get('userId');
     const limit  = parseInt(url.searchParams.get('limit') || '200');
     const offset = parseInt(url.searchParams.get('offset') || '0');
-    const status = url.searchParams.get('status'); // 'pending' | 'returned' | null
+    const status = url.searchParams.get('status');
 
+    // ✅ ไม่ใช้ r.* เพราะ JOIN อาจ conflict column id
     let query = `
-      SELECT r.*, u.picture_url, u.department
+      SELECT
+        r.id, r.user_id, r.name, r.phone, r.car, r.mileage,
+        r.reason, r.route_text, r.total_distance, r.total_time,
+        r.has_photo, r.return_status, r.returned_at,
+        r.duration_text, r.return_location, r.timestamp,
+        u.picture_url, u.department
       FROM records r
       LEFT JOIN users u ON r.user_id = u.user_id
     `;
@@ -22,7 +28,6 @@ export async function onRequestGet(context) {
 
     if (userId) { where.push('r.user_id = ?'); params.push(userId); }
     if (status) { where.push('r.return_status = ?'); params.push(status); }
-
     if (where.length) query += ' WHERE ' + where.join(' AND ');
     query += ' ORDER BY r.timestamp DESC LIMIT ? OFFSET ?';
     params.push(limit, offset);
@@ -43,14 +48,15 @@ export async function onRequestGet(context) {
       returnStatus: r.return_status,
       returnedAt: r.returned_at,
       durationText: r.duration_text,
-      returnLocation: r.return_location ? JSON.parse(r.return_location) : null,
+      returnLocation: r.return_location ? (() => {
+        try { return JSON.parse(r.return_location); } catch { return null; }
+      })() : null,
       timestamp: r.timestamp,
       userId: r.user_id,
       pictureUrl: r.picture_url || null,
       department: r.department || null
     }));
 
-    // Stats summary
     const statsRes = await env.DB.prepare(`
       SELECT
         COUNT(*) as total,
