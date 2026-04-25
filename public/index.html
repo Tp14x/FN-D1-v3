@@ -1306,13 +1306,23 @@ async function handleReturnCar() {
   if (!usage) { showToast('ไม่พบข้อมูลการใช้รถ', 'error'); return; }
 
   const returnTime = new Date();
-  const durationMs = returnTime - new Date(usage.startedAt);
-  const durationMin = Math.floor(durationMs / 60000);
-  const durationH = Math.floor(durationMin / 60);
-  const durationText = durationH > 0
-    ? `${durationH} ชั่วโมง ${durationMin%60} นาที`
-    : `${durationMin} นาที`;
+  const startTime = new Date(usage.startedAt);
+  const durationMs = Math.max(0, returnTime.getTime() - startTime.getTime());
+  const totalSec = Math.floor(durationMs / 1000);
+  const totalMin = Math.floor(totalSec / 60);
+  const durationH = Math.floor(totalMin / 60);
+  const durationMin = totalMin % 60;
+  const durationSec = totalSec % 60;
 
+  let durationText;
+  if (durationH > 0) {
+    durationText = `${durationH} ชั่วโมง ${durationMin} นาที`;
+  } else if (totalMin > 0) {
+    durationText = `${totalMin} นาที ${durationSec} วินาที`;
+  } else {
+    durationText = `${durationSec} วินาที`;
+  }
+  
   // ✅ สร้าง message sync ก่อน
   const message = buildReturnFlexMessage(usage.carPlate, usage.userName, returnTime, durationText, returnLocation);
 
