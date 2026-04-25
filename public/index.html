@@ -947,95 +947,154 @@ function checkAutoDestination() {
 // FLEX MESSAGE BUILDER
 // ======================================================
 function buildFlexMessage(name, phone, car, mileage, reason, markerList, routeInfoText, hasPhoto) {
-  const distMatch = routeInfoText.match(/ระยะทางรวม:\s*([\d.]+)\s*กม/);
-  const timeMatch = routeInfoText.match(/เวลาโดยประมาณ:\s*(\d+)\s*นาที/);
-  const km = distMatch ? distMatch[1] : '0';
-  const min = timeMatch ? timeMatch[1] : '0';
+  // ✅ parse ระยะทาง/เวลาจาก routeInfoText อย่างปลอดภัย
+  const distMatch = String(routeInfoText).match(/([\d.]+)\s*กม/);
+  const timeMatch = String(routeInfoText).match(/(\d+)\s*นาที/);
+  const km  = distMatch ? distMatch[1] : '-';
+  const min = timeMatch ? timeMatch[1] : '-';
+
   const now = new Date();
+  const dateStr = now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+  const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+
+  // ✅ สร้าง destination texts (ไม่ใช้ spread ที่อาจทำให้ contents array ผิดรูปแบบ)
+  const destTexts = markerList.length > 0
+    ? markerList.map((m, i) => ({
+        type: 'text', size: 'sm', wrap: true, color: '#6b7280',
+        text: `• จุดที่ ${i + 1}: ${m.getPosition().lat().toFixed(5)}, ${m.getPosition().lng().toFixed(5)}`
+      }))
+    : [{ type: 'text', size: 'sm', color: '#9ca3af', text: '• ไม่ได้ระบุปลายทาง' }];
+
+  // ✅ ใช้ window.location.origin แทน location.origin เพื่อความชัดเจน
+  const baseUrl = window.location.origin;
 
   return {
     type: 'flex',
-    altText: `🚗 บันทึกการใช้รถโดย ${name}`,
+    altText: `🚗 ${name} ขอใช้รถ ${car} เลขไมล์ ${mileage}`,
     contents: {
-      type: 'bubble', size: 'mega',
+      type: 'bubble',
+      size: 'mega',
       header: {
-        type: 'box', layout: 'vertical',
-        backgroundColor: '#16a34a', paddingAll: '16px',
-        contents: [{ type: 'text', text: '🚗 บันทึกการใช้รถ', weight: 'bold', size: 'xl', color: '#FFFFFF', align: 'center' },
-                   { type: 'text', text: now.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}), size: 'sm', color: 'rgba(255,255,255,0.8)', align: 'center' }]
+        type: 'box',
+        layout: 'vertical',
+        backgroundColor: '#16a34a',
+        paddingAll: '16px',
+        contents: [
+          { type: 'text', text: '🚗 บันทึกการใช้รถ', weight: 'bold', size: 'xl', color: '#FFFFFF', align: 'center' },
+          { type: 'text', text: `${dateStr}  ${timeStr} น.`, size: 'xs', color: '#d1fae5', align: 'center', margin: 'sm' }
+        ]
       },
       body: {
-        type: 'box', layout: 'vertical', spacing: 'md',
+        type: 'box',
+        layout: 'vertical',
+        spacing: 'sm',
         contents: [
           { type: 'text', text: `👤 ${name}`, size: 'md', wrap: true },
-          { type: 'text', text: `📞 ${phone}`, size: 'md', wrap: true },
-          { type: 'text', text: `🚘 ${car}`, size: 'md', wrap: true },
-          { type: 'text', text: `🔢 ไมล์: ${mileage} กม.`, size: 'md', wrap: true },
-          { type: 'text', text: `📝 ${reason}`, size: 'md', wrap: true, color: '#374151' },
+          { type: 'text', text: `📞 ${phone}`, size: 'md', wrap: true, color: '#374151' },
+          { type: 'text', text: `🚘 ${car}`, size: 'md', wrap: true, weight: 'bold' },
+          { type: 'text', text: `🔢 ไมล์เริ่มต้น: ${mileage}`, size: 'md', wrap: true },
+          { type: 'text', text: `📝 ${reason}`, size: 'sm', wrap: true, color: '#6b7280', margin: 'md' },
           { type: 'separator', margin: 'md' },
-          { type: 'text', text: '📌 ปลายทาง:', weight: 'bold', size: 'sm', margin: 'md' },
-          ...markerList.map((m, i) => ({
-            type: 'text', size: 'sm', wrap: true, color: '#6b7280',
-            text: `• จุดที่ ${i+1}: ${m.getPosition().lat().toFixed(5)}, ${m.getPosition().lng().toFixed(5)}`
-          })),
+          { type: 'text', text: '📌 ปลายทาง', weight: 'bold', size: 'sm', margin: 'md' },
+          ...destTexts,
           { type: 'separator', margin: 'md' },
           {
             type: 'box', layout: 'horizontal', spacing: 'lg', margin: 'md',
             contents: [
-              { type: 'box', layout: 'vertical', contents: [
-                { type: 'text', text: '🛣️ ระยะทาง', size: 'xs', color: '#9ca3af' },
-                { type: 'text', text: `${km} กม.`, size: 'lg', weight: 'bold', color: '#16a34a' }
-              ]},
-              { type: 'box', layout: 'vertical', contents: [
-                { type: 'text', text: '⏱ เวลา', size: 'xs', color: '#9ca3af' },
-                { type: 'text', text: `${min} นาที`, size: 'lg', weight: 'bold', color: '#16a34a' }
-              ]}
+              {
+                type: 'box', layout: 'vertical', alignItems: 'center',
+                contents: [
+                  { type: 'text', text: km === '-' ? '-' : `${km} กม.`, size: 'lg', weight: 'bold', color: '#16a34a' },
+                  { type: 'text', text: 'ระยะทาง', size: 'xs', color: '#9ca3af' }
+                ]
+              },
+              {
+                type: 'box', layout: 'vertical', alignItems: 'center',
+                contents: [
+                  { type: 'text', text: min === '-' ? '-' : `${min} นาที`, size: 'lg', weight: 'bold', color: '#16a34a' },
+                  { type: 'text', text: 'เวลาประมาณ', size: 'xs', color: '#9ca3af' }
+                ]
+              }
             ]
           },
-          { type: 'text', text: hasPhoto ? '📸 แนบรูปเลขไมล์แล้ว ✓' : '⚠️ ไม่มีรูปเลขไมล์', size: 'sm', align: 'center', margin: 'sm', color: hasPhoto ? '#16a34a' : '#ef4444' }
+          {
+            type: 'text',
+            text: hasPhoto ? '📸 แนบรูปเลขไมล์แล้ว ✓' : '⚠️ ไม่มีรูปเลขไมล์',
+            size: 'sm', align: 'center', margin: 'sm',
+            color: hasPhoto ? '#16a34a' : '#ef4444'
+          }
         ]
       },
       footer: {
-        type: 'box', layout: 'vertical', spacing: 'sm',
+        type: 'box', layout: 'vertical',
         contents: [{
           type: 'button',
-          action: { type: 'uri', label: '📊 ดูประวัติการใช้งานรถ', uri: `${location.origin}/history` },
-          style: 'primary', color: '#16a34a'
+          action: { type: 'uri', label: '📊 ดูประวัติการใช้งานรถ', uri: `${baseUrl}/history` },
+          style: 'primary',
+          color: '#16a34a',
+          height: 'sm'
         }]
       }
     }
   };
 }
 
-function buildReturnFlexMessage(carPlate, userName, returnTime, durationText, location) {
-  const mapsLink = `https://www.google.com/maps?q=${location.lat},${location.lng}`;
+// ✅ เปลี่ยนชื่อ parameter จาก location → returnLoc เพื่อไม่ทับ window.location
+function buildReturnFlexMessage(carPlate, userName, returnTime, durationText, returnLoc) {
+  const mapsLink = `https://www.google.com/maps?q=${returnLoc.lat},${returnLoc.lng}`;
+  const baseUrl  = window.location.origin;   // ✅ ใช้ window.location.origin แทน
+
+  const dateStr = returnTime.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+  const timeStr = returnTime.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+
   return {
     type: 'flex',
-    altText: `🔑 คืนรถแล้ว: ${carPlate}`,
+    altText: `🔑 คืนรถแล้ว: ${carPlate} โดย ${userName}`,
     contents: {
       type: 'bubble',
       header: {
         type: 'box', layout: 'vertical',
-        backgroundColor: '#ef4444', paddingAll: '15px',
-        contents: [{ type: 'text', text: '🔑 แจ้งคืนรถแล้ว', weight: 'bold', size: 'xl', color: '#FFFFFF', align: 'center' }]
+        backgroundColor: '#dc2626', paddingAll: '16px',
+        contents: [
+          { type: 'text', text: '🔑 แจ้งคืนรถแล้ว', weight: 'bold', size: 'xl', color: '#FFFFFF', align: 'center' },
+          { type: 'text', text: `${dateStr}  ${timeStr} น.`, size: 'xs', color: '#fecaca', align: 'center', margin: 'sm' }
+        ]
       },
       body: {
-        type: 'box', layout: 'vertical', spacing: 'md',
+        type: 'box', layout: 'vertical', spacing: 'sm',
         contents: [
-          { type: 'text', text: `🚗 ${carPlate}`, size: 'lg', weight: 'bold', wrap: true },
-          { type: 'text', text: `👤 ${userName}`, size: 'md', wrap: true },
-          { type: 'text', text: `📅 ${returnTime.toLocaleDateString('th-TH')}`, size: 'md' },
-          { type: 'text', text: `⏰ ${returnTime.toLocaleTimeString('th-TH')}`, size: 'md' },
-          { type: 'text', text: `⏱ ระยะเวลา: ${durationText}`, size: 'md', weight: 'bold', color: '#ef4444' },
+          { type: 'text', text: `🚗 ${carPlate}`, size: 'xl', weight: 'bold', wrap: true },
+          { type: 'text', text: `👤 ${userName}`, size: 'md', wrap: true, margin: 'sm' },
           { type: 'separator', margin: 'md' },
-          { type: 'text', text: `📍 ตำแหน่ง: ${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`, size: 'sm', wrap: true, color: '#6b7280', margin: 'md' }
+          {
+            type: 'box', layout: 'vertical', margin: 'md',
+            backgroundColor: '#fff1f2', cornerRadius: '10px', paddingAll: '12px',
+            contents: [
+              { type: 'text', text: '⏱ ระยะเวลาใช้งาน', size: 'xs', color: '#9ca3af' },
+              { type: 'text', text: durationText, size: 'xl', weight: 'bold', color: '#dc2626', margin: 'sm' }
+            ]
+          },
+          { type: 'separator', margin: 'md' },
+          {
+            type: 'text',
+            text: `📍 ${returnLoc.lat.toFixed(5)}, ${returnLoc.lng.toFixed(5)}`,
+            size: 'xs', wrap: true, color: '#9ca3af', margin: 'md'
+          }
         ]
       },
       footer: {
         type: 'box', layout: 'vertical', spacing: 'sm',
         contents: [
-          { type: 'button', action: { type: 'uri', label: '🗺️ ดูตำแหน่งคืนรถ', uri: mapsLink }, style: 'link', color: '#3b82f6' },
-          { type: 'button', action: { type: 'uri', label: '📊 ดูประวัติ', uri: `${location.origin}/history` }, style: 'primary', color: '#16a34a' }
+          {
+            type: 'button',
+            action: { type: 'uri', label: '🗺️ ดูตำแหน่งคืนรถ', uri: mapsLink },
+            style: 'link', color: '#2563eb', height: 'sm'
+          },
+          {
+            type: 'button',
+            action: { type: 'uri', label: '📊 ดูประวัติการใช้รถ', uri: `${baseUrl}/history` },
+            style: 'primary', color: '#16a34a', height: 'sm'
+          }
         ]
       }
     }
