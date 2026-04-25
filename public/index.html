@@ -704,7 +704,8 @@ const CONFIG = {
 let currentUser = null;
 let map = null, markers = [], directionsRenderer, directionsService, mapInitialized = false, mapType = 'roadmap';
 let autocomplete = null;
-let cachedPhotoBase64 = null; 
+let cachedPhotoBase64 = null;
+let cachedPhotoFile = null;   // ✅ เก็บ File object ไว้อัปโหลด R2
 let returnLocation = null;
 let timerInterval = null;
 
@@ -771,6 +772,7 @@ function clearErr(id) {
 document.getElementById('mileagePhoto').addEventListener('change', e => {
   const file = e.target.files[0];
   cachedPhotoBase64 = null;
+  cachedPhotoFile = null;
   const preview = document.getElementById('photoPreview');
   const info = document.getElementById('photoInfo');
   const removeBtn = document.getElementById('removePhotoBtn');
@@ -779,7 +781,9 @@ document.getElementById('mileagePhoto').addEventListener('change', e => {
 
   const validTypes = ['image/jpeg','image/png','image/gif','image/webp'];
   if (!validTypes.includes(file.type)) { showToast('รองรับ JPG, PNG, GIF, WEBP เท่านั้น', 'warning'); e.target.value=''; return; }
-  if (file.size > 5*1024*1024) { showToast('ไฟล์ต้องไม่เกิน 5MB', 'warning'); e.target.value=''; return; }
+  if (file.size > 10*1024*1024) { showToast('ไฟล์ต้องไม่เกิน 10MB', 'warning'); e.target.value=''; return; }
+
+  cachedPhotoFile = file;   // ✅ เก็บ File object
 
   const reader = new FileReader();
   reader.onloadend = () => {
@@ -796,6 +800,7 @@ document.getElementById('mileagePhoto').addEventListener('change', e => {
 function clearPhoto() {
   document.getElementById('mileagePhoto').value = '';
   cachedPhotoBase64 = null;
+  cachedPhotoFile = null;
   document.getElementById('photoPreview').classList.remove('show');
   document.getElementById('photoInfo').classList.remove('show');
   document.getElementById('removePhotoBtn').style.display = 'none';
@@ -1175,7 +1180,7 @@ document.getElementById('mainForm').addEventListener('submit', async function(e)
 
   if (!shareSuccess) return;
 
-  // ✅ 4. หลังจากแชร์สำเร็จ → บันทึกลง DB
+  // ✅ 4. หลังจากแชร์สำเร็จ → อัปโหลดรูปและบันทึกลง DB
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
 
@@ -1183,6 +1188,27 @@ document.getElementById('mainForm').addEventListener('submit', async function(e)
     const distMatch = routeText.match(/ระยะทางรวม:\s*([\d.]+)/);
     const timeMatch = routeText.match(/เวลาโดยประมาณ:\s*(\d+)/);
 
+    // ✅ 4a. อัปโหลดรูปไปยัง R2 (ถ้ามี)
+    let photoKey = null;
+    if (cachedPhotoFile) {
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลดรูป...';
+      try {
+        const fd = new FormData();
+        fd.append('photo', cachedPhotoFile);
+        const uploadRes = await fetch('/upload-photo', { method: 'POST', body: fd });
+        const uploadData = await uploadRes.json();
+        if (uploadData.success) {
+          photoKey = uploadData.key;
+        } else {
+          showToast('⚠️ อัปโหลดรูปไม่สำเร็จ บันทึกข้อมูลอื่นต่อ...', 'warning');
+        }
+      } catch (_) {
+        showToast('⚠️ อัปโหลดรูปไม่สำเร็จ บันทึกข้อมูลอื่นต่อ...', 'warning');
+      }
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
+    }
+
+    // ✅ 4b. บันทึกลง D1
     await fetch('/save-record', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1192,7 +1218,8 @@ document.getElementById('mainForm').addEventListener('submit', async function(e)
         routeText,
         totalDistance: distMatch ? parseFloat(distMatch[1]) : 0,
         totalTime: timeMatch ? parseInt(timeMatch[1]) : 0,
-        hasPhoto: !!cachedPhotoBase64,
+        hasPhoto: !!(photoKey || cachedPhotoBase64),
+        photoKey,
         destinations: markers.map((m, i) => ({ point: i+1, lat: m.getPosition().lat(), lng: m.getPosition().lng() })),
         timestamp: new Date().toISOString()
       })
