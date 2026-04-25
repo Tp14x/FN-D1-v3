@@ -253,6 +253,7 @@ body{
 }
 .table-wrap{
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 table{
   width: 100%;
@@ -340,36 +341,6 @@ tr:hover td{
   font-weight: 600;
   color: var(--primary-dark);
 }
-/* Mobile Cards */
-.mobile-cards{
-  display: none;
-  padding: 16px;
-}
-.record-card{
-  background: white;
-  border-radius: 24px;
-  padding: 18px;
-  margin-bottom: 14px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-  border: 1px solid var(--border);
-}
-.rc-top{
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-.rc-info{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 8px;
-}
-.rc-label{
-  font-size: 11px;
-  color: var(--muted);
-  letter-spacing: 0.3px;
-}
 /* Pagination */
 .pagination{
   display: flex;
@@ -419,15 +390,25 @@ tr:hover td{
   .filter-bar input, .filter-bar select, .btn-filter, .btn-reset{
     width: 100%;
   }
-  .desktop-table{
-    display: none;
-  }
-  .mobile-cards{
-    display: block;
-  }
   .header-row{
     flex-direction: column;
     text-align: center;
+  }
+  /* ปรับขนาดฟอนต์และ padding สำหรับมือถือ */
+  th, td{
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .user-name{
+    font-size: 13px;
+  }
+  .badge{
+    padding: 3px 8px;
+    font-size: 10px;
+  }
+  .car-badge{
+    padding: 3px 8px;
+    font-size: 10px;
   }
 }
 </style>
@@ -495,7 +476,7 @@ tr:hover td{
       <div style="font-size: 40px;">⏳</div>
       <div>กำลังโหลดข้อมูล...</div>
     </div>
-    <div class="table-wrap desktop-table" id="desktopTable" style="display: none;">
+    <div class="table-wrap" id="desktopTable" style="display: none;">
       <table>
         <thead>
           <tr><th>ผู้ใช้</th><th>ทะเบียนรถ</th><th>ไมล์เริ่ม</th><th>สาเหตุ</th><th>ระยะทาง</th><th>วันที่เริ่ม</th><th>สถานะ</th><th>คืนเมื่อ</th><th>ระยะเวลา</th></tr>
@@ -503,7 +484,6 @@ tr:hover td{
         <tbody id="tableBody"></tbody>
       </table>
     </div>
-    <div class="mobile-cards" id="mobileCards" style="display: none;"></div>
     <div class="empty-state" id="emptyState" style="display: none;">
       <div style="font-size: 48px;">🧾</div>
       <div style="font-weight: 600; margin-top: 8px;">ไม่พบข้อมูล</div>
@@ -547,19 +527,17 @@ function renderUI() {
   document.getElementById('recordCount').innerText = `${total} รายการ`;
   if (total === 0) {
     document.getElementById('desktopTable').style.display = 'none';
-    document.getElementById('mobileCards').style.display = 'none';
     document.getElementById('emptyState').style.display = 'block';
     document.getElementById('pagination').style.display = 'none';
     return;
   }
   document.getElementById('emptyState').style.display = 'none';
   document.getElementById('desktopTable').style.display = 'block';
-  document.getElementById('mobileCards').style.display = 'block';
   
   const start = (currentPage-1)*PAGE_SIZE;
   const pageData = filteredRecords.slice(start, start+PAGE_SIZE);
   
-  // Desktop table
+  // Desktop table only
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = pageData.map(r => {
     const statusHtml = r.returnStatus === 'returned' ? `<span class="badge badge-returned"><i class="fas fa-check-circle"></i> คืนแล้ว</span>` : `<span class="badge badge-pending"><i class="fas fa-car-side"></i> กำลังใช้</span>`;
@@ -574,24 +552,7 @@ function renderUI() {
       <td>${statusHtml}</td>
       <td>${r.returnedAt ? formatDate(r.returnedAt) : '-'}</td>
       <td>${r.durationText || '-'}</td>
-    </tr>`;
-  }).join('');
-  
-  // Mobile cards
-  const mobileContainer = document.getElementById('mobileCards');
-  mobileContainer.innerHTML = pageData.map(r => {
-    const statusBadge = r.returnStatus === 'returned' ? '<span class="badge badge-returned">✅ คืนแล้ว</span>' : '<span class="badge badge-pending">🔑 กำลังใช้</span>';
-    return `<div class="record-card">
-      <div class="rc-top"><div><div style="font-weight:700;">${escapeHtml(r.name||'-')}</div><div style="font-size:11px; color:var(--muted);">${formatDate(r.timestamp)}</div></div>${statusBadge}</div>
-      <div class="rc-info">
-        <div><div class="rc-label">ทะเบียน</div><span class="car-badge" style="font-size:11px;">${escapeHtml(r.car||'-')}</span></div>
-        <div><div class="rc-label">ไมล์เริ่ม</div>${escapeHtml(r.mileage||'-')}</div>
-        <div><div class="rc-label">ระยะทาง</div><span class="route-val">${r.totalDistance ? r.totalDistance.toFixed(1)+' กม.' : '-'}</span></div>
-        <div><div class="rc-label">ระยะเวลา</div>${r.durationText||'-'}</div>
-        ${r.returnStatus === 'returned' ? `<div style="grid-column:span 2"><div class="rc-label">คืนเมื่อ</div>${formatDate(r.returnedAt)}</div>` : ''}
-      </div>
-      ${r.reason ? `<div style="margin-top:10px; border-top:1px solid var(--border); padding-top:8px; font-size:12px;"><i class="fas fa-pen"></i> ${escapeHtml(r.reason)}</div>` : ''}
-    </div>`;
+    </table>`;
   }).join('');
   
   renderPagination(total);
