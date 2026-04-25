@@ -989,13 +989,13 @@ function buildFlexMessage(name, phone, car, mileage, reason, markerList, routeIn
         layout: 'vertical',
         spacing: 'sm',
         contents: [
-          { type: 'text', text: `👤 ${name}`, size: 'md', wrap: true },
-          { type: 'text', text: `📞 ${phone}`, size: 'md', wrap: true, color: '#374151' },
-          { type: 'text', text: `🚘 ${car}`, size: 'md', wrap: true, weight: 'bold' },
-          { type: 'text', text: `🔢 ไมล์เริ่มต้น: ${mileage}`, size: 'md', wrap: true },
-          { type: 'text', text: `📝 ${reason}`, size: 'sm', wrap: true, color: '#6b7280', margin: 'md' },
+          { type: 'text', text: `ชื่อ : ${name}`, size: 'md', wrap: true },
+          { type: 'text', text: `เบอร์โทร : ${phone}`, size: 'md', wrap: true, color: '#374151' },
+          { type: 'text', text: `ทะเบียนรถ : ${car}`, size: 'md', wrap: true, weight: 'bold' },
+          { type: 'text', text: `ไมล์รถ : ${mileage}`, size: 'md', wrap: true },
+          { type: 'text', text: `📝สาเหตุ : ${reason}`, size: 'sm', wrap: true, color: '#6b7280', margin: 'md' },
           { type: 'separator', margin: 'md' },
-          { type: 'text', text: '📌 ปลายทาง', weight: 'bold', size: 'sm', margin: 'md' },
+          { type: 'text', text: 'ปลายทาง', weight: 'bold', size: 'sm', margin: 'md' },
           ...destTexts,
           { type: 'separator', margin: 'md' },
           {
@@ -1019,7 +1019,7 @@ function buildFlexMessage(name, phone, car, mileage, reason, markerList, routeIn
           },
           {
             type: 'text',
-            text: hasPhoto ? '📸 แนบรูปเลขไมล์แล้ว ✓' : '⚠️ ไม่มีรูปเลขไมล์',
+            text: hasPhoto ? 'แนบรูปเลขไมล์แล้ว ✓' : 'ไม่มีรูปเลขไมล์',
             size: 'sm', align: 'center', margin: 'sm',
             color: hasPhoto ? '#16a34a' : '#ef4444'
           }
@@ -1029,7 +1029,7 @@ function buildFlexMessage(name, phone, car, mileage, reason, markerList, routeIn
         type: 'box', layout: 'vertical',
         contents: [{
           type: 'button',
-          action: { type: 'uri', label: '📊 ดูประวัติการใช้งานรถ', uri: `${baseUrl}/history` },
+          action: { type: 'uri', label: 'ดูประวัติการใช้งานรถ', uri: `${baseUrl}/history` },
           style: 'primary',
           color: '#16a34a',
           height: 'sm'
@@ -1056,28 +1056,28 @@ function buildReturnFlexMessage(carPlate, userName, returnTime, durationText, re
         type: 'box', layout: 'vertical',
         backgroundColor: '#dc2626', paddingAll: '16px',
         contents: [
-          { type: 'text', text: '🔑 แจ้งคืนรถแล้ว', weight: 'bold', size: 'xl', color: '#FFFFFF', align: 'center' },
+          { type: 'text', text: 'แจ้งคืนรถแล้ว', weight: 'bold', size: 'xl', color: '#FFFFFF', align: 'center' },
           { type: 'text', text: `${dateStr}  ${timeStr} น.`, size: 'xs', color: '#fecaca', align: 'center', margin: 'sm' }
         ]
       },
       body: {
         type: 'box', layout: 'vertical', spacing: 'sm',
         contents: [
-          { type: 'text', text: `🚗 ${carPlate}`, size: 'xl', weight: 'bold', wrap: true },
-          { type: 'text', text: `👤 ${userName}`, size: 'md', wrap: true, margin: 'sm' },
+          { type: 'text', text: `ทะเบียนรถ : ${carPlate}`, size: 'xl', weight: 'bold', wrap: true },
+          { type: 'text', text: `ชื่อ : ${userName}`, size: 'md', wrap: true, margin: 'sm' },
           { type: 'separator', margin: 'md' },
           {
             type: 'box', layout: 'vertical', margin: 'md',
             backgroundColor: '#fff1f2', cornerRadius: '10px', paddingAll: '12px',
             contents: [
-              { type: 'text', text: '⏱ ระยะเวลาใช้งาน', size: 'xs', color: '#9ca3af' },
+              { type: 'text', text: 'ระยะเวลาใช้งาน', size: 'xs', color: '#9ca3af' },
               { type: 'text', text: durationText, size: 'xl', weight: 'bold', color: '#dc2626', margin: 'sm' }
             ]
           },
           { type: 'separator', margin: 'md' },
           {
             type: 'text',
-            text: `📍 ${returnLoc.lat.toFixed(5)}, ${returnLoc.lng.toFixed(5)}`,
+            text: `พิกัดคืนรถ : ${returnLoc.lat.toFixed(5)}, ${returnLoc.lng.toFixed(5)}`,
             size: 'xs', wrap: true, color: '#9ca3af', margin: 'md'
           }
         ]
@@ -1087,12 +1087,12 @@ function buildReturnFlexMessage(carPlate, userName, returnTime, durationText, re
         contents: [
           {
             type: 'button',
-            action: { type: 'uri', label: '🗺️ ดูตำแหน่งคืนรถ', uri: mapsLink },
+            action: { type: 'uri', label: 'ดูตำแหน่งคืนรถ', uri: mapsLink },
             style: 'link', color: '#2563eb', height: 'sm'
           },
           {
             type: 'button',
-            action: { type: 'uri', label: '📊 ดูประวัติการใช้รถ', uri: `${baseUrl}/history` },
+            action: { type: 'uri', label: 'ดูประวัติการใช้รถ', uri: `${baseUrl}/history` },
             style: 'primary', color: '#16a34a', height: 'sm'
           }
         ]
@@ -1265,7 +1265,7 @@ async function getReturnLocation() {
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังดึงตำแหน่ง...';
   status.className = 'location-status';
-  status.innerHTML = '📡 กำลังดึงตำแหน่ง GPS...';
+  status.innerHTML = 'กำลังดึงตำแหน่ง GPS...';
 
   try {
     const pos = await new Promise((resolve, reject) => {
