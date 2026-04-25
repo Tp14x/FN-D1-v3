@@ -298,6 +298,7 @@ tbody tr:hover td{background:var(--g50)}
 .m-val{font-size:14px;font-weight:500;color:var(--text);line-height:1.5;word-break:break-word}
 .m-val.green{color:var(--g600);font-weight:700}
 .m-val.red{color:#dc2626;font-weight:700}
+.photo-zoom{max-width:100%!important;max-height:none!important;cursor:zoom-out!important;}
 
 /* loc card */
 .loc-card{
@@ -802,7 +803,11 @@ function openDetail(idx) {
         <div class="m-item full"><div class="m-lbl">สาเหตุการใช้รถ</div><div class="m-val">${esc(r.reason||'-')}</div></div>
         <div class="m-item"><div class="m-lbl">🟢 เริ่มใช้รถ</div><div class="m-val green">${fmtDate(r.timestamp)}</div></div>
         <div class="m-item"><div class="m-lbl">🔴 คืนรถเมื่อ</div><div class="m-val red">${r.returnedAt ? fmtDate(r.returnedAt) : '-'}</div></div>
-        <div class="m-item"><div class="m-lbl">รูปเลขไมล์</div><div class="m-val">${r.hasPhoto ? '📸 มีรูปแนบ' : '—'}</div></div>
+        <div class="m-item full"><div class="m-lbl">รูปเลขไมล์</div><div class="m-val">${
+          r.photoKey
+            ? `<div style="margin-top:6px"><img src="/get-photo?key=${encodeURIComponent(r.photoKey)}" alt="รูปเลขไมล์" loading="lazy" onclick="this.classList.toggle('photo-zoom')" style="max-width:100%;max-height:220px;border-radius:8px;border:1px solid #e2e8f0;cursor:zoom-in;display:block"></div><div style="font-size:11px;color:#64748b;margin-top:4px">📸 แตะรูปเพื่อขยาย</div>`
+            : r.hasPhoto ? '📸 มีรูปแนบ (อัปโหลดก่อนเปิดใช้ R2)' : '—'
+        }</div></div>
       </div>
     </div>
 
