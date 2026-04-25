@@ -624,23 +624,22 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   <div class="car-in-use-card">
     <div class="car-pulse">🚗🔑</div>
     <h2>กำลังใช้รถ</h2>
-    <div class="subtitle">รถออกจากบริษัทแล้ว</div>
 
     <div class="info-box" id="carInfoBox">
       <div class="info-row">
-        <span class="label">🚘 ทะเบียนรถ</span>
+        <span class="label">ทะเบียนรถ</span>
         <span class="value" id="infoCarPlate">-</span>
       </div>
       <div class="info-row">
-        <span class="label">👤 ผู้ใช้</span>
+        <span class="label">ชื่อผู้ใช้</span>
         <span class="value" id="infoUserName">-</span>
       </div>
       <div class="info-row">
-        <span class="label">📍 ไมล์เริ่ม</span>
+        <span class="label">ไมล์เริ่ม</span>
         <span class="value" id="infoMileage">-</span>
       </div>
       <div class="info-row">
-        <span class="label">🕐 เริ่มใช้</span>
+        <span class="label">วัน/เวลาที่เริ่มใช้</span>
         <span class="value" id="infoStartTime">-</span>
       </div>
     </div>
@@ -649,7 +648,7 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
     <div class="location-status" id="locationStatus">
       <i class="fas fa-map-marker-alt"></i>
-      ⏳ ยังไม่ได้ระบุตำแหน่งคืนรถ
+      ยังไม่ได้ระบุตำแหน่งคืนรถ
     </div>
     <div id="locationDetail" style="display:none;font-size:12px;color:var(--text-muted);margin-bottom:8px;text-align:left;padding:0 4px"></div>
 
@@ -705,7 +704,7 @@ const CONFIG = {
 let currentUser = null;
 let map = null, markers = [], directionsRenderer, directionsService, mapInitialized = false, mapType = 'roadmap';
 let autocomplete = null;
-let cachedPhotoBase64 = null;       // ✅ โหลดล่วงหน้าตอนเลือกรูป
+let cachedPhotoBase64 = null; 
 let returnLocation = null;
 let timerInterval = null;
 
@@ -980,7 +979,7 @@ function buildFlexMessage(name, phone, car, mileage, reason, markerList, routeIn
         backgroundColor: '#16a34a',
         paddingAll: '16px',
         contents: [
-          { type: 'text', text: '🚗 บันทึกการใช้รถ', weight: 'bold', size: 'xl', color: '#FFFFFF', align: 'center' },
+          { type: 'text', text: 'บันทึกการใช้รถ', weight: 'bold', size: 'xl', color: '#FFFFFF', align: 'center' },
           { type: 'text', text: `${dateStr}  ${timeStr} น.`, size: 'xs', color: '#d1fae5', align: 'center', margin: 'sm' }
         ]
       },
@@ -993,7 +992,7 @@ function buildFlexMessage(name, phone, car, mileage, reason, markerList, routeIn
           { type: 'text', text: `เบอร์โทร : ${phone}`, size: 'md', wrap: true, color: '#374151' },
           { type: 'text', text: `ทะเบียนรถ : ${car}`, size: 'md', wrap: true, weight: 'bold' },
           { type: 'text', text: `ไมล์รถ : ${mileage}`, size: 'md', wrap: true },
-          { type: 'text', text: `📝สาเหตุ : ${reason}`, size: 'sm', wrap: true, color: '#6b7280', margin: 'md' },
+          { type: 'text', text: `สาเหตุ : ${reason}`, size: 'sm', wrap: true, color: '#6b7280', margin: 'md' },
           { type: 'separator', margin: 'md' },
           { type: 'text', text: 'ปลายทาง', weight: 'bold', size: 'sm', margin: 'md' },
           ...destTexts,
