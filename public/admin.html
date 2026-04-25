@@ -288,8 +288,8 @@ tr:hover td{background:#fafffe}
           </div>
           <div class="tbl-wrap">
             <table>
-              <thead><tr><th>ผู้ใช้</th><th>ทะเบียน</th><th>ไมล์</th><th>สาเหตุ</th><th>ระยะทาง</th><th>วันที่</th><th>สถานะ</th><th>คืนเมื่อ</th><th>ระยะเวลา</th></tr></thead>
-              <tbody id="recordsBody"><tr><td colspan="9" class="load-row">กำลังโหลด...</td></tr></tbody>
+              <thead><tr><th>ผู้ใช้</th><th>ทะเบียน</th><th>ไมล์</th><th>สาเหตุ</th><th>ระยะทาง</th><th>รูป</th><th>วันที่</th><th>สถานะ</th><th>คืนเมื่อ</th><th>ระยะเวลา</th></tr></thead>
+              <tbody id="recordsBody"><tr><td colspan="10" class="load-row">กำลังโหลด...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -654,7 +654,7 @@ function renderRecords() {
   });
 
   if (list.length === 0) {
-    document.getElementById('recordsBody').innerHTML = '<tr><td colspan="9" class="load-row">ไม่พบรายการ</td></tr>';
+    document.getElementById('recordsBody').innerHTML = '<tr><td colspan="10" class="load-row">ไม่พบรายการ</td></tr>';
     return;
   }
 
@@ -662,6 +662,9 @@ function renderRecords() {
     const badge = r.return_status === 'returned'
       ? '<span class="badge b-green">✅ คืนแล้ว</span>'
       : '<span class="badge b-yellow">🔑 ใช้อยู่</span>';
+    const photoCell = r.photo_key
+      ? `<a href="/get-photo?key=${encodeURIComponent(r.photo_key)}" target="_blank" title="ดูรูปเลขไมล์"><img src="/get-photo?key=${encodeURIComponent(r.photo_key)}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #e2e8f0;cursor:pointer"></a>`
+      : r.has_photo ? '📸' : '—';
     return `<tr>
       <td><div class="u-cell">
         ${r.picture_url ? `<img src="${r.picture_url}" alt="">` : `<div class="av">${(r.name||'?').charAt(0)}</div>`}
@@ -671,6 +674,7 @@ function renderRecords() {
       <td>${esc(r.mileage||'-')}</td>
       <td style="font-size:13px;max-width:160px">${esc((r.reason||'').slice(0,50))}${(r.reason||'').length>50?'...':''}</td>
       <td style="color:var(--primary);font-weight:600">${r.total_distance ? r.total_distance.toFixed(1)+' กม.' : '-'}</td>
+      <td style="text-align:center">${photoCell}</td>
       <td style="font-size:12px;white-space:nowrap">${fmtDate(r.timestamp)}</td>
       <td>${badge}</td>
       <td style="font-size:12px;white-space:nowrap">${r.returned_at ? fmtDate(r.returned_at) : '-'}</td>
