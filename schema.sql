@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS records (
   total_distance  REAL DEFAULT 0,
   total_time      REAL DEFAULT 0,
   has_photo       INTEGER DEFAULT 0,
+  photo_key       TEXT,
   return_status   TEXT DEFAULT 'pending',
   returned_at     TEXT,
   duration_text   TEXT,
@@ -51,3 +52,8 @@ CREATE INDEX IF NOT EXISTS idx_records_car       ON records(car);
 CREATE INDEX IF NOT EXISTS idx_records_user      ON records(user_id);
 CREATE INDEX IF NOT EXISTS idx_records_status    ON records(return_status);
 CREATE INDEX IF NOT EXISTS idx_requests_user     ON requests(user_id);
+
+-- ===================================================
+-- Migration: เพิ่ม photo_key (รัน 1 ครั้ง บน DB ที่มีอยู่แล้ว)
+-- ===================================================
+ALTER TABLE records ADD COLUMN photo_key TEXT;
