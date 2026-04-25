@@ -4,367 +4,369 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ประวัติการใช้รถ</title>
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
-  --primary: #16a34a;
-  --primary-light: #22c55e;
-  --primary-dark: #14532d;
-  --primary-muted: #bbf7d0;
-  --bg: #f0fdf4;
-  --bg2: #dcfce7;
+  --g50:  #f0fdf4; --g100: #dcfce7; --g200: #bbf7d0;
+  --g300: #86efac; --g400: #4ade80; --g500: #22c55e;
+  --g600: #16a34a; --g700: #15803d; --g800: #166534; --g900: #14532d;
+  --bg:   #f0fdf4;
   --card: #ffffff;
-  --text: #1e293b;
-  --muted: #64748b;
+  --text: #1e293b; --text2: #475569; --muted: #94a3b8;
   --border: #d1fae5;
-  --shadow: 0 2px 16px rgba(22,163,74,0.08);
+  --shadow-sm: 0 1px 6px rgba(22,163,74,0.06);
+  --shadow:    0 4px 20px rgba(22,163,74,0.10);
+  --shadow-lg: 0 12px 40px rgba(22,163,74,0.16);
+  --radius: 20px; --radius-sm: 12px;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Kanit', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; }
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Kanit',sans-serif;background:var(--bg);color:var(--text);font-size:15px;min-height:100vh}
 
-/* ── HEADER ── */
-.top-header {
-  background: linear-gradient(145deg, #14532d, #16a34a);
-  color: #fff; padding: 24px 20px 80px;
-  position: relative; overflow: hidden;
+/* ─── HEADER ─── */
+.header{
+  background:linear-gradient(135deg,var(--g900) 0%,var(--g700) 50%,var(--g600) 100%);
+  padding:0 0 60px; position:relative; overflow:hidden;
 }
-.top-header::after {
-  content: ''; position: absolute; bottom: -30px;
-  left: 0; right: 0; height: 60px;
-  background: var(--bg); border-radius: 50%;
+.header::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='30'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
-.header-inner { max-width: 1200px; margin: 0 auto; }
-.header-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.header-logo { display: flex; align-items: center; gap: 12px; }
-.header-logo .icon { font-size: 36px; }
-.header-logo h1 { font-size: 22px; font-weight: 700; }
-.header-logo p { opacity: .8; font-size: 13px; }
-.btn-back {
-  padding: 9px 16px;
-  background: rgba(255,255,255,0.18);
-  color: #fff; border: 2px solid rgba(255,255,255,0.35);
-  border-radius: 10px; font-family: 'Kanit', sans-serif;
-  font-size: 14px; text-decoration: none;
-  display: flex; align-items: center; gap: 6px;
-  backdrop-filter: blur(6px); transition: .2s;
+.header::after{
+  content:'';position:absolute;bottom:-2px;left:0;right:0;
+  height:64px;background:var(--bg);
+  border-radius:60% 60% 0 0 / 100% 100% 0 0;
 }
-.btn-back:hover { background: rgba(255,255,255,0.3); }
+.header-inner{max-width:1200px;margin:0 auto;padding:28px 24px 0;position:relative;z-index:1}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:32px}
+.header-brand{display:flex;align-items:center;gap:14px}
+.brand-icon{
+  width:54px;height:54px;border-radius:16px;
+  background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,0.25);
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+}
+.brand-text h1{color:#fff;font-size:22px;font-weight:800;letter-spacing:-.3px}
+.brand-text p{color:rgba(255,255,255,0.65);font-size:13px;margin-top:2px}
+.header-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn-ghost{
+  padding:9px 18px;background:rgba(255,255,255,0.12);color:#fff;
+  border:1.5px solid rgba(255,255,255,0.3);border-radius:10px;
+  font-family:'Kanit',sans-serif;font-size:14px;font-weight:500;
+  text-decoration:none;display:flex;align-items:center;gap:7px;
+  cursor:pointer;transition:.2s;backdrop-filter:blur(6px);
+}
+.btn-ghost:hover{background:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.5)}
 
-/* ── STATS ── */
-.stats-row {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px; max-width: 1200px; margin: 0 auto;
-  padding: 0 16px; position: relative; top: -40px;
+/* ─── STAT CARDS ─── */
+.stats-wrap{max-width:1200px;margin:0 auto;padding:0 24px;position:relative;top:-44px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat-card{
+  background:var(--card);border-radius:var(--radius);
+  padding:20px 18px;box-shadow:var(--shadow);
+  border:1px solid var(--border);
+  display:flex;align-items:center;gap:14px;
+  transition:transform .2s,box-shadow .2s;
+  position:relative;overflow:hidden;
 }
-.stat-card {
-  background: var(--card); border-radius: 20px;
-  padding: 18px 16px; box-shadow: var(--shadow);
-  text-align: center; transition: transform .2s;
-  border: 1px solid var(--border);
+.stat-card::before{
+  content:'';position:absolute;top:0;right:0;
+  width:80px;height:80px;border-radius:50%;
+  transform:translate(20px,-20px);opacity:.07;
+  background:var(--g600);
 }
-.stat-card:hover { transform: translateY(-3px); }
-.stat-card .stat-icon { font-size: 28px; margin-bottom: 6px; }
-.stat-card .stat-num { font-size: 26px; font-weight: 700; color: var(--primary); }
-.stat-card .stat-label { font-size: 12px; color: var(--muted); }
+.stat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.stat-icon-wrap{
+  width:48px;height:48px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.si-green{background:linear-gradient(135deg,var(--g100),var(--g200))}
+.si-yellow{background:linear-gradient(135deg,#fef3c7,#fde68a)}
+.si-blue{background:linear-gradient(135deg,#dbeafe,#bfdbfe)}
+.si-red{background:linear-gradient(135deg,#fee2e2,#fecaca)}
+.stat-info{}
+.stat-num{font-size:28px;font-weight:800;color:var(--text);line-height:1}
+.stat-label{font-size:12px;color:var(--muted);margin-top:3px;font-weight:500}
+.stat-sub{font-size:11px;margin-top:4px;font-weight:600}
+.stat-sub.up{color:var(--g600)} .stat-sub.warn{color:#d97706} .stat-sub.danger{color:#ef4444}
 
-/* ── FILTER ── */
-.filter-section { max-width: 1200px; margin: 0 auto 20px; padding: 0 16px; }
-.filter-bar {
-  background: var(--card); border-radius: 16px;
-  padding: 16px; box-shadow: var(--shadow);
-  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
-  border: 1px solid var(--border);
-}
-.filter-bar input, .filter-bar select {
-  padding: 9px 14px; border: 1.5px solid var(--border);
-  border-radius: 10px; font-family: 'Kanit', sans-serif;
-  font-size: 14px; color: var(--text); background: var(--bg);
-  outline: none; transition: border-color .2s;
-  appearance: none; -webkit-appearance: none; flex: 1; min-width: 120px;
-}
-.filter-bar input:focus, .filter-bar select:focus { border-color: var(--primary); }
-.btn-filter {
-  padding: 9px 16px; background: var(--primary); color: #fff;
-  border: none; border-radius: 10px; font-family: 'Kanit', sans-serif;
-  font-size: 14px; cursor: pointer; display: flex; align-items: center;
-  gap: 6px; white-space: nowrap; transition: .2s;
-}
-.btn-filter:hover { background: var(--primary-dark); }
-.btn-reset {
-  padding: 9px 14px; background: var(--bg2); color: var(--primary);
-  border: 1.5px solid var(--primary-muted); border-radius: 10px;
-  font-family: 'Kanit', sans-serif; font-size: 14px; cursor: pointer; transition: .2s;
-}
-.btn-reset:hover { background: var(--primary-muted); }
-.btn-export {
-  padding: 9px 16px; background: var(--card); color: var(--primary);
-  border: 2px solid var(--primary); border-radius: 10px;
-  font-family: 'Kanit', sans-serif; font-size: 14px; cursor: pointer;
-  display: flex; align-items: center; gap: 6px; transition: all .2s;
-}
-.btn-export:hover { background: var(--primary); color: #fff; }
+/* ─── SECTION WRAP ─── */
+.section{max-width:1200px;margin:0 auto;padding:0 24px 28px}
 
-/* ── TABLE ── */
-.table-section { max-width: 1200px; margin: 0 auto; padding: 0 16px 80px; }
-.table-card {
-  background: var(--card); border-radius: 20px;
-  box-shadow: var(--shadow); overflow: hidden;
-  border: 1px solid var(--border);
+/* ─── CHART CARD ─── */
+.chart-card{
+  background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);border:1px solid var(--border);
+  padding:24px;margin-bottom:24px;
 }
-.table-header {
-  padding: 16px 20px; border-bottom: 2px solid var(--bg2);
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+.card-title{
+  font-size:15px;font-weight:700;color:var(--g800);
+  display:flex;align-items:center;gap:8px;margin-bottom:20px;
 }
-.table-header h2 { font-size: 16px; font-weight: 700; color: var(--primary-dark); }
-.record-count {
-  background: var(--primary-muted); color: var(--primary-dark);
-  padding: 4px 12px; border-radius: 99px; font-size: 13px; font-weight: 600;
-}
+.card-title i{color:var(--g600)}
+.chart-wrap{position:relative;height:260px}
 
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; min-width: 880px; }
-thead tr { background: var(--bg2); }
-th {
-  padding: 11px 14px; text-align: left; font-size: 11px;
-  font-weight: 700; color: var(--primary-dark);
-  text-transform: uppercase; letter-spacing: .5px; white-space: nowrap;
-  border-bottom: 2px solid var(--primary-muted);
+/* ─── FILTER BAR ─── */
+.filter-card{
+  background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);border:1px solid var(--border);
+  padding:16px 20px;margin-bottom:20px;
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;
 }
-td {
-  padding: 11px 14px; border-top: 1px solid var(--bg2);
-  font-size: 13px; vertical-align: middle;
+.f-input,.f-select{
+  padding:9px 14px;border:1.5px solid var(--border);
+  border-radius:10px;font-family:'Kanit',sans-serif;
+  font-size:14px;color:var(--text);background:var(--g50);
+  outline:none;transition:.2s;flex:1;min-width:130px;
+  appearance:none;-webkit-appearance:none;
 }
-tr:hover td { background: #f0fdf4; }
+.f-input:focus,.f-select:focus{border-color:var(--g500);background:#fff;box-shadow:0 0 0 3px rgba(34,197,94,.1)}
+.btn-green{
+  padding:9px 18px;background:var(--g600);color:#fff;
+  border:none;border-radius:10px;font-family:'Kanit',sans-serif;
+  font-size:14px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:6px;transition:.2s;white-space:nowrap;
+}
+.btn-green:hover{background:var(--g700)}
+.btn-outline{
+  padding:9px 14px;background:var(--g50);color:var(--g700);
+  border:1.5px solid var(--g300);border-radius:10px;
+  font-family:'Kanit',sans-serif;font-size:14px;cursor:pointer;transition:.2s;
+}
+.btn-outline:hover{background:var(--g100)}
+.btn-csv{
+  padding:9px 16px;background:#fff;color:var(--g700);
+  border:2px solid var(--g300);border-radius:10px;
+  font-family:'Kanit',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;
+}
+.btn-csv:hover{background:var(--g600);color:#fff;border-color:var(--g600)}
 
-/* ── USER CELL ── */
-.user-cell { display: flex; align-items: center; gap: 10px; }
-.user-cell img {
-  width: 34px; height: 34px; border-radius: 50%;
-  object-fit: cover; flex-shrink: 0;
-  border: 2px solid var(--primary-muted);
+/* ─── TABLE CARD ─── */
+.table-card{
+  background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;
 }
-.user-cell .av {
-  width: 34px; height: 34px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-weight: 700; font-size: 13px; flex-shrink: 0;
+.table-head-bar{
+  padding:16px 20px;
+  background:linear-gradient(135deg,var(--g50),var(--g100));
+  border-bottom:2px solid var(--g200);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
 }
-.user-name { font-weight: 600; font-size: 13px; }
-.user-dept { font-size: 11px; color: var(--muted); margin-top: 1px; }
-
-/* ── REASON — truncate แต่ไม่ล้นตาราง ── */
-.reason-cell {
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--text);
-  font-size: 13px;
-  display: block;
+.table-head-bar h2{font-size:15px;font-weight:700;color:var(--g800);display:flex;align-items:center;gap:8px}
+.rec-badge{
+  background:var(--g200);color:var(--g800);
+  padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700;
 }
 
-/* ── BADGES ── */
-.badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 3px 10px; border-radius: 99px;
-  font-size: 11px; font-weight: 600; white-space: nowrap;
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+thead tr{background:linear-gradient(135deg,var(--g50),var(--g100))}
+th{
+  padding:11px 14px;text-align:left;
+  font-size:11px;font-weight:700;color:var(--g800);
+  text-transform:uppercase;letter-spacing:.6px;
+  white-space:nowrap;border-bottom:2px solid var(--g200);
 }
-.badge-returned { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
-.badge-pending  { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
-.car-badge {
-  background: #eff6ff; color: #2563eb;
-  padding: 3px 10px; border-radius: 99px;
-  font-size: 11px; font-weight: 600; white-space: nowrap;
-  border: 1px solid #bfdbfe;
+td{padding:12px 14px;border-top:1px solid var(--g50);font-size:13px;vertical-align:middle}
+tbody tr{transition:background .15s}
+tbody tr:hover td{background:var(--g50)}
+
+/* user cell */
+.u-cell{display:flex;align-items:center;gap:10px}
+.u-cell img,.u-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;object-fit:cover}
+.u-av{
+  background:linear-gradient(135deg,var(--g600),var(--g400));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;font-size:13px;
+  border:2px solid var(--g200);
+}
+.u-name{font-weight:600;font-size:13px;color:var(--text)}
+.u-dept{font-size:11px;color:var(--muted);margin-top:1px}
+
+/* reason truncate */
+.reason-cell{
+  max-width:180px;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;
+  display:block;color:var(--text2);font-size:13px;
 }
 
-/* ── EYE BUTTON ── */
-.btn-eye {
-  width: 32px; height: 32px;
-  border: 1.5px solid var(--primary-muted);
-  border-radius: 8px; background: var(--bg2);
-  cursor: pointer; display: inline-flex;
-  align-items: center; justify-content: center;
-  color: var(--primary); transition: all .2s; font-size: 14px;
-}
-.btn-eye:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: scale(1.1); }
+/* badges */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;white-space:nowrap}
+.b-green{background:var(--g100);color:var(--g700);border:1px solid var(--g200)}
+.b-yellow{background:#fef3c7;color:#b45309;border:1px solid #fde68a}
+.car-badge{background:#eff6ff;color:#1d4ed8;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;border:1px solid #bfdbfe;white-space:nowrap}
 
-/* ── MAP LINK BTN (in table) ── */
-.loc-link {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 4px 9px; border-radius: 8px;
-  font-size: 11px; font-weight: 600;
-  border: 1.5px solid var(--primary-muted);
-  background: var(--bg2); color: var(--primary);
-  cursor: pointer; transition: all .2s;
-  white-space: nowrap; text-decoration: none;
-  font-family: 'Kanit', sans-serif;
-}
-.loc-link:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
-.loc-link.red { color: #ef4444; border-color: #fecaca; background: #fff1f2; }
-.loc-link.red:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
-.no-loc { color: #cbd5e1; font-size: 12px; }
+/* date cells */
+.date-start{color:var(--g700);font-weight:600;font-size:12px;white-space:nowrap}
+.date-end{color:#dc2626;font-weight:600;font-size:12px;white-space:nowrap}
 
-/* ── PAGINATION ── */
-.pagination {
-  display: flex; align-items: center; justify-content: center;
-  gap: 6px; padding: 16px; border-top: 2px solid var(--bg2);
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+/* eye btn */
+.btn-eye{
+  width:32px;height:32px;border:1.5px solid var(--g200);
+  border-radius:8px;background:var(--g50);cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:var(--g600);font-size:13px;transition:all .2s;
 }
-.page-btn {
-  width: 36px; height: 36px; border: 1.5px solid var(--primary-muted);
-  border-radius: 8px; background: var(--card); cursor: pointer;
-  font-family: 'Kanit', sans-serif; font-size: 14px;
-  display: flex; align-items: center; justify-content: center; transition: all .2s;
-}
-.page-btn:hover, .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-.page-btn:disabled { opacity: .4; pointer-events: none; }
-.page-info { color: var(--muted); font-size: 13px; padding: 0 8px; }
+.btn-eye:hover{background:var(--g600);color:#fff;border-color:var(--g600);transform:scale(1.1)}
 
-/* ── LOADING / EMPTY ── */
-.loading-state, .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
-.loading-state .spinner { font-size: 36px; animation: spin 1s linear infinite; margin-bottom: 12px; }
-.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: .5; }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* ─── PAGINATION ─── */
+.pagination{
+  display:flex;align-items:center;justify-content:center;
+  gap:6px;padding:16px;
+  background:linear-gradient(135deg,var(--g50),var(--g100));
+  border-top:2px solid var(--g200);
+}
+.pg-btn{
+  width:34px;height:34px;border:1.5px solid var(--g200);
+  border-radius:8px;background:var(--card);cursor:pointer;
+  font-family:'Kanit',sans-serif;font-size:14px;
+  display:flex;align-items:center;justify-content:center;transition:.2s;
+}
+.pg-btn:hover,.pg-btn.active{background:var(--g600);color:#fff;border-color:var(--g600)}
+.pg-btn:disabled{opacity:.4;pointer-events:none}
+.pg-info{color:var(--muted);font-size:13px;padding:0 6px}
 
-/* ── DETAIL MODAL ── */
-.modal-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(15,23,42,0.55); z-index: 1000;
-  align-items: center; justify-content: center; padding: 16px;
-}
-.modal-overlay.show { display: flex; }
-.modal-box {
-  background: var(--card); border-radius: 24px;
-  width: 100%; max-width: 540px; max-height: 90vh;
-  overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.2);
-  animation: popIn .25s ease;
-  border: 1px solid var(--border);
-}
-@keyframes popIn { from { transform: scale(.88); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+/* ─── STATES ─── */
+.load-state,.empty-state{text-align:center;padding:64px 20px;color:var(--muted)}
+.spin{font-size:36px;animation:spin 1s linear infinite;display:block;margin-bottom:12px}
+.empty-ico{font-size:48px;margin-bottom:12px;opacity:.4;display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-.modal-header {
-  padding: 18px 22px 14px;
-  border-bottom: 2px solid var(--bg2);
-  display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; background: var(--card);
-  border-radius: 24px 24px 0 0; z-index: 10;
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+/* ─── DETAIL MODAL ─── */
+.overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(15,23,42,0.6);z-index:1000;
+  align-items:center;justify-content:center;padding:16px;
+  backdrop-filter:blur(4px);
 }
-.modal-header h3 { font-size: 16px; font-weight: 700; color: var(--primary-dark); display: flex; align-items: center; gap: 8px; }
-.modal-close {
-  width: 32px; height: 32px; border: none;
-  background: var(--primary-muted); border-radius: 50%;
-  cursor: pointer; font-size: 14px;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--primary-dark); transition: .2s; flex-shrink: 0;
+.overlay.show{display:flex}
+.modal{
+  background:var(--card);border-radius:24px;
+  width:100%;max-width:560px;max-height:92vh;
+  overflow-y:auto;box-shadow:var(--shadow-lg);
+  border:1px solid var(--border);animation:popIn .25s ease;
 }
-.modal-close:hover { background: var(--primary); color: #fff; }
+@keyframes popIn{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-hd{
+  padding:18px 22px 14px;
+  background:linear-gradient(135deg,var(--g50),var(--g100));
+  border-bottom:2px solid var(--g200);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:10;border-radius:24px 24px 0 0;
+}
+.modal-hd h3{font-size:16px;font-weight:700;color:var(--g800);display:flex;align-items:center;gap:8px}
+.modal-close{
+  width:32px;height:32px;border:none;background:var(--g200);
+  border-radius:50%;cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--g800);transition:.2s;flex-shrink:0;
+}
+.modal-close:hover{background:var(--g600);color:#fff}
+.modal-bd{padding:20px 22px 28px}
 
-.modal-body { padding: 20px 22px 28px; }
+/* modal user */
+.m-user{
+  display:flex;align-items:center;gap:14px;
+  background:linear-gradient(135deg,var(--g50),var(--g100));
+  border-radius:16px;padding:14px;margin-bottom:20px;
+  border:1px solid var(--g200);
+}
+.m-user img,.m-uav{width:52px;height:52px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.m-uav{
+  background:linear-gradient(135deg,var(--g600),var(--g400));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:800;font-size:22px;
+}
+.m-uname{font-weight:700;font-size:16px;color:var(--g800)}
+.m-usub{font-size:12px;color:var(--muted);margin-top:2px}
 
-/* modal user row */
-.modal-user {
-  display: flex; align-items: center; gap: 14px;
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-  border-radius: 16px; padding: 14px; margin-bottom: 18px;
-  border: 1px solid var(--primary-muted);
+/* modal sections */
+.m-sec{margin-bottom:20px}
+.m-sec-title{
+  font-size:11px;font-weight:700;color:var(--g600);
+  text-transform:uppercase;letter-spacing:.8px;
+  margin-bottom:10px;display:flex;align-items:center;gap:6px;
+  padding-bottom:7px;border-bottom:2px solid var(--g100);
 }
-.modal-user img, .modal-user .av {
-  width: 52px; height: 52px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
-}
-.modal-user .av {
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-weight: 700; font-size: 22px;
-}
-.modal-user .u-name { font-weight: 700; font-size: 16px; color: var(--primary-dark); }
-.modal-user .u-sub  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.m-item{background:var(--g50);border-radius:12px;padding:10px 13px;border:1px solid var(--border)}
+.m-item.full{grid-column:1/-1}
+.m-lbl{font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:500}
+.m-val{font-size:14px;font-weight:500;color:var(--text);line-height:1.5;word-break:break-word}
+.m-val.green{color:var(--g600);font-weight:700}
+.m-val.red{color:#dc2626;font-weight:700}
 
-/* modal section */
-.m-sec { margin-bottom: 18px; }
-.m-sec-title {
-  font-size: 11px; font-weight: 700; color: var(--primary);
-  text-transform: uppercase; letter-spacing: .8px;
-  margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
-  padding-bottom: 6px; border-bottom: 1.5px solid var(--bg2);
+/* loc card */
+.loc-card{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;flex-wrap:wrap;background:var(--g50);
+  border-radius:12px;padding:12px 14px;margin-bottom:8px;
+  border:1px solid var(--border);transition:border-color .2s;
 }
-.m-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.m-item {
-  background: var(--bg); border-radius: 12px; padding: 10px 13px;
-  border: 1px solid var(--border);
+.loc-card:hover{border-color:var(--g300)}
+.lc-lbl{font-size:11px;color:var(--muted);margin-bottom:3px}
+.lc-coord{font-size:13px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.lc-acc{font-size:11px;color:var(--muted);margin-top:2px}
+.btn-map{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 14px;border:none;border-radius:10px;
+  font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;text-decoration:none;transition:all .2s;flex-shrink:0;
+  background:var(--g600);color:#fff;
 }
-.m-item.full { grid-column: 1 / -1; }
-.m-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-.m-val { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.5; word-break: break-word; }
-.m-val.green { color: var(--primary); font-weight: 700; }
+.btn-map:hover{background:var(--g700);transform:translateY(-1px)}
+.btn-map.red{background:#ef4444}
+.btn-map.red:hover{background:#dc2626}
+.no-loc{color:var(--muted);font-size:13px;text-align:center;padding:12px;background:var(--g50);border-radius:12px;border:1px dashed var(--g200)}
 
-/* location card inside modal */
-.loc-card {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; flex-wrap: wrap;
-  background: var(--bg); border-radius: 12px;
-  padding: 12px 14px; margin-bottom: 8px;
-  border: 1px solid var(--border);
-  transition: border-color .2s;
+/* ─── TOAST ─── */
+.toast{
+  position:fixed;bottom:20px;right:20px;
+  padding:11px 18px;border-radius:12px;
+  font-size:14px;z-index:9999;
+  display:none;align-items:center;gap:8px;
+  box-shadow:var(--shadow-lg);
 }
-.loc-card:hover { border-color: var(--primary-muted); }
-.lc-label { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
-.lc-coord { font-size: 13px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
-.lc-acc { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.btn-map {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 14px; border: none; border-radius: 10px;
-  font-family: 'Kanit', sans-serif; font-size: 13px; font-weight: 600;
-  cursor: pointer; text-decoration: none; transition: all .2s; flex-shrink: 0;
-  background: var(--primary); color: #fff;
-}
-.btn-map:hover { background: var(--primary-dark); transform: translateY(-1px); }
-.btn-map.red { background: #ef4444; }
-.btn-map.red:hover { background: #dc2626; }
-.no-loc-msg { color: var(--muted); font-size: 13px; padding: 10px; text-align: center; }
+.toast.show{display:flex;animation:slideUp .3s ease}
+.toast.success{background:linear-gradient(135deg,var(--g600),var(--g500));color:#fff}
+.toast.error{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
 
-/* TOAST */
-.toast {
-  position: fixed; bottom: 20px; right: 20px;
-  background: #1e293b; color: #fff; padding: 10px 18px;
-  border-radius: 12px; font-size: 14px; z-index: 9999;
-  display: none; align-items: center; gap: 8px;
+@media(max-width:900px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
 }
-.toast.show { display: flex; animation: slideIn .3s ease; }
-.toast.success { background: linear-gradient(135deg, #16a34a, #22c55e); }
-.toast.error   { background: linear-gradient(135deg, #ef4444, #dc2626); }
-@keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
-
-@media(max-width: 760px) {
-  .filter-bar { flex-direction: column; }
-  .filter-bar input, .filter-bar select { min-width: 100%; }
-  .header-logo h1 { font-size: 18px; }
-  .stats-row { grid-template-columns: repeat(2, 1fr); }
-  .m-grid { grid-template-columns: 1fr; }
+@media(max-width:600px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .header-inner{padding:20px 16px 0}
+  .section{padding:0 16px 24px}
+  .stats-wrap{padding:0 16px}
+  .m-grid{grid-template-columns:1fr}
+  .filter-card{flex-direction:column}
+  .f-input,.f-select{min-width:100%}
 }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="top-header">
+<!-- ─── HEADER ─── -->
+<div class="header">
   <div class="header-inner">
-    <div class="header-row">
-      <div class="header-logo">
-        <span class="icon">📊</span>
-        <div>
+    <div class="header-top">
+      <div class="header-brand">
+        <div class="brand-icon">🚗</div>
+        <div class="brand-text">
           <h1>ประวัติการใช้รถ</h1>
-          <p>Car Usage History Dashboard</p>
+          <p>Car Usage History &amp; Dashboard</p>
         </div>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-        <button class="btn-export" onclick="exportCSV()">
+      <div class="header-actions">
+        <button class="btn-ghost" onclick="exportCSV()">
           <i class="fas fa-download"></i> ดาวน์โหลด CSV
         </button>
-        <a href="/" class="btn-back">
+        <a href="/" class="btn-ghost">
           <i class="fas fa-arrow-left"></i> กลับหน้าหลัก
         </a>
       </div>
@@ -372,35 +374,62 @@ tr:hover td { background: #f0fdf4; }
   </div>
 </div>
 
-<!-- STATS -->
-<div class="stats-row">
-  <div class="stat-card">
-    <div class="stat-icon">🚗</div>
-    <div class="stat-num" id="statTotal">-</div>
-    <div class="stat-label">เที่ยวทั้งหมด</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-icon">🛣️</div>
-    <div class="stat-num" id="statKm">-</div>
-    <div class="stat-label">กม. รวม</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-icon">🔑</div>
-    <div class="stat-num" id="statActive">-</div>
-    <div class="stat-label">รถออกอยู่</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-icon">✅</div>
-    <div class="stat-num" id="statReturned">-</div>
-    <div class="stat-label">คืนรถแล้ว</div>
+<!-- ─── STATS ─── -->
+<div class="stats-wrap">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon-wrap si-green">🛣️</div>
+      <div class="stat-info">
+        <div class="stat-num" id="sKm">-</div>
+        <div class="stat-label">กม. เดือนนี้</div>
+        <div class="stat-sub up" id="sKmSub">กำลังโหลด...</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-wrap si-yellow">🔑</div>
+      <div class="stat-info">
+        <div class="stat-num" id="sActive">-</div>
+        <div class="stat-label">รถออกอยู่ตอนนี้</div>
+        <div class="stat-sub" id="sActiveSub">คัน</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-wrap si-blue">✅</div>
+      <div class="stat-info">
+        <div class="stat-num" id="sReturned">-</div>
+        <div class="stat-label">คืนรถแล้วเดือนนี้</div>
+        <div class="stat-sub up" id="sReturnedSub">เที่ยว</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-wrap si-red">👤</div>
+      <div class="stat-info">
+        <div class="stat-num" id="sUsers">-</div>
+        <div class="stat-label">ผู้ใช้เดือนนี้</div>
+        <div class="stat-sub up" id="sUsersSub">คน</div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- FILTERS -->
-<div class="filter-section">
-  <div class="filter-bar">
-    <input type="text" id="searchInput" placeholder="🔍 ค้นหาชื่อ, ทะเบียน, สาเหตุ...">
-    <select id="filterCar">
+<!-- ─── CHART ─── -->
+<div class="section" style="margin-top:-16px">
+  <div class="chart-card">
+    <div class="card-title">
+      <i class="fas fa-chart-bar"></i> สถิติการใช้รถ 12 เดือนย้อนหลัง
+      <span style="margin-left:auto;font-size:12px;color:var(--muted);font-weight:400" id="chartSub"></span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="monthChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FILTER ─── -->
+<div class="section">
+  <div class="filter-card">
+    <input class="f-input" type="text" id="searchInput" placeholder="🔍 ค้นหาชื่อ, ทะเบียน, สาเหตุ...">
+    <select class="f-select" id="filterCar">
       <option value="">รถทุกคัน</option>
       <option value="Nissan">Nissan ผอ 5757</option>
       <option value="Mazda">Mazda ยค 3777</option>
@@ -408,58 +437,49 @@ tr:hover td { background: #f0fdf4; }
       <option value="Click">Honda Click จงจ 222</option>
       <option value="Fino">Fino งธท 222</option>
     </select>
-    <select id="filterStatus">
+    <select class="f-select" id="filterStatus">
       <option value="">สถานะทั้งหมด</option>
       <option value="pending">กำลังใช้อยู่</option>
       <option value="returned">คืนรถแล้ว</option>
     </select>
-    <input type="date" id="filterDate">
-    <button class="btn-filter" onclick="applyFilter()">
-      <i class="fas fa-filter"></i> กรอง
-    </button>
-    <button class="btn-reset" onclick="resetFilter()">รีเซ็ต</button>
+    <input class="f-input" type="date" id="filterDate" style="flex:0 0 auto;min-width:150px">
+    <button class="btn-green" onclick="applyFilter()"><i class="fas fa-filter"></i> กรอง</button>
+    <button class="btn-outline" onclick="resetFilter()">รีเซ็ต</button>
   </div>
-</div>
 
-<!-- TABLE -->
-<div class="table-section">
+  <!-- TABLE -->
   <div class="table-card">
-    <div class="table-header">
-      <h2>📋 รายการใช้รถ</h2>
-      <span class="record-count" id="recordCount">โหลด...</span>
+    <div class="table-head-bar">
+      <h2><i class="fas fa-list" style="color:var(--g600)"></i> รายการใช้รถ</h2>
+      <span class="rec-badge" id="recCount">โหลด...</span>
     </div>
 
-    <!-- Loading -->
-    <div class="loading-state" id="loadingState">
-      <div class="spinner">⏳</div>
-      <div>กำลังโหลดข้อมูล...</div>
+    <!-- loading -->
+    <div class="load-state" id="loadState">
+      <span class="spin">⏳</span>กำลังโหลดข้อมูล...
     </div>
 
-    <!-- Table (desktop only) -->
-    <div class="table-wrap" id="tableWrap" style="display:none">
+    <!-- table -->
+    <div class="tbl-wrap" id="tblWrap" style="display:none">
       <table>
         <thead>
           <tr>
             <th>ผู้ใช้</th>
             <th>ทะเบียนรถ</th>
-            <th>ไมล์</th>
             <th>สาเหตุ</th>
-            <th>ระยะทาง</th>
-            <th>🟢 วัน/เวลาเริ่มใช้รถ</th>
+            <th>🟢 เริ่มใช้รถ</th>
             <th>สถานะ</th>
-            <th>ปลายทาง</th>
-            <th>🔴 วัน/เวลาคืนรถ</th>
-           <th>ตำแหน่งคืนรถ</th>
-            <th>รายละเอียด</th>
+            <th>🔴 คืนรถเมื่อ</th>
+            <th style="text-align:center">รายละเอียด</th>
           </tr>
         </thead>
-        <tbody id="tableBody"></tbody>
+        <tbody id="tblBody"></tbody>
       </table>
     </div>
 
-    <!-- Empty -->
+    <!-- empty -->
     <div class="empty-state" id="emptyState" style="display:none">
-      <div class="empty-icon">🗒️</div>
+      <span class="empty-ico">🗒️</span>
       <div style="font-size:16px;font-weight:600;margin-bottom:6px">ไม่พบข้อมูล</div>
       <div style="font-size:13px">ลองเปลี่ยนเงื่อนไขการค้นหา</div>
     </div>
@@ -468,153 +488,247 @@ tr:hover td { background: #f0fdf4; }
   </div>
 </div>
 
-<!-- ===== DETAIL MODAL ===== -->
-<div class="modal-overlay" id="detailModal" onclick="handleOverlayClick(event)">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <h3><i class="fas fa-eye" style="color:var(--primary)"></i> รายละเอียดการใช้รถ</h3>
-      <button class="modal-close" onclick="closeModal()">
-        <i class="fas fa-times"></i>
-      </button>
+<!-- ─── DETAIL MODAL ─── -->
+<div class="overlay" id="detailOverlay" onclick="handleOverlay(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <h3><i class="fas fa-eye" style="color:var(--g600)"></i> รายละเอียดการใช้รถ</h3>
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
     </div>
-    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-bd" id="modalBd"></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-let allRecords = [];
-let filteredRecords = [];
-let currentPage = 1;
-const PAGE_SIZE = 20;
+let allRecords = [], filteredRecords = [], currentPage = 1;
+const PAGE = 20;
+let chartInstance = null;
 
-// ── FETCH DATA ──
+// ─── FETCH ───
 async function loadData() {
   try {
     const res = await fetch('/get-records');
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     allRecords = data.records || [];
-    const stats = data.stats || {};
 
-    document.getElementById('statTotal').textContent    = stats.total ?? allRecords.length;
-    document.getElementById('statKm').textContent       = stats.total_km ? Number(stats.total_km).toFixed(0) : '0';
-    document.getElementById('statActive').textContent   = stats.active ?? 0;
-    document.getElementById('statReturned').textContent = (stats.total ?? allRecords.length) - (stats.active ?? 0);
-
+    calcStats(allRecords);
+    buildChart(allRecords);
     filteredRecords = [...allRecords];
     renderTable();
-    document.getElementById('loadingState').style.display = 'none';
-  } catch (e) {
-    document.getElementById('loadingState').innerHTML = `
-      <div style="font-size:36px;margin-bottom:8px">⚠️</div>
+    document.getElementById('loadState').style.display = 'none';
+  } catch(e) {
+    document.getElementById('loadState').innerHTML = `
+      <span style="font-size:36px;display:block;margin-bottom:8px">⚠️</span>
       <div style="color:var(--muted)">โหลดไม่สำเร็จ: ${e.message}</div>
-      <button onclick="loadData()" style="margin-top:12px;padding:8px 18px;background:var(--primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:Kanit,sans-serif">ลองอีกครั้ง</button>
+      <button onclick="loadData()" style="margin-top:12px;padding:8px 18px;background:var(--g600);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:Kanit,sans-serif">ลองอีกครั้ง</button>
     `;
   }
 }
 
-// ── PARSE COORDS FROM routeText ──
+// ─── CALC STATS ───
+function calcStats(records) {
+  const now  = new Date();
+  const thisY = now.getFullYear();
+  const thisM = now.getMonth();
+
+  const monthly = records.filter(r => {
+    if (!r.timestamp) return false;
+    const d = new Date(r.timestamp);
+    return d.getFullYear() === thisY && d.getMonth() === thisM;
+  });
+
+  // กม. เดือนนี้
+  const km = monthly.reduce((s,r) => s + (r.totalDistance||0), 0);
+  document.getElementById('sKm').textContent = km.toFixed(0);
+  document.getElementById('sKmSub').textContent = `${monthly.length} เที่ยวเดือนนี้`;
+
+  // รถออกอยู่
+  const active = records.filter(r => r.returnStatus === 'pending').length;
+  document.getElementById('sActive').textContent = active;
+  document.getElementById('sActiveSub').className = `stat-sub ${active > 0 ? 'warn' : 'up'}`;
+  document.getElementById('sActiveSub').textContent = active > 0 ? '⚠️ ยังไม่คืนรถ' : '✅ ทุกคันกลับแล้ว';
+
+  // คืนแล้วเดือนนี้
+  const returned = monthly.filter(r => r.returnStatus === 'returned').length;
+  document.getElementById('sReturned').textContent = returned;
+  document.getElementById('sReturnedSub').textContent = `จาก ${monthly.length} เที่ยว`;
+
+  // ผู้ใช้เดือนนี้
+  const users = new Set(monthly.map(r => r.userId)).size;
+  document.getElementById('sUsers').textContent = users;
+  document.getElementById('sUsersSub').textContent = `คน (ใช้รถเดือนนี้)`;
+}
+
+// ─── BUILD 12-MONTH CHART ───
+function buildChart(records) {
+  const now = new Date();
+  const months = [];
+  const tripsData  = [];
+  const kmData     = [];
+  const labels     = [];
+
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const y = d.getFullYear(), m = d.getMonth();
+    months.push({ y, m });
+    labels.push(d.toLocaleDateString('th-TH', { month: 'short', year: '2-digit' }));
+  }
+
+  months.forEach(({ y, m }) => {
+    const recs = records.filter(r => {
+      if (!r.timestamp) return false;
+      const d = new Date(r.timestamp);
+      return d.getFullYear() === y && d.getMonth() === m;
+    });
+    tripsData.push(recs.length);
+    kmData.push(parseFloat(recs.reduce((s, r) => s + (r.totalDistance || 0), 0).toFixed(1)));
+  });
+
+  document.getElementById('chartSub').textContent =
+    `รวม ${records.length} เที่ยว · ${records.reduce((s,r)=>s+(r.totalDistance||0),0).toFixed(0)} กม. ตลอดเวลา`;
+
+  if (chartInstance) chartInstance.destroy();
+
+  const ctx = document.getElementById('monthChart').getContext('2d');
+  chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'จำนวนเที่ยว',
+          data: tripsData,
+          backgroundColor: 'rgba(22,163,74,0.75)',
+          borderColor: 'rgba(22,163,74,1)',
+          borderWidth: 2,
+          borderRadius: 8,
+          borderSkipped: false,
+          yAxisID: 'y',
+        },
+        {
+          label: 'ระยะทาง (กม.)',
+          data: kmData,
+          type: 'line',
+          borderColor: '#f59e0b',
+          backgroundColor: 'rgba(245,158,11,0.08)',
+          pointBackgroundColor: '#f59e0b',
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          borderWidth: 2.5,
+          tension: 0.4,
+          fill: true,
+          yAxisID: 'y1',
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { font: { family: 'Kanit', size: 12 }, padding: 16, usePointStyle: true }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(20,83,45,0.92)',
+          titleFont: { family: 'Kanit', size: 13 },
+          bodyFont:  { family: 'Kanit', size: 12 },
+          padding: 12, cornerRadius: 10,
+          callbacks: {
+            label: ctx => ctx.datasetIndex === 0
+              ? ` ${ctx.parsed.y} เที่ยว`
+              : ` ${ctx.parsed.y} กม.`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { family: 'Kanit', size: 11 } }
+        },
+        y: {
+          position: 'left',
+          beginAtZero: true,
+          grid: { color: 'rgba(22,163,74,0.08)' },
+          ticks: { font: { family: 'Kanit', size: 11 }, precision: 0 },
+          title: { display: true, text: 'จำนวนเที่ยว', font: { family: 'Kanit', size: 11 }, color: '#16a34a' }
+        },
+        y1: {
+          position: 'right',
+          beginAtZero: true,
+          grid: { drawOnChartArea: false },
+          ticks: { font: { family: 'Kanit', size: 11 } },
+          title: { display: true, text: 'กม.', font: { family: 'Kanit', size: 11 }, color: '#f59e0b' }
+        }
+      }
+    }
+  });
+}
+
+// ─── PARSE COORDS ───
 function parseRouteCoords(routeText) {
   if (!routeText) return [];
-
-  // ✅ ลอง parse JSON ก่อน (format ใหม่)
+  // JSON format (ใหม่)
   try {
     const arr = JSON.parse(routeText);
-    if (Array.isArray(arr) && arr.length > 0 && arr[0].lat !== undefined) {
+    if (Array.isArray(arr) && arr.length && arr[0].lat !== undefined)
       return arr.map(p => ({ lat: parseFloat(p.lat), lng: parseFloat(p.lng) }));
-    }
-  } catch (_) {}
-
-  // fallback: regex (format เก่า)
+  } catch(_) {}
+  // regex fallback (เก่า)
   const re = /จุดที่\s*\d+[^:]*:\s*([-\d.]+),\s*([-\d.]+)/g;
-  const out = [];
-  let m;
-  while ((m = re.exec(routeText)) !== null) {
+  const out = []; let m;
+  while ((m = re.exec(routeText)) !== null)
     out.push({ lat: parseFloat(m[1]), lng: parseFloat(m[2]) });
-  }
   return out;
 }
 
-// ── RENDER TABLE ──
+// ─── RENDER TABLE ───
 function renderTable() {
   const total = filteredRecords.length;
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const page  = filteredRecords.slice(start, start + PAGE_SIZE);
+  const start = (currentPage - 1) * PAGE;
+  const page  = filteredRecords.slice(start, start + PAGE);
 
-  document.getElementById('recordCount').textContent = `${total} รายการ`;
+  document.getElementById('recCount').textContent = `${total} รายการ`;
 
   if (total === 0) {
-    document.getElementById('tableWrap').style.display  = 'none';
+    document.getElementById('tblWrap').style.display   = 'none';
     document.getElementById('emptyState').style.display = 'block';
     document.getElementById('pagination').style.display = 'none';
     return;
   }
 
   document.getElementById('emptyState').style.display = 'none';
-  document.getElementById('tableWrap').style.display  = 'block';
+  document.getElementById('tblWrap').style.display    = 'block';
 
-  document.getElementById('tableBody').innerHTML = page.map((r, i) => {
-    const globalIdx = start + i;
-
-    // avatar
+  document.getElementById('tblBody').innerHTML = page.map((r, i) => {
+    const gi = start + i;
     const av = r.pictureUrl
       ? `<img src="${r.pictureUrl}" alt="" onerror="this.style.display='none'">`
-      : `<div class="av">${(r.name||'?').charAt(0)}</div>`;
+      : `<div class="u-av">${(r.name||'?').charAt(0)}</div>`;
 
-    // status
     const statusBadge = r.returnStatus === 'returned'
-      ? '<span class="badge badge-returned">✅ คืนแล้ว</span>'
-      : '<span class="badge badge-pending">🔑 ใช้อยู่</span>';
-
-    // destinations button (in table)
-    const coords = parseRouteCoords(r.routeText);
-    let destCell = '<span class="no-loc">-</span>';
-    if (coords.length === 1) {
-      destCell = `<a href="https://www.google.com/maps?q=${coords[0].lat},${coords[0].lng}" target="_blank" class="loc-link">
-        <i class="fas fa-map-marker-alt"></i> ดูแผนที่
-      </a>`;
-    } else if (coords.length > 1) {
-      destCell = `<button class="loc-link" onclick="openDetail(${globalIdx})">
-        <i class="fas fa-map-marked-alt"></i> ${coords.length} จุด
-      </button>`;
-    }
-
-    // return location button (in table)
-    let retLocCell = '<span class="no-loc">-</span>';
-    if (r.returnLocation?.lat && r.returnLocation?.lng) {
-      const url = `https://www.google.com/maps?q=${r.returnLocation.lat},${r.returnLocation.lng}`;
-      retLocCell = `<a href="${url}" target="_blank" class="loc-link red">
-        <i class="fas fa-flag"></i> ตำแหน่งคืนรถ
-      </a>`;
-    }
+      ? '<span class="badge b-green"><i class="fas fa-check"></i> คืนแล้ว</span>'
+      : '<span class="badge b-yellow"><i class="fas fa-clock"></i> ใช้อยู่</span>';
 
     return `<tr>
       <td>
-        <div class="user-cell">
-          ${av}
+        <div class="u-cell">${av}
           <div>
-            <div class="user-name">${esc(r.name||'-')}</div>
-            <div class="user-dept">${esc(r.department||'')}${r.phone?' · '+r.phone:''}</div>
+            <div class="u-name">${esc(r.name||'-')}</div>
+            <div class="u-dept">${esc(r.department||'')}${r.phone?' · '+r.phone:''}</div>
           </div>
         </div>
       </td>
       <td><span class="car-badge">🚗 ${esc(r.car||'-')}</span></td>
-      <td style="white-space:nowrap">${esc(r.mileage||'-')}</td>
-      <td>
-        <span class="reason-cell" title="${esc(r.reason||'-')}">${esc(r.reason||'-')}</span>
-      </td>
-      <td style="color:var(--primary);font-weight:700;white-space:nowrap">
-        ${r.totalDistance ? r.totalDistance.toFixed(1)+' กม.' : '-'}
-      </td>
-      <td style="white-space:nowrap;font-size:12px;color:#16a34a;font-weight:600">${fmtDate(r.timestamp)}</td>
+      <td><span class="reason-cell" title="${esc(r.reason||'-')}">${esc(r.reason||'-')}</span></td>
+      <td class="date-start">${fmtDate(r.timestamp)}</td>
       <td>${statusBadge}</td>
-      <td>${destCell}</td>
-      <td style="white-space:nowrap;font-size:12px;color:#ef4444;font-weight:600">${r.returnedAt ? fmtDate(r.returnedAt) : '-'}</td>
-      <td>${retLocCell}</td>
-      <td>
-        <button class="btn-eye" onclick="openDetail(${globalIdx})" title="ดูรายละเอียด">
+      <td class="date-end">${r.returnedAt ? fmtDate(r.returnedAt) : '-'}</td>
+      <td style="text-align:center">
+        <button class="btn-eye" onclick="openDetail(${gi})" title="ดูรายละเอียด">
           <i class="fas fa-eye"></i>
         </button>
       </td>
@@ -624,7 +738,7 @@ function renderTable() {
   renderPagination(total);
 }
 
-// ── DETAIL MODAL ──
+// ─── DETAIL MODAL ───
 function openDetail(idx) {
   const r = filteredRecords[idx];
   if (!r) return;
@@ -632,225 +746,163 @@ function openDetail(idx) {
   const coords = parseRouteCoords(r.routeText);
   const retLoc = r.returnLocation;
 
-  // avatar
   const av = r.pictureUrl
     ? `<img src="${r.pictureUrl}" alt="" onerror="this.style.display='none'">`
-    : `<div class="av">${(r.name||'?').charAt(0)}</div>`;
+    : `<div class="m-uav">${(r.name||'?').charAt(0)}</div>`;
 
-  // status badge
   const statusBadge = r.returnStatus === 'returned'
-    ? '<span class="badge badge-returned">✅ คืนรถแล้ว</span>'
-    : '<span class="badge badge-pending">🔑 กำลังใช้อยู่</span>';
+    ? '<span class="badge b-green">✅ คืนรถแล้ว</span>'
+    : '<span class="badge b-yellow">🔑 กำลังใช้อยู่</span>';
 
-  // destinations section
-  let destHtml;
-  if (coords.length === 0) {
-    destHtml = '<p class="no-loc-msg">📍 ไม่มีข้อมูลปลายทาง</p>';
-  } else {
-    destHtml = coords.map((c, i) => {
-      const url = `https://www.google.com/maps?q=${c.lat},${c.lng}`;
-      return `<div class="loc-card">
+  // destinations
+  const destHtml = coords.length === 0
+    ? '<div class="no-loc">📍 ไม่มีข้อมูลปลายทาง</div>'
+    : coords.map((c, i) => `
+        <div class="loc-card">
+          <div>
+            <div class="lc-lbl">📍 จุดที่ ${i+1}</div>
+            <div class="lc-coord">${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}</div>
+          </div>
+          <a href="https://www.google.com/maps?q=${c.lat},${c.lng}" target="_blank" class="btn-map">
+            <i class="fas fa-map-marker-alt"></i> เปิดแผนที่
+          </a>
+        </div>`).join('');
+
+  // return location
+  const retLocHtml = (!retLoc || !retLoc.lat)
+    ? '<div class="no-loc">🚩 ไม่มีข้อมูลตำแหน่งคืนรถ</div>'
+    : `<div class="loc-card">
         <div>
-          <div class="lc-label">📍 จุดที่ ${i+1}</div>
-          <div class="lc-coord">${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}</div>
+          <div class="lc-lbl">🚩 ตำแหน่งที่คืนรถ</div>
+          <div class="lc-coord">${retLoc.lat.toFixed(6)}, ${retLoc.lng.toFixed(6)}</div>
+          ${retLoc.accuracy ? `<div class="lc-acc">ความแม่นยำ ±${Math.round(retLoc.accuracy)} เมตร</div>` : ''}
         </div>
-        <a href="${url}" target="_blank" class="btn-map">
-          <i class="fas fa-map-marker-alt"></i> เปิดแผนที่
+        <a href="https://www.google.com/maps?q=${retLoc.lat},${retLoc.lng}" target="_blank" class="btn-map red">
+          <i class="fas fa-flag"></i> เปิดแผนที่
         </a>
       </div>`;
-    }).join('');
-  }
 
-  // return location section
-  let retLocHtml;
-  if (!retLoc || !retLoc.lat || !retLoc.lng) {
-    retLocHtml = '<p class="no-loc-msg">🚩 ไม่มีข้อมูลตำแหน่งคืนรถ</p>';
-  } else {
-    const url = `https://www.google.com/maps?q=${retLoc.lat},${retLoc.lng}`;
-    retLocHtml = `<div class="loc-card">
-      <div>
-        <div class="lc-label">🚩 ตำแหน่งที่คืนรถ</div>
-        <div class="lc-coord">${retLoc.lat.toFixed(6)}, ${retLoc.lng.toFixed(6)}</div>
-        ${retLoc.accuracy ? `<div class="lc-acc">ความแม่นยำ ±${Math.round(retLoc.accuracy)} เมตร</div>` : ''}
-      </div>
-      <a href="${url}" target="_blank" class="btn-map red">
-        <i class="fas fa-flag"></i> เปิดแผนที่
-      </a>
-    </div>`;
-  }
-
-  document.getElementById('modalBody').innerHTML = `
-    <!-- User -->
-    <div class="modal-user">
+  document.getElementById('modalBd').innerHTML = `
+    <div class="m-user">
       ${av}
       <div>
-        <div class="u-name">${esc(r.name||'-')}</div>
-        <div class="u-sub">${esc(r.department||'')}${r.phone?' · '+r.phone:''}</div>
+        <div class="m-uname">${esc(r.name||'-')}</div>
+        <div class="m-usub">${esc(r.department||'')}${r.phone?' · '+r.phone:''}</div>
         <div style="margin-top:8px">${statusBadge}</div>
       </div>
     </div>
 
-    <!-- Car info -->
     <div class="m-sec">
       <div class="m-sec-title"><i class="fas fa-car"></i> ข้อมูลการใช้รถ</div>
       <div class="m-grid">
-        <div class="m-item">
-          <div class="m-label">ทะเบียนรถ</div>
-          <div class="m-val">🚗 ${esc(r.car||'-')}</div>
-        </div>
-        <div class="m-item">
-          <div class="m-label">เลขไมล์เริ่มต้น</div>
-          <div class="m-val">${esc(r.mileage||'-')}</div>
-        </div>
-        <div class="m-item">
-          <div class="m-label">ระยะทางรวม</div>
-          <div class="m-val green">${r.totalDistance ? r.totalDistance.toFixed(2)+' กม.' : '-'}</div>
-        </div>
-        <div class="m-item">
-          <div class="m-label">ระยะเวลาใช้งาน</div>
-          <div class="m-val green">⏱ ${esc(r.durationText||'-')}</div>
-        </div>
-        <div class="m-item full">
-          <div class="m-label">สาเหตุการใช้รถ</div>
-          <div class="m-val">${esc(r.reason||'-')}</div>
-        </div>
-        <div class="m-item">
-          <div class="m-label">วันเวลาเริ่มใช้</div>
-          <div class="m-val">${fmtDate(r.timestamp)}</div>
-        </div>
-        <div class="m-item">
-          <div class="m-label">วันเวลาคืนรถ</div>
-          <div class="m-val">${r.returnedAt ? fmtDate(r.returnedAt) : '-'}</div>
-        </div>
-        <div class="m-item">
-          <div class="m-label">รูปเลขไมล์</div>
-          <div class="m-val">${r.hasPhoto ? '📸 มีรูปแนบ' : '—'}</div>
-        </div>
+        <div class="m-item"><div class="m-lbl">ทะเบียนรถ</div><div class="m-val">🚗 ${esc(r.car||'-')}</div></div>
+        <div class="m-item"><div class="m-lbl">เลขไมล์เริ่มต้น</div><div class="m-val">${esc(r.mileage||'-')}</div></div>
+        <div class="m-item"><div class="m-lbl">ระยะทางรวม</div><div class="m-val green">${r.totalDistance ? r.totalDistance.toFixed(2)+' กม.' : '-'}</div></div>
+        <div class="m-item"><div class="m-lbl">ระยะเวลาใช้งาน</div><div class="m-val green">⏱ ${esc(r.durationText||'-')}</div></div>
+        <div class="m-item full"><div class="m-lbl">สาเหตุการใช้รถ</div><div class="m-val">${esc(r.reason||'-')}</div></div>
+        <div class="m-item"><div class="m-lbl">🟢 เริ่มใช้รถ</div><div class="m-val green">${fmtDate(r.timestamp)}</div></div>
+        <div class="m-item"><div class="m-lbl">🔴 คืนรถเมื่อ</div><div class="m-val red">${r.returnedAt ? fmtDate(r.returnedAt) : '-'}</div></div>
+        <div class="m-item"><div class="m-lbl">รูปเลขไมล์</div><div class="m-val">${r.hasPhoto ? '📸 มีรูปแนบ' : '—'}</div></div>
       </div>
     </div>
 
-    <!-- Destinations -->
     <div class="m-sec">
       <div class="m-sec-title"><i class="fas fa-map-marked-alt"></i> ปลายทางที่เลือก</div>
       ${destHtml}
     </div>
 
-    <!-- Return location -->
     <div class="m-sec">
       <div class="m-sec-title"><i class="fas fa-flag-checkered"></i> ตำแหน่งคืนรถ</div>
       ${retLocHtml}
     </div>
   `;
 
-  document.getElementById('detailModal').classList.add('show');
+  document.getElementById('detailOverlay').classList.add('show');
   document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
-  document.getElementById('detailModal').classList.remove('show');
+  document.getElementById('detailOverlay').classList.remove('show');
   document.body.style.overflow = '';
 }
+function handleOverlay(e) { if (e.target === e.currentTarget) closeModal(); }
 
-function handleOverlayClick(e) {
-  if (e.target === e.currentTarget) closeModal();
-}
-
-// ── FILTER ──
+// ─── FILTER ───
 function applyFilter() {
-  const search = document.getElementById('searchInput').value.toLowerCase().trim();
-  const car    = document.getElementById('filterCar').value.toLowerCase();
-  const status = document.getElementById('filterStatus').value;
-  const date   = document.getElementById('filterDate').value;
-
+  const s  = document.getElementById('searchInput').value.toLowerCase().trim();
+  const c  = document.getElementById('filterCar').value.toLowerCase();
+  const st = document.getElementById('filterStatus').value;
+  const dt = document.getElementById('filterDate').value;
   filteredRecords = allRecords.filter(r => {
-    if (search && !`${r.name} ${r.car} ${r.reason} ${r.phone}`.toLowerCase().includes(search)) return false;
-    if (car    && !r.car?.toLowerCase().includes(car))              return false;
-    if (status && r.returnStatus !== status)                        return false;
-    if (date   && r.timestamp && !r.timestamp.startsWith(date))    return false;
+    if (s  && !`${r.name} ${r.car} ${r.reason} ${r.phone}`.toLowerCase().includes(s)) return false;
+    if (c  && !r.car?.toLowerCase().includes(c))              return false;
+    if (st && r.returnStatus !== st)                          return false;
+    if (dt && r.timestamp && !r.timestamp.startsWith(dt))    return false;
     return true;
   });
-  currentPage = 1;
-  renderTable();
+  currentPage = 1; renderTable();
 }
-
 function resetFilter() {
-  ['searchInput','filterCar','filterStatus','filterDate'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  filteredRecords = [...allRecords];
-  currentPage = 1;
-  renderTable();
+  ['searchInput','filterCar','filterStatus','filterDate'].forEach(id => document.getElementById(id).value = '');
+  filteredRecords = [...allRecords]; currentPage = 1; renderTable();
 }
-
 document.getElementById('searchInput').addEventListener('input', applyFilter);
 
-// ── PAGINATION ──
+// ─── PAGINATION ───
 function renderPagination(total) {
-  const pages = Math.ceil(total / PAGE_SIZE);
+  const pages = Math.ceil(total / PAGE);
   const pag = document.getElementById('pagination');
   if (pages <= 1) { pag.style.display = 'none'; return; }
   pag.style.display = 'flex';
-
-  let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+  let h = `<button class="pg-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
   for (let i = 1; i <= pages; i++) {
-    if (i===1 || i===pages || (i>=currentPage-1 && i<=currentPage+1)) {
-      html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
-    } else if (i===currentPage-2 || i===currentPage+2) {
-      html += `<span class="page-info">...</span>`;
-    }
+    if (i===1||i===pages||(i>=currentPage-1&&i<=currentPage+1))
+      h += `<button class="pg-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    else if (i===currentPage-2||i===currentPage+2)
+      h += `<span class="pg-info">...</span>`;
   }
-  html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>›</button>`;
-  html += `<span class="page-info">${currentPage}/${pages}</span>`;
-  pag.innerHTML = html;
+  h += `<button class="pg-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>›</button>`;
+  h += `<span class="pg-info">${currentPage}/${pages}</span>`;
+  pag.innerHTML = h;
 }
-
 function goPage(p) {
-  const pages = Math.ceil(filteredRecords.length / PAGE_SIZE);
+  const pages = Math.ceil(filteredRecords.length / PAGE);
   if (p < 1 || p > pages) return;
-  currentPage = p;
-  renderTable();
+  currentPage = p; renderTable();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ── EXPORT CSV ──
+// ─── CSV ───
 function exportCSV() {
   const data = filteredRecords.length ? filteredRecords : allRecords;
-  const headers = ['ชื่อ','เบอร์โทร','แผนก','ทะเบียนรถ','ไมล์เริ่ม','สาเหตุ','ระยะทาง(กม)','วันเวลาเริ่ม','สถานะ','วันเวลาคืน','ระยะเวลา'];
+  const headers = ['ชื่อ','เบอร์โทร','แผนก','ทะเบียนรถ','ไมล์','สาเหตุ','ระยะทาง(กม)','เริ่มใช้','สถานะ','คืนเมื่อ','ระยะเวลา'];
   const rows = data.map(r => [
-    r.name||'', r.phone||'', r.department||'', r.car||'', r.mileage||'',
-    r.reason||'', r.totalDistance||0, r.timestamp||'',
+    r.name||'',r.phone||'',r.department||'',r.car||'',r.mileage||'',
+    r.reason||'',r.totalDistance||0,r.timestamp||'',
     r.returnStatus==='returned'?'คืนแล้ว':'กำลังใช้',
-    r.returnedAt||'', r.durationText||''
+    r.returnedAt||'',r.durationText||''
   ]);
-  const csv = '\uFEFF' + [headers,...rows].map(row =>
-    row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')
-  ).join('\n');
+  const csv = '\uFEFF'+[headers,...rows].map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   a.download = `car-history-${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
 }
 
-// ── HELPERS ──
+// ─── HELPERS ───
 function fmtDate(iso) {
   if (!iso) return '-';
-  try {
-    return new Date(iso).toLocaleString('th-TH',{
-      year:'numeric', month:'short', day:'numeric',
-      hour:'2-digit', minute:'2-digit'
-    });
-  } catch { return iso; }
+  try { return new Date(iso).toLocaleString('th-TH',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+  catch { return iso; }
 }
 function esc(s) {
-  return String(s||'')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── INIT ──
+// ─── INIT ───
 loadData();
 setInterval(loadData, 120000);
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
 </script>
 </body>
 </html>
