@@ -19,8 +19,8 @@ export async function onRequestPost(context) {
     await env.DB.prepare(`
       INSERT INTO records
         (id, user_id, name, phone, car, mileage, reason, route_text,
-         total_distance, total_time, has_photo, return_status, timestamp)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+         total_distance, total_time, has_photo, photo_key, return_status, timestamp)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
     `).bind(
       id,
       record.userId,
@@ -32,7 +32,8 @@ export async function onRequestPost(context) {
       routeTextToSave,
       record.totalDistance || 0,
       record.totalTime || 0,
-      record.hasPhoto ? 1 : 0,
+      record.photoKey ? 1 : (record.hasPhoto ? 1 : 0),
+      record.photoKey || null,
       new Date().toISOString()
     ).run();
 
