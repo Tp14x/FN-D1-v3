@@ -17,7 +17,7 @@ export async function onRequestGet(context) {
       SELECT
         r.id, r.user_id, r.name, r.phone, r.car, r.mileage,
         r.reason, r.route_text, r.total_distance, r.total_time,
-        r.has_photo, r.return_status, r.returned_at,
+        r.has_photo, r.photo_key, r.return_status, r.returned_at,
         r.duration_text, r.return_location, r.timestamp,
         u.picture_url, u.department
       FROM records r
@@ -45,6 +45,7 @@ export async function onRequestGet(context) {
       totalDistance: r.total_distance,
       totalTime: r.total_time,
       hasPhoto: r.has_photo === 1,
+      photoKey: r.photo_key || null,
       returnStatus: r.return_status,
       returnedAt: r.returned_at,
       durationText: r.duration_text,
