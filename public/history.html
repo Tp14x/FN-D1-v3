@@ -519,6 +519,16 @@ async function loadData() {
 // ── PARSE COORDS FROM routeText ──
 function parseRouteCoords(routeText) {
   if (!routeText) return [];
+
+  // ✅ ลอง parse JSON ก่อน (format ใหม่)
+  try {
+    const arr = JSON.parse(routeText);
+    if (Array.isArray(arr) && arr.length > 0 && arr[0].lat !== undefined) {
+      return arr.map(p => ({ lat: parseFloat(p.lat), lng: parseFloat(p.lng) }));
+    }
+  } catch (_) {}
+
+  // fallback: regex (format เก่า)
   const re = /จุดที่\s*\d+[^:]*:\s*([-\d.]+),\s*([-\d.]+)/g;
   const out = [];
   let m;
