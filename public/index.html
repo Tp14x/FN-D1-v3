@@ -7,24 +7,167 @@
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-/* ===== VARIABLES ===== */
 :root {
-  --primary: #16a34a;
-  --primary-light: #22c55e;
-  --primary-dark: #14532d;
-  --accent: #4ade80;
+  --primary: #C6E686;
+  --primary-light: #DDF2A3;
+  --primary-dark: #A9D25C;
+
+  --accent: #B8E17D;
   --danger: #ef4444;
   --warning: #f59e0b;
   --info: #3b82f6;
-  --bg: #f0fdf4;
-  --card: #ffffff;
-  --text: #1e293b;
-  --text-muted: #64748b;
-  --border: #e2e8f0;
-  --shadow: 0 4px 24px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 40px rgba(0,0,0,0.14);
-  --radius: 20px;
-  --radius-sm: 12px;
+
+  --bg: #f9fff1;
+  --card: rgba(255,255,255,0.85);
+
+  --text: #1f2937;
+  --text-muted: #6b7280;
+
+  --border: #e5e7eb;
+
+  --shadow: 0 10px 30px rgba(0,0,0,0.08);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
+
+  --radius: 22px;
+  --radius-sm: 14px;
+}
+
+/* ===== GLOBAL ===== */
+body {
+  background: linear-gradient(180deg,#f9fff1 0%,#f3fbe3 100%);
+}
+
+/* ===== HEADER ===== */
+.app-header {
+  background: linear-gradient(135deg,#C6E686,#A9D25C);
+  padding: 22px 20px 34px;
+}
+
+.app-header::after {
+  background: var(--bg);
+}
+
+/* ===== USER CARD ===== */
+.user-card {
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.4);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+}
+
+/* ===== CARD ===== */
+.card {
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.6);
+  box-shadow: var(--shadow);
+  transition: 0.25s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ===== CARD HEADER ICON ===== */
+.card-header .icon {
+  background: linear-gradient(135deg,#ecfccb,#d9f99d);
+  color: #65a30d;
+}
+
+/* ===== INPUT ===== */
+input, select, textarea {
+  background: rgba(255,255,255,0.9);
+  border: 2px solid #e5e7eb;
+  transition: 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #C6E686;
+  box-shadow: 0 0 0 3px rgba(198,230,134,0.4);
+}
+
+/* ===== BUTTON ===== */
+.btn-primary {
+  background: linear-gradient(135deg,#C6E686,#A9D25C);
+  color: #1f2937;
+  box-shadow: 0 6px 20px rgba(198,230,134,0.6);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(198,230,134,0.7);
+}
+
+/* ===== SECONDARY BUTTON ===== */
+.btn-secondary {
+  background: #f3f4f6;
+}
+
+/* ===== MAP BOX ===== */
+#map {
+  border-radius: 16px;
+  border: 2px solid #ecfccb;
+}
+
+/* ===== ROUTE BOX ===== */
+.route-info {
+  background: linear-gradient(135deg,#ecfccb,#d9f99d);
+  color: #4d7c0f;
+}
+
+/* ===== DESTINATION BOX ===== */
+.destinations-box {
+  background: #f7fee7;
+}
+
+/* ===== PHOTO AREA ===== */
+.photo-upload-area {
+  border: 2px dashed #d9f99d;
+  background: #f7fee7;
+}
+
+.photo-upload-area:hover {
+  border-color: #C6E686;
+  background: #ecfccb;
+}
+
+/* ===== SUBMIT BAR ===== */
+.submit-bar {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(16px);
+}
+
+/* ===== MODAL ===== */
+.modal-box {
+  border-radius: 26px;
+}
+
+/* ===== TOAST ===== */
+.toast.success {
+  background: linear-gradient(135deg,#C6E686,#A9D25C);
+  color: #1f2937;
+}
+
+/* ===== CAR IN USE ===== */
+#screen-car-in-use {
+  background: linear-gradient(135deg,#eaffc7,#c6e686);
+}
+
+.car-in-use-card {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+}
+
+/* ===== TIMER ===== */
+.timer-display {
+  background: linear-gradient(135deg,#1f2937,#111827);
+  color: #C6E686;
+}
+
+/* ===== ANIMATION ===== */
+.card, .btn, input {
+  transition: all 0.25s ease;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
