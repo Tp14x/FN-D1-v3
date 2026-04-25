@@ -1,0 +1,12 @@
+{
+  "name": "car-usage-tracker",
+  "version": "2.0.0",
+  "description": "ระบบบันทึกการใช้รถ - Cloudflare Pages + D1",
+  "scripts": {
+    "build": "echo 'No build step needed'",
+    "deploy": "wrangler pages deploy public"
+  },
+  "keywords": ["car", "tracking", "line-liff", "cloudflare"],
+  "author": "",
+  "license": "MIT"
+}

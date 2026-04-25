@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ประวัติการใช้รถ</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --primary: #16a34a; --primary-light: #22c55e; --primary-dark: #14532d;
+  --bg: #f0fdf4; --card: #fff; --text: #1e293b; --muted: #64748b;
+  --border: #e2e8f0; --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --returned: #16a34a; --pending: #f59e0b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Kanit',sans-serif;background:var(--bg);color:var(--text);font-size:15px}
+
+/* HEADER */
+.top-header{background:linear-gradient(145deg,#14532d,#16a34a);color:#fff;padding:24px 20px 80px;position:relative;overflow:hidden}
+.top-header::after{content:'';position:absolute;bottom:-30px;left:0;right:0;height:60px;background:var(--bg);border-radius:50%}
+.header-inner{max-width:1200px;margin:0 auto}
+.header-row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.header-logo{display:flex;align-items:center;gap:12px}
+.header-logo .icon{font-size:36px}
+.header-logo h1{font-size:22px;font-weight:700}
+.header-logo p{opacity:.8;font-size:13px}
+
+/* STATS CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;max-width:1200px;margin:0 auto;padding:0 16px;position:relative;top:-40px}
+.stat-card{background:#fff;border-radius:20px;padding:18px 16px;box-shadow:var(--shadow);text-align:center;transition:transform 0.2s}
+.stat-card:hover{transform:translateY(-2px)}
+.stat-card .stat-icon{font-size:28px;margin-bottom:6px}
+.stat-card .stat-num{font-size:26px;font-weight:700;color:var(--primary)}
+.stat-card .stat-label{font-size:12px;color:var(--muted)}
+
+/* FILTERS */
+.filter-section{max-width:1200px;margin:0 auto 20px;padding:0 16px}
+.filter-bar{background:#fff;border-radius:16px;padding:16px;box-shadow:var(--shadow);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.filter-bar input,.filter-bar select{
+  padding:9px 14px;border:1.5px solid var(--border);border-radius:10px;
+  font-family:'Kanit',sans-serif;font-size:14px;color:var(--text);
+  background:#fff;outline:none;transition:border-color .2s;
+  appearance:none;-webkit-appearance:none;
+  flex:1;min-width:120px;
+}
+.filter-bar input:focus,.filter-bar select:focus{border-color:var(--primary)}
+.btn-filter{padding:9px 16px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-family:'Kanit',sans-serif;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-filter:hover{background:var(--primary-dark)}
+.btn-reset{padding:9px 14px;background:var(--bg);color:var(--muted);border:1.5px solid var(--border);border-radius:10px;font-family:'Kanit',sans-serif;font-size:14px;cursor:pointer}
+
+/* TABLE */
+.table-section{max-width:1200px;margin:0 auto;padding:0 16px 80px}
+.table-card{background:#fff;border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+.table-header{padding:16px 20px;border-bottom:2px solid var(--bg);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.table-header h2{font-size:16px;font-weight:600}
+.record-count{background:var(--bg);padding:4px 12px;border-radius:99px;font-size:13px;color:var(--muted)}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:800px}
+thead tr{background:var(--bg)}
+th{padding:12px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+td{padding:12px 16px;border-top:1px solid var(--bg);font-size:14px;vertical-align:middle}
+tr:hover td{background:#fafffe}
+
+.user-cell{display:flex;align-items:center;gap:10px}
+.user-cell img{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.user-cell .avatar-placeholder{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-light));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0}
+.user-cell .user-name{font-weight:500}
+.user-cell .dept{font-size:12px;color:var(--muted)}
+
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap}
+.badge-returned{background:#dcfce7;color:#16a34a}
+.badge-pending{background:#fef3c7;color:#d97706}
+
+.car-badge{background:#eff6ff;color:#2563eb;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap}
+
+.route-val{color:var(--primary);font-weight:600}
+
+/* MOBILE CARDS */
+.mobile-cards{display:none}
+.record-card{background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.record-card .rc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.record-card .rc-info{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.record-card .rc-item{font-size:13px}
+.record-card .rc-item .rc-label{color:var(--muted);font-size:11px;margin-bottom:2px}
+
+/* PAGINATION */
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;padding:16px;border-top:2px solid var(--bg)}
+.page-btn{width:36px;height:36px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;font-family:'Kanit',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.page-btn:hover,.page-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.page-info{color:var(--muted);font-size:13px;padding:0 8px}
+
+/* LOADING */
+.loading-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.loading-state .spinner{font-size:36px;animation:spin 1s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state .empty-icon{font-size:48px;margin-bottom:12px;opacity:.5}
+
+/* EXPORT BTN */
+.btn-export{padding:9px 16px;background:#fff;color:var(--primary);border:2px solid var(--primary);border-radius:10px;font-family:'Kanit',sans-serif;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s}
+.btn-export:hover{background:var(--primary);color:#fff}
+
+/* TOAST */
+.toast{position:fixed;top:16px;right:16px;background:#1e293b;color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;z-index:999;display:none}
+.toast.show{display:block;animation:slideIn .3s ease}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:none;opacity:1}}
+
+@media(max-width:760px){
+  .table-wrap table,.desktop-table{display:none}
+  .mobile-cards{display:block}
+  .filter-bar{flex-direction:column}
+  .filter-bar input,.filter-bar select{min-width:100%}
+  .header-logo h1{font-size:18px}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div class="top-header">
+  <div class="header-inner">
+    <div class="header-row">
+      <div class="header-logo">
+        <span class="icon">📊</span>
+        <div>
+          <h1>ประวัติการใช้รถ</h1>
+          <p>Car Usage History Dashboard</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-export" id="exportBtn" onclick="exportCSV()">
+          <i class="fas fa-download"></i> ดาวน์โหลด CSV
+        </button>
+        <a href="/" style="padding:9px 16px;background:rgba(255,255,255,0.2);color:#fff;border:2px solid rgba(255,255,255,0.4);border-radius:10px;font-family:Kanit,sans-serif;font-size:14px;text-decoration:none;display:flex;align-items:center;gap:6px;backdrop-filter:blur(6px)">
+          <i class="fas fa-arrow-left"></i> กลับหน้าหลัก
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-row" id="statsRow">
+  <div class="stat-card"><div class="stat-icon">🚗</div><div class="stat-num" id="statTotal">-</div><div class="stat-label">เที่ยวทั้งหมด</div></div>
+  <div class="stat-card"><div class="stat-icon">🛣️</div><div class="stat-num" id="statKm">-</div><div class="stat-label">กม. รวม</div></div>
+  <div class="stat-card"><div class="stat-icon">🔑</div><div class="stat-num" id="statActive">-</div><div class="stat-label">รถออกอยู่</div></div>
+  <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-num" id="statReturned">-</div><div class="stat-label">คืนรถแล้ว</div></div>
+</div>
+
+<!-- FILTERS -->
+<div class="filter-section">
+  <div class="filter-bar">
+    <input type="text" id="searchInput" placeholder="🔍 ค้นหาชื่อ, ทะเบียน, สาเหตุ...">
+    <select id="filterCar">
+      <option value="">รถทุกคัน</option>
+      <option value="Nissan">Nissan ผอ 5757</option>
+      <option value="Mazda">Mazda ยค 3777</option>
+      <option value="MG">MG งบ 255</option>
+      <option value="Click">Honda Click จงจ 222</option>
+      <option value="Fino">Fino งธท 222</option>
+    </select>
+    <select id="filterStatus">
+      <option value="">สถานะทั้งหมด</option>
+      <option value="pending">กำลังใช้อยู่</option>
+      <option value="returned">คืนรถแล้ว</option>
+    </select>
+    <input type="date" id="filterDate" title="กรองตามวันที่">
+    <button class="btn-filter" onclick="applyFilter()"><i class="fas fa-filter"></i> กรอง</button>
+    <button class="btn-reset" onclick="resetFilter()">รีเซ็ต</button>
+  </div>
+</div>
+
+<!-- TABLE -->
+<div class="table-section">
+  <div class="table-card">
+    <div class="table-header">
+      <h2>รายการใช้รถ</h2>
+      <span class="record-count" id="recordCount">โหลด...</span>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-state" id="loadingState">
+      <div class="spinner">⏳</div>
+      <div>กำลังโหลดข้อมูล...</div>
+    </div>
+
+    <!-- Desktop Table -->
+    <div class="table-wrap desktop-table" id="desktopTable" style="display:none">
+      <table>
+        <thead>
+          <tr>
+            <th>ผู้ใช้</th>
+            <th>ทะเบียนรถ</th>
+            <th>ไมล์เริ่ม</th>
+            <th>สาเหตุ</th>
+            <th>ระยะทาง</th>
+            <th>วันที่เริ่ม</th>
+            <th>สถานะ</th>
+            <th>คืนเมื่อ</th>
+            <th>ระยะเวลา</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Mobile Cards -->
+    <div class="mobile-cards" id="mobileCards" style="padding:12px;display:none"></div>
+
+    <!-- Empty -->
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="empty-icon">🗒️</div>
+      <div style="font-size:16px;font-weight:600;margin-bottom:6px">ไม่พบข้อมูล</div>
+      <div style="font-size:13px">ลองเปลี่ยนเงื่อนไขการค้นหา</div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination" style="display:none"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let allRecords = [];
+let filteredRecords = [];
+let currentPage = 1;
+const PAGE_SIZE = 20;
+
+// ======================================================
+// FETCH DATA
+// ======================================================
+async function loadData() {
+  try {
+    const res = await fetch('/get-records');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    allRecords = data.records || [];
+    const stats = data.stats || {};
+
+    // Stats
+    document.getElementById('statTotal').textContent = stats.total || allRecords.length;
+    document.getElementById('statKm').textContent = stats.total_km ? stats.total_km.toFixed(0) : '0';
+    document.getElementById('statActive').textContent = stats.active || 0;
+    document.getElementById('statReturned').textContent = (stats.total || allRecords.length) - (stats.active || 0);
+
+    filteredRecords = [...allRecords];
+    renderTable();
+    document.getElementById('loadingState').style.display = 'none';
+
+  } catch (e) {
+    document.getElementById('loadingState').innerHTML = `
+      <div style="font-size:36px;margin-bottom:8px">⚠️</div>
+      <div>โหลดข้อมูลไม่สำเร็จ: ${e.message}</div>
+      <button onclick="loadData()" style="margin-top:12px;padding:8px 18px;background:#16a34a;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:Kanit,sans-serif">ลองอีกครั้ง</button>
+    `;
+  }
+}
+
+// ======================================================
+// RENDER
+// ======================================================
+function renderTable() {
+  const total = filteredRecords.length;
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const page = filteredRecords.slice(start, start + PAGE_SIZE);
+
+  document.getElementById('recordCount').textContent = `${total} รายการ`;
+
+  if (total === 0) {
+    document.getElementById('desktopTable').style.display = 'none';
+    document.getElementById('mobileCards').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('pagination').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('desktopTable').style.display = 'block';
+  document.getElementById('mobileCards').style.display = 'block';
+
+  // Desktop table
+  document.getElementById('tableBody').innerHTML = page.map(r => {
+    const statusBadge = r.returnStatus === 'returned'
+      ? '<span class="badge badge-returned"><i class="fas fa-check"></i> คืนแล้ว</span>'
+      : '<span class="badge badge-pending"><i class="fas fa-clock"></i> กำลังใช้</span>';
+
+    const avatar = r.pictureUrl
+      ? `<img src="${r.pictureUrl}" alt="${r.name}" onerror="this.style.display='none'">`
+      : `<div class="avatar-placeholder">${(r.name||'?').charAt(0)}</div>`;
+
+    const returnedAt = r.returnedAt
+      ? `<span style="font-size:12px">${formatDate(r.returnedAt)}</span>` : '-';
+
+    return `<tr>
+      <td><div class="user-cell">${avatar}<div><div class="user-name">${esc(r.name||'-')}</div><div class="dept">${esc(r.department||'')} ${r.phone ? '· '+r.phone : ''}</div></div></div></td>
+      <td><span class="car-badge">🚗 ${esc(r.car||'-')}</span></td>
+      <td>${esc(r.mileage||'-')}</td>
+      <td style="max-width:180px;white-space:normal;font-size:13px">${esc(r.reason||'-')}</td>
+      <td class="route-val">${r.totalDistance ? r.totalDistance.toFixed(1)+' กม.' : '-'}</td>
+      <td style="white-space:nowrap;font-size:13px">${formatDate(r.timestamp)}</td>
+      <td>${statusBadge}</td>
+      <td>${returnedAt}</td>
+      <td style="font-size:13px;color:#64748b">${r.durationText || '-'}</td>
+    </tr>`;
+  }).join('');
+
+  // Mobile cards
+  document.getElementById('mobileCards').innerHTML = page.map(r => {
+    const statusBadge = r.returnStatus === 'returned'
+      ? '<span class="badge badge-returned">✅ คืนแล้ว</span>'
+      : '<span class="badge badge-pending">🔑 กำลังใช้</span>';
+
+    return `<div class="record-card">
+      <div class="rc-top">
+        <div>
+          <div style="font-weight:600;margin-bottom:2px">${esc(r.name||'-')}</div>
+          <div style="font-size:12px;color:var(--muted)">${formatDate(r.timestamp)}</div>
+        </div>
+        ${statusBadge}
+      </div>
+      <div class="rc-info">
+        <div class="rc-item"><div class="rc-label">ทะเบียนรถ</div><span class="car-badge" style="font-size:11px">${esc(r.car||'-')}</span></div>
+        <div class="rc-item"><div class="rc-label">ไมล์</div>${esc(r.mileage||'-')}</div>
+        <div class="rc-item"><div class="rc-label">ระยะทาง</div><span class="route-val">${r.totalDistance ? r.totalDistance.toFixed(1)+' กม.' : '-'}</span></div>
+        <div class="rc-item"><div class="rc-label">ระยะเวลา</div>${r.durationText || '-'}</div>
+        ${r.returnStatus==='returned' ? `<div class="rc-item" style="grid-column:span 2"><div class="rc-label">คืนเมื่อ</div>${formatDate(r.returnedAt)}</div>` : ''}
+      </div>
+      ${r.reason ? `<div style="margin-top:10px;font-size:13px;color:var(--muted);padding-top:10px;border-top:1px solid var(--bg)">📝 ${esc(r.reason)}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  // Pagination
+  renderPagination(total);
+}
+
+function renderPagination(total) {
+  const pages = Math.ceil(total / PAGE_SIZE);
+  const pag = document.getElementById('pagination');
+  if (pages <= 1) { pag.style.display = 'none'; return; }
+  pag.style.display = 'flex';
+
+  let html = '';
+  html += `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+
+  for (let i = 1; i <= pages; i++) {
+    if (i === 1 || i === pages || (i >= currentPage-1 && i <= currentPage+1)) {
+      html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    } else if (i === currentPage-2 || i === currentPage+2) {
+      html += `<span class="page-info">...</span>`;
+    }
+  }
+
+  html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>›</button>`;
+  html += `<span class="page-info">${currentPage}/${pages}</span>`;
+  pag.innerHTML = html;
+}
+
+function goPage(p) {
+  const pages = Math.ceil(filteredRecords.length / PAGE_SIZE);
+  if (p < 1 || p > pages) return;
+  currentPage = p;
+  renderTable();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ======================================================
+// FILTER
+// ======================================================
+function applyFilter() {
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  const car = document.getElementById('filterCar').value.toLowerCase();
+  const status = document.getElementById('filterStatus').value;
+  const date = document.getElementById('filterDate').value;
+
+  filteredRecords = allRecords.filter(r => {
+    if (search && !`${r.name} ${r.car} ${r.reason} ${r.phone}`.toLowerCase().includes(search)) return false;
+    if (car && !r.car?.toLowerCase().includes(car)) return false;
+    if (status && r.returnStatus !== status) return false;
+    if (date && r.timestamp && !r.timestamp.startsWith(date)) return false;
+    return true;
+  });
+
+  currentPage = 1;
+  renderTable();
+}
+
+function resetFilter() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('filterCar').value = '';
+  document.getElementById('filterStatus').value = '';
+  document.getElementById('filterDate').value = '';
+  filteredRecords = [...allRecords];
+  currentPage = 1;
+  renderTable();
+}
+
+// Live search
+document.getElementById('searchInput').addEventListener('input', applyFilter);
+
+// ======================================================
+// EXPORT CSV
+// ======================================================
+function exportCSV() {
+  const data = filteredRecords.length > 0 ? filteredRecords : allRecords;
+  const headers = ['ชื่อ','เบอร์โทร','แผนก','ทะเบียนรถ','ไมล์เริ่ม','สาเหตุ','ระยะทาง(กม)','วันเวลาเริ่ม','สถานะ','วันเวลาคืน','ระยะเวลา'];
+  const rows = data.map(r => [
+    r.name||'', r.phone||'', r.department||'', r.car||'', r.mileage||'',
+    r.reason||'', r.totalDistance||0, r.timestamp||'',
+    r.returnStatus==='returned'?'คืนแล้ว':'กำลังใช้',
+    r.returnedAt||'', r.durationText||''
+  ]);
+  const csv = '\uFEFF' + [headers, ...rows].map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `car-history-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ======================================================
+// HELPERS
+// ======================================================
+function formatDate(iso) {
+  if (!iso) return '-';
+  try {
+    return new Date(iso).toLocaleString('th-TH', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+  } catch { return iso; }
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ======================================================
+// INIT
+// ======================================================
+loadData();
+// Auto refresh every 2 minutes
+setInterval(loadData, 120000);
+</script>
+</body>
+</html>

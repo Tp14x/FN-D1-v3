@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ระบบบันทึกการใช้รถ</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+/* ===== VARIABLES ===== */
+:root {
+  --primary: #16a34a;
+  --primary-light: #22c55e;
+  --primary-dark: #14532d;
+  --accent: #4ade80;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+  --bg: #f0fdf4;
+  --card: #ffffff;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.14);
+  --radius: 20px;
+  --radius-sm: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  font-family: 'Kanit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ===== LOADING ===== */
+#appLoading {
+  position: fixed; inset: 0;
+  background: linear-gradient(145deg, #14532d, #16a34a);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 9999; gap: 20px;
+}
+#appLoading .logo { font-size: 70px; animation: bounce 1s infinite; }
+#appLoading .title { color: #fff; font-size: 22px; font-weight: 600; }
+#appLoading .subtitle { color: rgba(255,255,255,0.7); font-size: 14px; }
+.loader-bar {
+  width: 200px; height: 4px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 99px; overflow: hidden;
+}
+.loader-bar-fill {
+  height: 100%; background: #fff;
+  border-radius: 99px;
+  animation: load 1.5s ease-in-out infinite;
+}
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+@keyframes load { 0%{width:0;margin-left:0} 50%{width:60%;margin-left:20%} 100%{width:0;margin-left:100%} }
+
+/* ===== SCREENS ===== */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: block; }
+
+/* ===== TOP HEADER ===== */
+.app-header {
+  background: linear-gradient(145deg, #14532d, #16a34a);
+  padding: 20px 20px 28px;
+  position: relative; overflow: hidden;
+}
+.app-header::after {
+  content: '';
+  position: absolute; bottom: -20px; left: 0; right: 0;
+  height: 40px; background: var(--bg);
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+.app-header .logo-row {
+  display: flex; align-items: center; gap: 10px;
+  color: #fff; margin-bottom: 16px;
+}
+.app-header .logo-row .icon { font-size: 28px; }
+.app-header .logo-row .app-title { font-size: 18px; font-weight: 600; }
+.user-card {
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 16px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 14px;
+  backdrop-filter: blur(10px);
+  color: #fff;
+}
+.user-avatar {
+  width: 50px; height: 50px;
+  border-radius: 50%; overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.6);
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700;
+}
+.user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.user-info .greeting { font-size: 12px; opacity: 0.8; }
+.user-info .name { font-size: 16px; font-weight: 600; }
+.user-info .badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.25);
+  border-radius: 99px; padding: 2px 10px;
+  font-size: 11px; margin-top: 2px;
+}
+
+/* ===== CONTENT AREA ===== */
+.content { padding: 28px 16px 100px; max-width: 480px; margin: 0 auto; }
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.card-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--bg);
+}
+.card-header .icon {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #dcfce7, #bbf7d0);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: var(--primary);
+  flex-shrink: 0;
+}
+.card-header h3 { font-size: 16px; font-weight: 600; color: var(--text); }
+
+/* ===== FORM ELEMENTS ===== */
+.form-group { margin-bottom: 16px; }
+.form-label {
+  display: block;
+  font-size: 13px; font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.input-wrap { position: relative; }
+.input-icon {
+  position: absolute; left: 14px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary); font-size: 15px;
+  pointer-events: none; z-index: 1;
+}
+input, select, textarea {
+  width: 100%; padding: 13px 14px 13px 42px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Kanit', sans-serif;
+  font-size: 15px; color: var(--text);
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none; -webkit-appearance: none;
+}
+textarea { padding-left: 14px; min-height: 90px; resize: vertical; line-height: 1.6; }
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(22,163,74,0.12);
+}
+select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
+.error-msg {
+  display: none; color: var(--danger);
+  font-size: 12px; margin-top: 6px;
+  align-items: center; gap: 4px;
+}
+.error-msg.show { display: flex; }
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 24px; border-radius: 99px;
+  font-family: 'Kanit', sans-serif;
+  font-size: 15px; font-weight: 600;
+  border: none; cursor: pointer;
+  transition: all 0.2s; width: 100%;
+  text-decoration: none;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff; box-shadow: 0 4px 16px rgba(22,163,74,0.3);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(22,163,74,0.4); }
+.btn-primary:active { transform: translateY(0); }
+.btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; box-shadow: 0 4px 16px rgba(239,68,68,0.3); }
+.btn-secondary { background: var(--border); color: var(--text-muted); }
+.btn-info { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; box-shadow: 0 4px 16px rgba(59,130,246,0.3); }
+.btn:disabled { opacity: 0.6; pointer-events: none; }
+
+/* ===== MAP ===== */
+#map { width: 100%; height: 320px; border-radius: var(--radius-sm); overflow: hidden; }
+.search-bar {
+  display: flex; gap: 8px; margin-bottom: 12px;
+}
+.search-bar input { padding-left: 14px; }
+.route-info {
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  border-radius: var(--radius-sm); padding: 14px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; color: var(--primary-dark);
+  margin-top: 12px;
+}
+.route-info i { font-size: 20px; color: var(--primary); }
+.destinations-box {
+  background: var(--bg); border-radius: var(--radius-sm);
+  padding: 12px 14px; font-size: 13px;
+  color: var(--text-muted); margin-top: 10px;
+  min-height: 44px; white-space: pre-line;
+  line-height: 1.8;
+}
+.map-fab-row {
+  display: flex; gap: 8px; margin-top: 10px;
+}
+.map-fab-row button {
+  flex: 1; padding: 10px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #fff; font-family: 'Kanit', sans-serif;
+  font-size: 12px; color: var(--text-muted);
+  cursor: pointer; transition: all 0.2s;
+}
+.map-fab-row button:hover { background: var(--bg); border-color: var(--primary); color: var(--primary); }
+
+/* ===== PHOTO UPLOAD ===== */
+.photo-upload-area {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px; text-align: center;
+  cursor: pointer; transition: all 0.2s;
+  position: relative;
+}
+.photo-upload-area:hover { border-color: var(--primary); background: #f0fdf4; }
+.photo-upload-area input[type="file"] {
+  position: absolute; inset: 0; opacity: 0;
+  cursor: pointer; padding: 0; border: none;
+  width: 100%; height: 100%;
+}
+.photo-preview {
+  display: none; max-width: 100%;
+  border-radius: var(--radius-sm);
+  margin-top: 12px; max-height: 200px;
+  object-fit: contain;
+}
+.photo-preview.show { display: block; }
+.photo-info { font-size: 12px; color: var(--primary); margin-top: 6px; display: none; }
+.photo-info.show { display: block; }
+
+/* ===== PENDING / STATUS SCREENS ===== */
+#screen-pending, #screen-suspended {
+  display: none; min-height: 100vh;
+  align-items: center; justify-content: center;
+  padding: 20px;
+  flex-direction: column;
+  text-align: center;
+}
+.status-card {
+  background: var(--card); border-radius: 28px;
+  padding: 36px 28px; max-width: 360px; width: 100%;
+  box-shadow: var(--shadow-lg);
+}
+.status-icon { font-size: 64px; margin-bottom: 16px; }
+.status-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+.status-card p { color: var(--text-muted); font-size: 14px; line-height: 1.8; }
+.status-card .btn { margin-top: 20px; }
+
+/* ===== REGISTRATION FORM ===== */
+#screen-register {
+  display: none; min-height: 100vh;
+  background: linear-gradient(145deg, #14532d, #16a34a);
+  padding: 30px 16px;
+}
+.register-container { max-width: 440px; margin: 0 auto; }
+.register-header {
+  text-align: center; color: #fff;
+  margin-bottom: 24px;
+}
+.register-header .avatar {
+  width: 80px; height: 80px;
+  border-radius: 50%; border: 3px solid rgba(255,255,255,0.6);
+  margin: 0 auto 12px;
+  object-fit: cover;
+}
+.register-header .avatar-fallback {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; font-weight: 700;
+  margin: 0 auto 12px; border: 3px solid rgba(255,255,255,0.4);
+  color: #fff;
+}
+.register-header h2 { font-size: 20px; font-weight: 700; }
+.register-header p { opacity: 0.8; font-size: 14px; }
+.register-body { background: #fff; border-radius: 24px; padding: 24px 20px; }
+
+/* ===== CAR IN USE SCREEN ===== */
+#screen-car-in-use {
+  display: none; min-height: 100vh;
+  background: linear-gradient(145deg, #1e293b, #0f172a);
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+.car-in-use-card {
+  background: #fff; border-radius: 28px;
+  padding: 28px 22px; max-width: 400px; width: 100%;
+  box-shadow: var(--shadow-lg); text-align: center;
+}
+.car-pulse {
+  font-size: 60px; margin-bottom: 10px;
+  animation: pulse-icon 2s infinite;
+}
+@keyframes pulse-icon { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+.car-in-use-card h2 { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.car-in-use-card .subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+.info-box {
+  background: var(--bg); border-radius: 16px;
+  padding: 16px; margin: 16px 0;
+  text-align: left;
+}
+.info-row {
+  display: flex; justify-content: space-between;
+  padding: 6px 0; font-size: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.info-row:last-child { border-bottom: none; }
+.info-row .label { color: var(--text-muted); }
+.info-row .value { font-weight: 600; color: var(--text); }
+.timer-display {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  color: #4ade80; border-radius: 16px;
+  padding: 14px; font-size: 28px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2px; margin: 12px 0;
+}
+.location-status {
+  background: #dcfce7; border-radius: 12px;
+  padding: 12px 14px; margin: 12px 0;
+  text-align: left; font-size: 13px;
+}
+.location-status.error { background: #fee2e2; }
+.location-status.success { background: #dcfce7; }
+
+/* ===== POPUP MODAL ===== */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 9000;
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal-box {
+  background: #fff; border-radius: 24px;
+  padding: 30px 24px; max-width: 340px; width: 100%;
+  text-align: center; animation: popIn 0.3s ease;
+}
+@keyframes popIn { from{transform:scale(0.8);opacity:0} to{transform:scale(1);opacity:1} }
+.modal-icon { font-size: 54px; margin-bottom: 14px; }
+.modal-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.modal-message { color: var(--text-muted); font-size: 14px; line-height: 1.8; margin-bottom: 20px; }
+
+/* ===== NOTIFICATION TOAST ===== */
+.toast {
+  position: fixed; top: 20px; left: 50%;
+  transform: translateX(-50%) translateY(-80px);
+  background: #1e293b; color: #fff;
+  padding: 12px 20px; border-radius: 99px;
+  font-size: 14px; font-weight: 500;
+  z-index: 99999; white-space: nowrap;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease;
+  display: flex; align-items: center; gap: 8px;
+  max-width: 90vw; white-space: pre-line; text-align: center;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { background: linear-gradient(135deg, #16a34a, #22c55e); }
+.toast.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.toast.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+/* ===== SUBMIT BTN ===== */
+.submit-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(12px);
+  padding: 14px 16px env(safe-area-inset-bottom,14px);
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.1);
+  z-index: 100;
+}
+.submit-bar .btn { max-width: 480px; margin: 0 auto; }
+
+/* ===== BADGE ===== */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 99px;
+  font-size: 11px; font-weight: 600;
+}
+.badge-success { background: #dcfce7; color: #16a34a; }
+.badge-warning { background: #fef3c7; color: #d97706; }
+.badge-danger { background: #fee2e2; color: #ef4444; }
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+.animate-in { animation: fadeIn 0.4s ease forwards; }
+
+@media (prefers-color-scheme: dark) { /* keep light */ }
+</style>
+</head>
+<body>
+
+<!-- ===== LOADING ===== -->
+<div id="appLoading">
+  <div class="logo">🚗</div>
+  <div class="title">ระบบบันทึกการใช้รถ</div>
+  <div class="subtitle">กำลังโหลด...</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<!-- ===== MAIN SCREEN ===== -->
+<div id="screen-main" class="screen">
+  <div class="app-header">
+    <div class="logo-row">
+      <span class="icon">🚗</span>
+      <span class="app-title">ระบบบันทึกการใช้รถ</span>
+    </div>
+    <div class="user-card" id="userCard">
+      <div class="user-avatar" id="userAvatar"><i class="fas fa-user"></i></div>
+      <div class="user-info">
+        <div class="greeting" id="userGreeting">สวัสดี คุณ</div>
+        <div class="name" id="userName">-</div>
+        <div class="badge" id="userDept">-</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Form Card -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="icon"><i class="fas fa-clipboard-list"></i></div>
+        <h3>บันทึกการใช้รถ</h3>
+      </div>
+      <form id="mainForm" novalidate>
+        <!-- Car Select -->
+        <div class="form-group">
+          <label class="form-label">ทะเบียนรถ <span style="color:var(--danger)">*</span></label>
+          <div class="input-wrap">
+            <i class="fas fa-car input-icon"></i>
+            <select id="car" required>
+              <option value="" disabled selected>เลือกทะเบียนรถ</option>
+              <option value="Nissan : ผอ 5757">Nissan : ผอ 5757</option>
+              <option value="Mazda : ยค 3777">Mazda : ยค 3777</option>
+              <option value="MG : งบ 255">MG : งบ 255</option>
+              <option value="Click : จงจ 222">Honda Click : จงจ 222</option>
+              <option value="Fino : งธท 222">Fino : งธท 222</option>
+            </select>
+          </div>
+          <div class="error-msg" id="car-error"><i class="fas fa-exclamation-circle"></i><span></span></div>
+        </div>
+
+        <!-- Mileage -->
+        <div class="form-group">
+          <label class="form-label">เลขไมล์รถ <span style="color:var(--danger)">*</span></label>
+          <div class="input-wrap">
+            <i class="fas fa-tachometer-alt input-icon"></i>
+            <input type="number" id="mileage" placeholder="กรอกเลขไมล์" inputmode="numeric" min="0" required>
+          </div>
+          <div class="error-msg" id="mileage-error"><i class="fas fa-exclamation-circle"></i><span></span></div>
+        </div>
+
+        <!-- Reason -->
+        <div class="form-group">
+          <label class="form-label">สาเหตุการใช้รถ <span style="color:var(--danger)">*</span></label>
+          <div class="input-wrap">
+            <textarea id="reason" placeholder="ระบุสาเหตุหรือภารกิจ..." required style="padding-left:14px"></textarea>
+          </div>
+          <div class="error-msg" id="reason-error"><i class="fas fa-exclamation-circle"></i><span></span></div>
+        </div>
+
+        <!-- Photo -->
+        <div class="form-group">
+          <label class="form-label">รูปเลขไมล์ (ไม่บังคับ)</label>
+          <div class="photo-upload-area" id="photoArea">
+            <input type="file" id="mileagePhoto" accept="image/*" capture="environment">
+            <i class="fas fa-camera" style="font-size:28px;color:var(--primary);margin-bottom:6px"></i>
+            <div style="font-size:13px;color:var(--text-muted)">แตะเพื่อถ่ายรูป / เลือกรูปภาพ</div>
+          </div>
+          <img class="photo-preview" id="photoPreview" alt="preview">
+          <div class="photo-info" id="photoInfo"></div>
+          <button type="button" id="removePhotoBtn" onclick="clearPhoto()" style="display:none;margin-top:8px;background:none;border:none;color:var(--danger);font-family:Kanit,sans-serif;font-size:13px;cursor:pointer;padding:4px 0">
+            <i class="fas fa-trash"></i> ลบรูป
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Map Card -->
+    <div class="card animate-in" style="animation-delay:0.1s">
+      <div class="card-header">
+        <div class="icon"><i class="fas fa-map-marked-alt"></i></div>
+        <h3>เส้นทาง / ปลายทาง</h3>
+      </div>
+      <div class="search-bar">
+        <div class="input-wrap" style="flex:1">
+          <i class="fas fa-search input-icon"></i>
+          <input type="text" id="searchInput" placeholder="ค้นหาสถานที่...">
+        </div>
+      </div>
+      <div id="map"></div>
+      <div id="selectedDestinations" class="destinations-box">📍 คลิกบนแผนที่เพื่อเลือกปลายทาง (สูงสุด 3 จุด)</div>
+      <div id="routeInfo" class="route-info">
+        <i class="fas fa-route"></i>
+        <span>เลือกปลายทางเพื่อคำนวณเส้นทาง...</span>
+      </div>
+      <div class="error-msg" id="destinations-error"><i class="fas fa-exclamation-circle"></i><span></span></div>
+      <div class="map-fab-row">
+        <button onclick="clearAllMarkers()"><i class="fas fa-trash"></i> ล้างจุด</button>
+        <button onclick="centerMap()"><i class="fas fa-crosshairs"></i> กลับจุดเริ่ม</button>
+        <button onclick="toggleMapType()"><i class="fas fa-satellite"></i> เปลี่ยนแผนที่</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Bar -->
+  <div class="submit-bar" id="submitBar">
+    <button type="submit" form="mainForm" class="btn btn-primary" id="submitBtn">
+      <i class="fas fa-share-alt"></i>
+      บันทึก & แชร์ไปกลุ่ม
+    </button>
+  </div>
+</div>
+
+<!-- ===== PENDING APPROVAL ===== -->
+<div id="screen-pending" class="screen" style="background:var(--bg);display:flex">
+  <div class="status-card">
+    <div class="status-icon">⏳</div>
+    <h2 id="pendingTitle">รอการอนุมัติ</h2>
+    <p id="pendingMsg">คำขอของคุณได้รับการส่งเรียบร้อยแล้ว<br>กรุณารอแอดมินยืนยัน</p>
+    <a href="https://line.me/ti/p/~" class="btn btn-secondary" style="margin-top:16px">
+      <i class="fab fa-line"></i> ติดต่อแอดมิน
+    </a>
+  </div>
+</div>
+
+<!-- ===== SUSPENDED ===== -->
+<div id="screen-suspended" class="screen" style="background:var(--bg);display:flex">
+  <div class="status-card">
+    <div class="status-icon">⛔</div>
+    <h2>ถูกระงับการใช้งาน</h2>
+    <p id="suspendedMsg">บัญชีของคุณถูกระงับการใช้งาน<br>กรุณาติดต่อผู้ดูแลระบบ</p>
+    <a href="https://line.me/ti/p/~" class="btn btn-danger" style="margin-top:16px">
+      <i class="fab fa-line"></i> ติดต่อแอดมิน
+    </a>
+  </div>
+</div>
+
+<!-- ===== REGISTRATION ===== -->
+<div id="screen-register" class="screen">
+  <div class="register-container">
+    <div class="register-header">
+      <div id="regAvatar" class="avatar-fallback">👤</div>
+      <h2>สมัครใช้งานระบบ</h2>
+      <p>กรอกข้อมูลเพื่อขอสิทธิ์การใช้งาน</p>
+    </div>
+    <div class="register-body">
+      <form id="regForm" novalidate>
+        <div class="form-group">
+          <label class="form-label">ชื่อ-นามสกุล <span style="color:var(--danger)">*</span></label>
+          <div class="input-wrap">
+            <i class="fas fa-user input-icon"></i>
+            <input type="text" id="regName" placeholder="กรอกชื่อ-นามสกุลจริง" required>
+          </div>
+          <div class="error-msg" id="regName-error"><i class="fas fa-exclamation-circle"></i><span></span></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">เบอร์โทรศัพท์ <span style="color:var(--danger)">*</span></label>
+          <div class="input-wrap">
+            <i class="fas fa-phone input-icon"></i>
+            <input type="tel" id="regPhone" placeholder="0XX-XXX-XXXX" maxlength="10" inputmode="tel" required>
+          </div>
+          <div class="error-msg" id="regPhone-error"><i class="fas fa-exclamation-circle"></i><span></span></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">แผนก <span style="color:var(--danger)">*</span></label>
+          <div class="input-wrap">
+            <i class="fas fa-building input-icon"></i>
+            <select id="regDept" required>
+              <option value="" disabled selected>เลือกแผนก</option>
+              <option value="AE">AE</option>
+              <option value="Graphics">Graphics</option>
+              <option value="Graphics &amp; Print">Graphics &amp; Print</option>
+              <option value="Prod &amp; Print">Prod &amp; Print</option>
+              <option value="นักศึกษาฝึกงาน">นักศึกษาฝึกงาน</option>
+              <option value="อื่นๆ">อื่นๆ (ระบุ)</option>
+            </select>
+          </div>
+          <div class="error-msg" id="regDept-error"><i class="fas fa-exclamation-circle"></i><span></span></div>
+        </div>
+        <div class="form-group" id="otherDeptGroup" style="display:none">
+          <label class="form-label">ระบุแผนก</label>
+          <div class="input-wrap">
+            <i class="fas fa-pen input-icon"></i>
+            <input type="text" id="regOtherDept" placeholder="ระบุชื่อแผนก">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" id="regSubmitBtn">
+          <i class="fas fa-paper-plane"></i> ส่งคำขอสมัคร
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CAR IN USE SCREEN ===== -->
+<div id="screen-car-in-use" class="screen" style="display:flex">
+  <div class="car-in-use-card">
+    <div class="car-pulse">🚗🔑</div>
+    <h2>กำลังใช้รถ</h2>
+    <div class="subtitle">รถออกจากบริษัทแล้ว</div>
+
+    <div class="info-box" id="carInfoBox">
+      <div class="info-row">
+        <span class="label">🚘 ทะเบียนรถ</span>
+        <span class="value" id="infoCarPlate">-</span>
+      </div>
+      <div class="info-row">
+        <span class="label">👤 ผู้ใช้</span>
+        <span class="value" id="infoUserName">-</span>
+      </div>
+      <div class="info-row">
+        <span class="label">📍 ไมล์เริ่ม</span>
+        <span class="value" id="infoMileage">-</span>
+      </div>
+      <div class="info-row">
+        <span class="label">🕐 เริ่มใช้</span>
+        <span class="value" id="infoStartTime">-</span>
+      </div>
+    </div>
+
+    <div class="timer-display" id="timerDisplay">00:00:00</div>
+
+    <div class="location-status" id="locationStatus">
+      <i class="fas fa-map-marker-alt"></i>
+      ⏳ ยังไม่ได้ระบุตำแหน่งคืนรถ
+    </div>
+    <div id="locationDetail" style="display:none;font-size:12px;color:var(--text-muted);margin-bottom:8px;text-align:left;padding:0 4px"></div>
+
+    <button class="btn btn-info" id="getLocationBtn" onclick="getReturnLocation()" style="margin-bottom:10px">
+      <i class="fas fa-location-dot"></i> ดึงตำแหน่งปัจจุบัน
+    </button>
+
+    <button class="btn btn-danger" id="returnCarBtn" onclick="handleReturnCar()" disabled style="opacity:0.5">
+      <i class="fas fa-undo-alt"></i> คืนรถ (ต้องดึงตำแหน่งก่อน)
+    </button>
+
+    <button class="btn btn-secondary" onclick="handleCancelUsage()" style="margin-top:10px;font-size:13px">
+      <i class="fas fa-times"></i> ยกเลิกการใช้รถ (ไม่ได้ใช้จริง)
+    </button>
+  </div>
+</div>
+
+<!-- ===== SUCCESS MODAL ===== -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal-box">
+    <div class="modal-icon" id="modalIcon">✅</div>
+    <div class="modal-title" id="modalTitle">สำเร็จ!</div>
+    <div class="modal-message" id="modalMessage">-</div>
+    <button class="btn btn-primary" onclick="closeModal()">
+      <i class="fas fa-check"></i> ตกลง
+    </button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="https://static.line-scdn.net/liff/edge/versions/2.22.3/sdk.js"></script>
+<script>
+// ======================================================
+// CONFIG
+// ======================================================
+const CONFIG = {
+  liffId: '2007130450-YVNvyNbL',
+  googleMapsKey: 'AIzaSyAw5sDr5qXKIpun2dp4jpu8NerbXy6Hfew',
+  originLatLng: { lat: 14.975719186601136, lng: 102.1254756236624 },
+  autoDestination: {
+    userId: 'Uc8695dc6e2569a960fe8912809a2e2ff',
+    startTime: { h: 16, m: 40 },
+    endTime:   { h: 17, m: 20 },
+    location:  { lat: 14.975057297021436, lng: 102.11365790021132 }
+  }
+};
+
+// ======================================================
+// STATE
+// ======================================================
+let currentUser = null;
+let map = null, markers = [], directionsRenderer, directionsService, mapInitialized = false, mapType = 'roadmap';
+let autocomplete = null;
+let cachedPhotoBase64 = null;       // ✅ โหลดล่วงหน้าตอนเลือกรูป
+let returnLocation = null;
+let timerInterval = null;
+
+const CAR_USAGE_KEY = 'car_usage_v2';
+
+function loadUsage() {
+  try {
+    const s = localStorage.getItem(CAR_USAGE_KEY);
+    if (!s) return null;
+    const u = JSON.parse(s);
+    // ล้างถ้าเกิน 24 ชั่วโมง
+    if (u.startedAt && (Date.now() - new Date(u.startedAt)) > 86400000) {
+      localStorage.removeItem(CAR_USAGE_KEY);
+      return null;
+    }
+    return u.isUsing ? u : null;
+  } catch { return null; }
+}
+function saveUsage(data) { localStorage.setItem(CAR_USAGE_KEY, JSON.stringify(data)); }
+function clearUsage() { localStorage.removeItem(CAR_USAGE_KEY); }
+
+// ======================================================
+// SCREEN MANAGEMENT
+// ======================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.style.display = 'none';
+    s.classList.remove('active');
+  });
+  const el = document.getElementById(id);
+  if (el) {
+    el.style.display = ['screen-pending','screen-suspended','screen-car-in-use'].includes(id) ? 'flex' : 'block';
+    el.classList.add('active');
+  }
+}
+
+// ======================================================
+// TOAST NOTIFICATIONS
+// ======================================================
+let toastTimer;
+function showToast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ======================================================
+// FORM ERRORS
+// ======================================================
+function showErr(id, msg) {
+  const el = document.getElementById(id + '-error');
+  if (el) { el.querySelector('span').textContent = msg; el.classList.add('show'); }
+}
+function clearErr(id) {
+  const el = document.getElementById(id + '-error');
+  if (el) el.classList.remove('show');
+}
+
+// ======================================================
+// PHOTO HANDLING — ✅ โหลดก่อน เพื่อไม่ให้มี await ก่อน shareTargetPicker
+// ======================================================
+document.getElementById('mileagePhoto').addEventListener('change', e => {
+  const file = e.target.files[0];
+  cachedPhotoBase64 = null;
+  const preview = document.getElementById('photoPreview');
+  const info = document.getElementById('photoInfo');
+  const removeBtn = document.getElementById('removePhotoBtn');
+
+  if (!file) { preview.classList.remove('show'); info.classList.remove('show'); removeBtn.style.display='none'; return; }
+
+  const validTypes = ['image/jpeg','image/png','image/gif','image/webp'];
+  if (!validTypes.includes(file.type)) { showToast('รองรับ JPG, PNG, GIF, WEBP เท่านั้น', 'warning'); e.target.value=''; return; }
+  if (file.size > 5*1024*1024) { showToast('ไฟล์ต้องไม่เกิน 5MB', 'warning'); e.target.value=''; return; }
+
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    cachedPhotoBase64 = reader.result;    // ✅ เก็บไว้ก่อน
+    preview.src = reader.result;
+    preview.classList.add('show');
+    info.textContent = `✅ ${file.name} (${(file.size/1024/1024).toFixed(2)} MB)`;
+    info.classList.add('show');
+    removeBtn.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+});
+
+function clearPhoto() {
+  document.getElementById('mileagePhoto').value = '';
+  cachedPhotoBase64 = null;
+  document.getElementById('photoPreview').classList.remove('show');
+  document.getElementById('photoInfo').classList.remove('show');
+  document.getElementById('removePhotoBtn').style.display = 'none';
+}
+
+// ======================================================
+// GOOGLE MAPS
+// ======================================================
+function initMap() {
+  if (mapInitialized) return;
+  try {
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: CONFIG.originLatLng,
+      zoom: 12,
+      mapTypeId: 'roadmap',
+      mapTypeControl: false,
+      fullscreenControl: false,
+      streetViewControl: false,
+      zoomControl: true,
+    });
+
+    directionsRenderer = new google.maps.DirectionsRenderer({
+      map, suppressMarkers: true,
+      polylineOptions: { strokeColor: '#16a34a', strokeWeight: 4 }
+    });
+    directionsService = new google.maps.DirectionsService();
+
+    // Origin marker
+    new google.maps.Marker({
+      position: CONFIG.originLatLng, map,
+      title: 'บริษัท (จุดเริ่ม)',
+      icon: { url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png', scaledSize: new google.maps.Size(40,40) }
+    });
+
+    // Autocomplete search
+    autocomplete = new google.maps.places.Autocomplete(document.getElementById('searchInput'), {
+      types: ['establishment','geocode'],
+      componentRestrictions: { country: 'th' }
+    });
+    autocomplete.bindTo('bounds', map);
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      if (!place.geometry?.location) return;
+      if (markers.length >= 3) { showToast('เลือกได้สูงสุด 3 จุด', 'warning'); return; }
+      addMarker(place.geometry.location);
+      map.panTo(place.geometry.location);
+      document.getElementById('searchInput').value = '';
+    });
+
+    map.addListener('click', e => {
+      if (markers.length >= 3) { showToast('เลือกได้สูงสุด 3 จุด', 'warning'); return; }
+      addMarker(e.latLng);
+    });
+
+    mapInitialized = true;
+
+    // Auto destination check
+    setTimeout(() => {
+      if (currentUser && !loadUsage()) checkAutoDestination();
+    }, 1500);
+  } catch(e) {
+    document.getElementById('map').innerHTML = '<div style="padding:40px;text-align:center;color:#64748b"><i class="fas fa-map" style="font-size:32px;margin-bottom:8px;display:block"></i>ไม่สามารถโหลดแผนที่ได้</div>';
+  }
+}
+
+function addMarker(pos) {
+  const m = new google.maps.Marker({
+    position: pos, map,
+    icon: { url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png', scaledSize: new google.maps.Size(32,32) },
+    animation: google.maps.Animation.DROP,
+    title: `จุดที่ ${markers.length+1}`
+  });
+  m.addListener('click', () => {
+    m.setMap(null);
+    markers = markers.filter(x => x !== m);
+    updateDestDisplay();
+    calcRoute();
+  });
+  markers.push(m);
+  updateDestDisplay();
+  calcRoute();
+  clearErr('destinations');
+}
+
+function updateDestDisplay() {
+  const el = document.getElementById('selectedDestinations');
+  el.textContent = markers.length === 0
+    ? '📍 คลิกบนแผนที่เพื่อเลือกปลายทาง (สูงสุด 3 จุด)'
+    : markers.map((m,i) => `📍 จุดที่ ${i+1}: ${m.getPosition().lat().toFixed(5)}, ${m.getPosition().lng().toFixed(5)}`).join('\n');
+}
+
+function calcRoute() {
+  const el = document.getElementById('routeInfo');
+  if (markers.length === 0) {
+    directionsRenderer?.set('directions', null);
+    el.innerHTML = '<i class="fas fa-route"></i><span>เลือกปลายทางเพื่อคำนวณเส้นทาง...</span>';
+    return;
+  }
+  const waypoints = markers.slice(0, -1).map(m => ({ location: m.getPosition(), stopover: true }));
+  directionsService.route({
+    origin: CONFIG.originLatLng,
+    destination: markers[markers.length-1].getPosition(),
+    waypoints, travelMode: google.maps.TravelMode.DRIVING
+  }, (res, status) => {
+    if (status === 'OK') {
+      directionsRenderer.setDirections(res);
+      let dist = 0, time = 0;
+      res.routes[0].legs.forEach(l => { dist += l.distance.value; time += l.duration.value; });
+      const km = (dist/1000).toFixed(2), min = Math.round(time/60);
+      el.innerHTML = `<i class="fas fa-route"></i><div><div>🛣️ ระยะทางรวม: <strong>${km} กม.</strong></div><div>⏱ เวลาโดยประมาณ: <strong>${min} นาที</strong></div></div>`;
+    }
+  });
+}
+
+function clearAllMarkers() {
+  markers.forEach(m => m.setMap(null));
+  markers = [];
+  updateDestDisplay();
+  calcRoute();
+  showToast('ล้างจุดหมายทั้งหมดแล้ว', 'info');
+}
+
+function centerMap() {
+  if (map) { map.panTo(CONFIG.originLatLng); map.setZoom(12); }
+}
+
+function toggleMapType() {
+  if (!map) return;
+  mapType = mapType === 'roadmap' ? 'satellite' : 'roadmap';
+  map.setMapTypeId(mapType);
+}
+
+function checkAutoDestination() {
+  if (!currentUser || currentUser.userId !== CONFIG.autoDestination.userId) return;
+  const now = new Date();
+  const total = now.getHours()*60 + now.getMinutes();
+  const s = CONFIG.autoDestination.startTime.h*60 + CONFIG.autoDestination.startTime.m;
+  const e = CONFIG.autoDestination.endTime.h*60 + CONFIG.autoDestination.endTime.m;
+  if (total >= s && total <= e && markers.length === 0) {
+    const loc = CONFIG.autoDestination.location;
+    addMarker(new google.maps.LatLng(loc.lat, loc.lng));
+    map.panTo(loc);
+    showToast('📍 เพิ่มปลายทางอัตโนมัติ (16:40-17:20 น.)', 'info');
+  }
+}
+
+// ======================================================
+// FLEX MESSAGE BUILDER
+// ======================================================
+function buildFlexMessage(name, phone, car, mileage, reason, markerList, routeInfoText, hasPhoto) {
+  const distMatch = routeInfoText.match(/ระยะทางรวม:\s*([\d.]+)\s*กม/);
+  const timeMatch = routeInfoText.match(/เวลาโดยประมาณ:\s*(\d+)\s*นาที/);
+  const km = distMatch ? distMatch[1] : '0';
+  const min = timeMatch ? timeMatch[1] : '0';
+  const now = new Date();
+
+  return {
+    type: 'flex',
+    altText: `🚗 บันทึกการใช้รถโดย ${name}`,
+    contents: {
+      type: 'bubble', size: 'mega',
+      header: {
+        type: 'box', layout: 'vertical',
+        backgroundColor: '#16a34a', paddingAll: '16px',
+        contents: [{ type: 'text', text: '🚗 บันทึกการใช้รถ', weight: 'bold', size: 'xl', color: '#FFFFFF', align: 'center' },
+                   { type: 'text', text: now.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}), size: 'sm', color: 'rgba(255,255,255,0.8)', align: 'center' }]
+      },
+      body: {
+        type: 'box', layout: 'vertical', spacing: 'md',
+        contents: [
+          { type: 'text', text: `👤 ${name}`, size: 'md', wrap: true },
+          { type: 'text', text: `📞 ${phone}`, size: 'md', wrap: true },
+          { type: 'text', text: `🚘 ${car}`, size: 'md', wrap: true },
+          { type: 'text', text: `🔢 ไมล์: ${mileage} กม.`, size: 'md', wrap: true },
+          { type: 'text', text: `📝 ${reason}`, size: 'md', wrap: true, color: '#374151' },
+          { type: 'separator', margin: 'md' },
+          { type: 'text', text: '📌 ปลายทาง:', weight: 'bold', size: 'sm', margin: 'md' },
+          ...markerList.map((m, i) => ({
+            type: 'text', size: 'sm', wrap: true, color: '#6b7280',
+            text: `• จุดที่ ${i+1}: ${m.getPosition().lat().toFixed(5)}, ${m.getPosition().lng().toFixed(5)}`
+          })),
+          { type: 'separator', margin: 'md' },
+          {
+            type: 'box', layout: 'horizontal', spacing: 'lg', margin: 'md',
+            contents: [
+              { type: 'box', layout: 'vertical', contents: [
+                { type: 'text', text: '🛣️ ระยะทาง', size: 'xs', color: '#9ca3af' },
+                { type: 'text', text: `${km} กม.`, size: 'lg', weight: 'bold', color: '#16a34a' }
+              ]},
+              { type: 'box', layout: 'vertical', contents: [
+                { type: 'text', text: '⏱ เวลา', size: 'xs', color: '#9ca3af' },
+                { type: 'text', text: `${min} นาที`, size: 'lg', weight: 'bold', color: '#16a34a' }
+              ]}
+            ]
+          },
+          { type: 'text', text: hasPhoto ? '📸 แนบรูปเลขไมล์แล้ว ✓' : '⚠️ ไม่มีรูปเลขไมล์', size: 'sm', align: 'center', margin: 'sm', color: hasPhoto ? '#16a34a' : '#ef4444' }
+        ]
+      },
+      footer: {
+        type: 'box', layout: 'vertical', spacing: 'sm',
+        contents: [{
+          type: 'button',
+          action: { type: 'uri', label: '📊 ดูประวัติการใช้งานรถ', uri: `${location.origin}/history` },
+          style: 'primary', color: '#16a34a'
+        }]
+      }
+    }
+  };
+}
+
+function buildReturnFlexMessage(carPlate, userName, returnTime, durationText, location) {
+  const mapsLink = `https://www.google.com/maps?q=${location.lat},${location.lng}`;
+  return {
+    type: 'flex',
+    altText: `🔑 คืนรถแล้ว: ${carPlate}`,
+    contents: {
+      type: 'bubble',
+      header: {
+        type: 'box', layout: 'vertical',
+        backgroundColor: '#ef4444', paddingAll: '15px',
+        contents: [{ type: 'text', text: '🔑 แจ้งคืนรถแล้ว', weight: 'bold', size: 'xl', color: '#FFFFFF', align: 'center' }]
+      },
+      body: {
+        type: 'box', layout: 'vertical', spacing: 'md',
+        contents: [
+          { type: 'text', text: `🚗 ${carPlate}`, size: 'lg', weight: 'bold', wrap: true },
+          { type: 'text', text: `👤 ${userName}`, size: 'md', wrap: true },
+          { type: 'text', text: `📅 ${returnTime.toLocaleDateString('th-TH')}`, size: 'md' },
+          { type: 'text', text: `⏰ ${returnTime.toLocaleTimeString('th-TH')}`, size: 'md' },
+          { type: 'text', text: `⏱ ระยะเวลา: ${durationText}`, size: 'md', weight: 'bold', color: '#ef4444' },
+          { type: 'separator', margin: 'md' },
+          { type: 'text', text: `📍 ตำแหน่ง: ${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`, size: 'sm', wrap: true, color: '#6b7280', margin: 'md' }
+        ]
+      },
+      footer: {
+        type: 'box', layout: 'vertical', spacing: 'sm',
+        contents: [
+          { type: 'button', action: { type: 'uri', label: '🗺️ ดูตำแหน่งคืนรถ', uri: mapsLink }, style: 'link', color: '#3b82f6' },
+          { type: 'button', action: { type: 'uri', label: '📊 ดูประวัติ', uri: `${location.origin}/history` }, style: 'primary', color: '#16a34a' }
+        ]
+      }
+    }
+  };
+}
+
+// ======================================================
+// FORM VALIDATION
+// ======================================================
+function validateForm() {
+  let ok = true;
+  const car = document.getElementById('car').value;
+  const mileage = document.getElementById('mileage').value;
+  const reason = document.getElementById('reason').value.trim();
+
+  if (!car) { showErr('car', 'กรุณาเลือกทะเบียนรถ'); ok = false; }
+  else clearErr('car');
+
+  if (!mileage || isNaN(mileage) || Number(mileage) < 0) { showErr('mileage', 'กรุณากรอกเลขไมล์ให้ถูกต้อง'); ok = false; }
+  else clearErr('mileage');
+
+  if (!reason) { showErr('reason', 'กรุณากรอกสาเหตุการใช้รถ'); ok = false; }
+  else clearErr('reason');
+
+  if (markers.length === 0) { showErr('destinations', 'กรุณาเลือกปลายทางอย่างน้อย 1 จุด'); ok = false; }
+  else clearErr('destinations');
+
+  return ok;
+}
+
+// ======================================================
+// MAIN FORM SUBMIT — ✅ shareTargetPicker เรียกทันที (ไม่มี await ก่อน)
+// ======================================================
+document.getElementById('mainForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const usage = loadUsage();
+  if (usage) { showCarInUseScreen(usage); return; }
+  if (!currentUser) { showToast('กรุณาเข้าสู่ระบบก่อน', 'warning'); return; }
+
+  // ✅ 1. Validate แบบ sync
+  if (!validateForm()) return;
+
+  const car     = document.getElementById('car').value;
+  const mileage = document.getElementById('mileage').value;
+  const reason  = document.getElementById('reason').value.trim();
+  const routeEl = document.getElementById('routeInfo');
+  const routeText = routeEl ? routeEl.innerText : '';
+  const name  = currentUser.name || currentUser.displayName || 'ไม่ระบุชื่อ';
+  const phone = currentUser.phone || '-';
+
+  // ✅ 2. สร้าง Flex Message แบบ sync (ใช้ cachedPhotoBase64 ที่โหลดไว้แล้ว)
+  const message = buildFlexMessage(name, phone, car, mileage, reason, markers, routeText, !!cachedPhotoBase64);
+
+  // ✅ 3. เรียก shareTargetPicker ทันที — ไม่มี await ใดๆ นำหน้า!
+  const submitBtn = document.getElementById('submitBtn');
+  let shareSuccess = false;
+
+  if (typeof liff !== 'undefined' && liff.isLoggedIn()) {
+    try {
+      const result = await liff.shareTargetPicker([message]);
+      shareSuccess = result?.status === 'success' || result === undefined || result === null;
+      // LIFF 2.x: ถ้าไม่ throw = success
+      shareSuccess = true;
+    } catch (err) {
+      const msg = String(err).toLowerCase();
+      if (msg.includes('cancel') || msg.includes('closed')) {
+        showToast('ยกเลิกการแชร์', 'warning');
+      } else {
+        showToast('ไม่สามารถเปิดการแชร์ได้ กรุณาลองใหม่', 'error');
+      }
+      return;
+    }
+  } else {
+    // Preview mode (outside LINE)
+    showToast('📤 [Preview] ข้ามการแชร์', 'info');
+    shareSuccess = true;
+  }
+
+  if (!shareSuccess) return;
+
+  // ✅ 4. หลังจากแชร์สำเร็จ → บันทึกลง DB
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
+
+  try {
+    const distMatch = routeText.match(/ระยะทางรวม:\s*([\d.]+)/);
+    const timeMatch = routeText.match(/เวลาโดยประมาณ:\s*(\d+)/);
+
+    await fetch('/save-record', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: currentUser.userId,
+        name, phone, car, mileage, reason,
+        routeText,
+        totalDistance: distMatch ? parseFloat(distMatch[1]) : 0,
+        totalTime: timeMatch ? parseInt(timeMatch[1]) : 0,
+        hasPhoto: !!cachedPhotoBase64,
+        destinations: markers.map((m, i) => ({ point: i+1, lat: m.getPosition().lat(), lng: m.getPosition().lng() })),
+        timestamp: new Date().toISOString()
+      })
+    });
+
+    // บันทึก state การใช้รถ
+    const usageData = {
+      isUsing: true, carPlate: car, carModel: car.split(':')[0].trim(),
+      startedAt: new Date().toISOString(),
+      userName: name, userId: currentUser.userId, mileage
+    };
+    saveUsage(usageData);
+    showCarInUseScreen(usageData);
+    showToast(`✅ บันทึกสำเร็จ! กำลังใช้รถ ${car}`, 'success');
+
+  } catch(err2) {
+    showToast('เกิดข้อผิดพลาดในการบันทึก', 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="fas fa-share-alt"></i> บันทึก & แชร์ไปกลุ่ม';
+  }
+});
+
+// ======================================================
+// CAR IN USE SCREEN
+// ======================================================
+function showCarInUseScreen(usage) {
+  if (!usage) usage = loadUsage();
+  if (!usage) return;
+
+  document.getElementById('infoCarPlate').textContent = usage.carPlate || '-';
+  document.getElementById('infoUserName').textContent = usage.userName || '-';
+  document.getElementById('infoMileage').textContent = usage.mileage ? `${usage.mileage} กม.` : '-';
+  document.getElementById('infoStartTime').textContent = usage.startedAt
+    ? new Date(usage.startedAt).toLocaleString('th-TH') : '-';
+
+  // Reset return button
+  const returnBtn = document.getElementById('returnCarBtn');
+  returnBtn.disabled = true;
+  returnBtn.style.opacity = '0.5';
+  returnBtn.innerHTML = '<i class="fas fa-undo-alt"></i> คืนรถ (ต้องดึงตำแหน่งก่อน)';
+  returnLocation = null;
+  document.getElementById('locationStatus').className = 'location-status';
+  document.getElementById('locationStatus').innerHTML = '<i class="fas fa-map-marker-alt"></i> ⏳ ยังไม่ได้ระบุตำแหน่งคืนรถ';
+  document.getElementById('locationDetail').style.display = 'none';
+
+  showScreen('screen-car-in-use');
+  startTimer(usage.startedAt);
+}
+
+function startTimer(startedAt) {
+  clearInterval(timerInterval);
+  const start = new Date(startedAt);
+  function update() {
+    const diff = Date.now() - start;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('timerDisplay').textContent =
+      `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  update();
+  timerInterval = setInterval(update, 1000);
+}
+
+async function getReturnLocation() {
+  const btn = document.getElementById('getLocationBtn');
+  const status = document.getElementById('locationStatus');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังดึงตำแหน่ง...';
+  status.className = 'location-status';
+  status.innerHTML = '📡 กำลังดึงตำแหน่ง GPS...';
+
+  try {
+    const pos = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true, timeout: 10000, maximumAge: 0
+      });
+    });
+    returnLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy };
+
+    status.className = 'location-status success';
+    status.innerHTML = '✅ ดึงตำแหน่งสำเร็จ!';
+
+    const detail = document.getElementById('locationDetail');
+    const mapsUrl = `https://www.google.com/maps?q=${returnLocation.lat},${returnLocation.lng}`;
+    detail.style.display = 'block';
+    detail.innerHTML = `📍 ${returnLocation.lat.toFixed(6)}, ${returnLocation.lng.toFixed(6)}&nbsp;
+      <a href="${mapsUrl}" target="_blank" style="color:var(--info)"><i class="fas fa-external-link-alt"></i> เปิดแผนที่</a>`;
+
+    const returnBtn = document.getElementById('returnCarBtn');
+    returnBtn.disabled = false;
+    returnBtn.style.opacity = '1';
+    returnBtn.innerHTML = '<i class="fas fa-undo-alt"></i> คืนรถ';
+
+    btn.innerHTML = '<i class="fas fa-check-circle"></i> ดึงตำแหน่งสำเร็จ';
+    btn.style.background = 'linear-gradient(135deg,#16a34a,#22c55e)';
+  } catch (err) {
+    status.className = 'location-status error';
+    status.innerHTML = `❌ ดึงตำแหน่งไม่ได้: ${err.code === 1 ? 'กรุณาอนุญาต GPS' : err.message}`;
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-redo"></i> ลองอีกครั้ง';
+  }
+}
+
+// ✅ Return car — shareTargetPicker ก็ต้องเรียก sync เช่นกัน
+async function handleReturnCar() {
+  if (!returnLocation) { showToast('กรุณาดึงตำแหน่งก่อน', 'warning'); return; }
+  const usage = loadUsage();
+  if (!usage) { showToast('ไม่พบข้อมูลการใช้รถ', 'error'); return; }
+
+  const returnTime = new Date();
+  const durationMs = returnTime - new Date(usage.startedAt);
+  const durationMin = Math.floor(durationMs / 60000);
+  const durationH = Math.floor(durationMin / 60);
+  const durationText = durationH > 0
+    ? `${durationH} ชั่วโมง ${durationMin%60} นาที`
+    : `${durationMin} นาที`;
+
+  // ✅ สร้าง message sync ก่อน
+  const message = buildReturnFlexMessage(usage.carPlate, usage.userName, returnTime, durationText, returnLocation);
+
+  const returnBtn = document.getElementById('returnCarBtn');
+  let shareSuccess = false;
+
+  if (typeof liff !== 'undefined' && liff.isLoggedIn()) {
+    try {
+      await liff.shareTargetPicker([message]);
+      shareSuccess = true;
+    } catch (err) {
+      const msg = String(err).toLowerCase();
+      if (!msg.includes('cancel')) showToast('ไม่สามารถเปิดการแชร์ได้', 'error');
+      else showToast('ยกเลิกการแชร์', 'warning');
+      return;
+    }
+  } else {
+    shareSuccess = true;
+  }
+
+  if (!shareSuccess) return;
+
+  returnBtn.disabled = true;
+  returnBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
+  clearInterval(timerInterval);
+
+  try {
+    await fetch('/update-return-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        carPlate: usage.carPlate,
+        returnedAt: returnTime.toISOString(),
+        durationText,
+        returnLocation
+      })
+    });
+  } catch (_) {}
+
+  clearUsage();
+  showToast(`✅ คืนรถ ${usage.carPlate} สำเร็จ!`, 'success');
+  showModal('✅', 'คืนรถสำเร็จ!', `คืนรถ ${usage.carPlate} เรียบร้อยแล้ว\nระยะเวลาใช้งาน: ${durationText}`);
+
+  setTimeout(() => {
+    if (typeof liff !== 'undefined' && liff.isInClient()) {
+      liff.closeWindow();
+    } else {
+      location.reload();
+    }
+  }, 2500);
+}
+
+function handleCancelUsage() {
+  if (!confirm('ยืนยันยกเลิกการใช้รถ? บันทึกก่อนหน้าจะไม่ถูกอัปเดต')) return;
+  clearUsage();
+  clearInterval(timerInterval);
+  showToast('ยกเลิกการใช้รถแล้ว', 'info');
+  location.reload();
+}
+
+// ======================================================
+// MODAL
+// ======================================================
+function showModal(icon, title, message) {
+  document.getElementById('modalIcon').textContent = icon;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMessage').innerHTML = message.replace(/\n/g,'<br>');
+  document.getElementById('successModal').classList.add('show');
+}
+function closeModal() { document.getElementById('successModal').classList.remove('show'); }
+
+// ======================================================
+// USER UI
+// ======================================================
+function setUserCard(name, pictureUrl, dept) {
+  const h = new Date().getHours();
+  const g = h<12 ? 'อรุณสวัสดิ์' : h<18 ? 'สวัสดีตอนบ่าย' : 'สวัสดีตอนเย็น';
+  document.getElementById('userGreeting').textContent = `${g} คุณ`;
+  document.getElementById('userName').textContent = name;
+  document.getElementById('userDept').textContent = dept || '';
+  const av = document.getElementById('userAvatar');
+  if (pictureUrl) {
+    av.innerHTML = `<img src="${pictureUrl}" alt="${name}" onerror="this.parentElement.textContent='${name.charAt(0)}'">`;
+  } else {
+    av.textContent = name.charAt(0);
+  }
+}
+
+// ======================================================
+// REGISTRATION SCREEN
+// ======================================================
+function showRegisterScreen(user) {
+  const av = document.getElementById('regAvatar');
+  if (user.pictureUrl) {
+    av.outerHTML = `<img id="regAvatar" class="avatar" src="${user.pictureUrl}" alt="${user.displayName}" style="width:80px;height:80px;border-radius:50%;border:3px solid rgba(255,255,255,0.6);margin:0 auto 12px;display:block;object-fit:cover">`;
+  } else {
+    av.textContent = user.displayName?.charAt(0) || '👤';
+  }
+  document.getElementById('regName').value = user.displayName || '';
+  showScreen('screen-register');
+}
+
+document.getElementById('regDept').addEventListener('change', function() {
+  document.getElementById('otherDeptGroup').style.display = this.value === 'อื่นๆ' ? 'block' : 'none';
+});
+
+document.getElementById('regForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('regSubmitBtn');
+  const name = document.getElementById('regName').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  const dept = document.getElementById('regDept').value;
+  const otherDept = document.getElementById('regOtherDept').value.trim();
+  let valid = true;
+
+  if (!name) { showErr('regName', 'กรุณากรอกชื่อ-นามสกุล'); valid = false; }
+  if (!phone || !/^[0-9]{9,10}$/.test(phone)) { showErr('regPhone', 'กรุณากรอกเบอร์โทร 9-10 หลัก'); valid = false; }
+  if (!dept) { showErr('regDept', 'กรุณาเลือกแผนก'); valid = false; }
+  if (dept === 'อื่นๆ' && !otherDept) { showErr('regOtherDept', 'กรุณาระบุแผนก'); valid = false; }
+  if (!valid) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...';
+
+  try {
+    const res = await fetch('/user-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'submit',
+        userId: currentUser.userId,
+        displayName: currentUser.displayName,
+        pictureUrl: currentUser.pictureUrl,
+        formData: { fullName: name, phone, department: dept === 'อื่นๆ' ? otherDept : dept }
+      })
+    });
+    const data = await res.json();
+    if (data.duplicate) {
+      showToast('คุณส่งคำขอไปแล้ว กรุณารอการอนุมัติ', 'warning');
+      showPendingScreen(currentUser.displayName, true);
+      return;
+    }
+    if (data.success) {
+      showModal('📨', 'ส่งคำขอสำเร็จ!', `ขอบคุณคุณ ${name}\nคำขอถูกส่งถึงแอดมินแล้ว\nกรุณารอการอนุมัติ (ภายใน 24 ชั่วโมง)`);
+      setTimeout(() => {
+        closeModal();
+        showPendingScreen(name, false);
+      }, 3000);
+    }
+  } catch (_) {
+    showToast('เกิดข้อผิดพลาด กรุณาลองใหม่', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> ส่งคำขอสมัคร';
+  }
+});
+
+function showPendingScreen(name, hasPendingRequest) {
+  document.getElementById('pendingTitle').textContent = hasPendingRequest ? '⏳ รอการอนุมัติ' : '📨 ส่งคำขอแล้ว';
+  document.getElementById('pendingMsg').innerHTML = hasPendingRequest
+    ? `สวัสดีคุณ ${name}<br>คำขอของคุณกำลังรออนุมัติจากแอดมิน<br>กรุณาตรวจสอบอีกครั้งภายหลัง`
+    : `ขอบคุณคุณ ${name}<br>คำขอได้รับแล้ว รอแอดมินยืนยัน<br>(ภายใน 24 ชั่วโมง)`;
+  showScreen('screen-pending');
+}
+
+// ======================================================
+// APP INIT
+// ======================================================
+async function initApp() {
+  try {
+    // Load Maps async
+    const mapsScript = document.createElement('script');
+    mapsScript.src = `https://maps.googleapis.com/maps/api/js?key=${CONFIG.googleMapsKey}&libraries=places&loading=async&callback=initMap`;
+    mapsScript.async = true;
+    document.head.appendChild(mapsScript);
+
+    // Check existing car usage
+    const usage = loadUsage();
+
+    await liff.init({ liffId: CONFIG.liffId });
+
+    if (!liff.isLoggedIn()) {
+      liff.login({ redirectUri: location.href });
+      return;
+    }
+
+    const profile = await liff.getProfile();
+    const userMap = await fetch(`/get-user?userId=${encodeURIComponent(profile.userId)}`).then(r => r.json()).catch(() => ({}));
+    const dbUser = userMap[profile.userId];
+
+    currentUser = {
+      userId: profile.userId,
+      displayName: profile.displayName,
+      pictureUrl: profile.pictureUrl,
+      name: dbUser?.name || profile.displayName,
+      phone: dbUser?.phone || '',
+      department: dbUser?.department || 'รออนุมัติ',
+      role: dbUser?.role || 'pending',
+      status: dbUser?.status || 'pending',
+    };
+
+    // Update profile pic silently
+    if (dbUser && profile.pictureUrl !== dbUser.pictureUrl) {
+      fetch('/update-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: profile.userId, pictureUrl: profile.pictureUrl })
+      }).catch(() => {});
+    }
+
+    // Log login silently
+    fetch('/log-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: profile.userId })
+    }).catch(() => {});
+
+    document.getElementById('appLoading').style.display = 'none';
+
+    // Route to correct screen
+    if (usage) {
+      showCarInUseScreen(usage);
+      return;
+    }
+
+    const role = currentUser.role;
+    const status = currentUser.status;
+
+    if (role === 'inactive' || status === 'inactive' || role === 'rejected') {
+      document.getElementById('suspendedMsg').innerHTML = `คุณ ${profile.displayName}<br>บัญชีถูกระงับการใช้งาน<br>กรุณาติดต่อผู้ดูแลระบบ`;
+      showScreen('screen-suspended');
+    } else if (role === 'pending') {
+      // Check if already submitted request
+      const checkRes = await fetch('/user-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'check', userId: profile.userId })
+      }).then(r => r.json()).catch(() => ({ exists: false }));
+
+      if (checkRes.exists) {
+        showPendingScreen(profile.displayName, true);
+      } else {
+        showRegisterScreen(currentUser);
+      }
+    } else {
+      // Normal user / admin
+      setUserCard(currentUser.name, profile.pictureUrl, currentUser.department);
+      showScreen('screen-main');
+    }
+
+  } catch (err) {
+    console.error('Init error:', err);
+    document.getElementById('appLoading').style.display = 'none';
+    showToast('เกิดข้อผิดพลาดในการเริ่มต้น', 'error');
+    // Show main screen in preview mode
+    showScreen('screen-main');
+  }
+}
+
+window.addEventListener('load', initApp);
+</script>
+</body>
+</html>

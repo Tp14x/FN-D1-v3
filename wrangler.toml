@@ -1,0 +1,12 @@
+name = "car-usage-tracker"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "car-tracker-db"
+database_id = "YOUR_D1_DATABASE_ID"
+
+[vars]
+ADMIN_USER_ID = "YOUR_LINE_USER_ID_HERE"
+ALLOWED_ORIGIN = "https://your-project.pages.dev"
