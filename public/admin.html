@@ -3,339 +3,962 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel - ระบบบันทึกการใช้รถ</title>
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Admin Panel — ระบบบันทึกการใช้รถ</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-:root{
-  --primary:#16a34a;--primary-dark:#14532d;--primary-light:#22c55e;
-  --bg:#f0fdf4;--card:#fff;--text:#1e293b;--muted:#64748b;
-  --border:#e2e8f0;--shadow:0 2px 12px rgba(0,0,0,0.07);
-  --danger:#ef4444;--warning:#f59e0b;--info:#3b82f6;
+/* =============================================
+   DESIGN TOKENS
+============================================= */
+:root {
+  --c-bg:        #0b0f1a;
+  --c-surface:   #111827;
+  --c-surface2:  #1a2235;
+  --c-surface3:  #222d42;
+  --c-border:    rgba(255,255,255,0.07);
+  --c-border2:   rgba(255,255,255,0.13);
+  --c-text:      #f0f4ff;
+  --c-text2:     #8899bb;
+  --c-text3:     #5a6a88;
+
+  --c-green:     #10b981;
+  --c-green-d:   #059669;
+  --c-green-dim: rgba(16,185,129,0.12);
+  --c-blue:      #3b82f6;
+  --c-blue-dim:  rgba(59,130,246,0.12);
+  --c-amber:     #f59e0b;
+  --c-amber-dim: rgba(245,158,11,0.12);
+  --c-red:       #ef4444;
+  --c-red-dim:   rgba(239,68,68,0.12);
+  --c-purple:    #8b5cf6;
+  --c-purple-dim:rgba(139,92,246,0.12);
+
+  --radius-sm:   8px;
+  --radius-md:   14px;
+  --radius-lg:   20px;
+  --radius-xl:   28px;
+
+  --shadow-card: 0 2px 24px rgba(0,0,0,0.35);
+  --shadow-glow: 0 0 32px rgba(16,185,129,0.15);
+
+  --font-body: 'Sarabun', sans-serif;
+  --font-head: 'Prompt', sans-serif;
+
+  --sidebar-w: 260px;
+  --topbar-h:  64px;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Kanit',sans-serif;background:var(--bg);color:var(--text);font-size:15px;min-height:100vh}
 
-/* LOGIN */
-#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(145deg,#14532d,#16a34a)}
-.login-box{background:#fff;border-radius:28px;padding:40px 32px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.2);text-align:center}
-.login-box .logo{font-size:56px;margin-bottom:12px}
-.login-box h2{font-size:22px;font-weight:700;margin-bottom:6px}
-.login-box p{color:var(--muted);font-size:14px;margin-bottom:24px}
-.login-input{width:100%;padding:13px 16px;border:2px solid var(--border);border-radius:12px;font-family:'Kanit',sans-serif;font-size:15px;margin-bottom:12px;outline:none;transition:.2s}
-.login-input:focus{border-color:var(--primary)}
-.login-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;border:none;border-radius:12px;font-family:'Kanit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
-.login-btn:hover{opacity:.9}
+/* =============================================
+   RESET / BASE
+============================================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-size: 15px;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
 
-/* SIDEBAR */
-#adminApp{display:none;min-height:100vh}
-.layout{display:flex}
-.sidebar{width:240px;background:linear-gradient(180deg,#14532d,#166534);min-height:100vh;flex-shrink:0;position:sticky;top:0}
-.sidebar-logo{padding:24px 20px;border-bottom:1px solid rgba(255,255,255,0.1)}
-.sidebar-logo .icon{font-size:28px}
-.sidebar-logo h2{color:#fff;font-size:16px;font-weight:700;margin-top:6px}
-.sidebar-logo p{color:rgba(255,255,255,0.6);font-size:12px}
-.nav-item{display:flex;align-items:center;gap:12px;padding:13px 20px;color:rgba(255,255,255,0.75);cursor:pointer;transition:.2s;font-size:14px;font-weight:500;border-left:3px solid transparent}
-.nav-item:hover{background:rgba(255,255,255,0.1);color:#fff}
-.nav-item.active{background:rgba(255,255,255,0.15);color:#fff;border-left-color:#4ade80}
-.nav-item i{width:18px;text-align:center}
-.nav-badge{background:#ef4444;color:#fff;border-radius:99px;padding:2px 7px;font-size:11px;margin-left:auto}
-.sidebar-footer{position:absolute;bottom:0;width:240px;padding:16px 20px;border-top:1px solid rgba(255,255,255,0.1)}
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--c-surface3); border-radius: 99px; }
 
-/* MAIN CONTENT */
-.main{flex:1;overflow-x:hidden}
-.topbar{background:#fff;padding:16px 24px;border-bottom:2px solid var(--bg);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
-.topbar h1{font-size:18px;font-weight:700}
-.topbar-actions{display:flex;gap:8px;align-items:center}
+/* =============================================
+   LOGIN SCREEN
+============================================= */
+#loginScreen {
+  position: fixed; inset: 0; z-index: 9000;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at 60% 40%, #0d2341 0%, #0b0f1a 60%);
+  padding: 20px;
+}
+#loginScreen::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(16,185,129,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(59,130,246,0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
 
-/* PAGES */
-.page{display:none;padding:24px}
-.page.active{display:block}
+.login-card {
+  position: relative; z-index: 1;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border2);
+  border-radius: var(--radius-xl);
+  padding: 44px 36px;
+  width: 100%; max-width: 400px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+  animation: fadeUp .5s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: none; }
+}
 
-/* STATS */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
-.stat-card{background:#fff;border-radius:16px;padding:20px;box-shadow:var(--shadow);display:flex;align-items:center;gap:16px}
-.stat-icon-box{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.stat-icon-box.green{background:#dcfce7}
-.stat-icon-box.yellow{background:#fef3c7}
-.stat-icon-box.blue{background:#dbeafe}
-.stat-icon-box.red{background:#fee2e2}
-.stat-num{font-size:28px;font-weight:700;color:var(--text)}
-.stat-label{font-size:13px;color:var(--muted)}
+.login-logo {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, var(--c-green-d), var(--c-green));
+  border-radius: 22px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px;
+  margin: 0 auto 24px;
+  box-shadow: 0 8px 32px rgba(16,185,129,0.3);
+}
+.login-title {
+  font-family: var(--font-head);
+  font-size: 24px; font-weight: 700;
+  text-align: center; margin-bottom: 6px;
+}
+.login-sub {
+  text-align: center; color: var(--c-text2); font-size: 14px; margin-bottom: 32px;
+}
+.field-label {
+  font-size: 12px; font-weight: 600; color: var(--c-text2);
+  text-transform: uppercase; letter-spacing: .8px;
+  margin-bottom: 8px; display: block;
+}
+.field-input {
+  width: 100%;
+  background: var(--c-surface2);
+  border: 1.5px solid var(--c-border2);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  font-family: var(--font-body); font-size: 14px; color: var(--c-text);
+  outline: none; transition: border-color .2s, box-shadow .2s;
+  margin-bottom: 16px;
+}
+.field-input:focus {
+  border-color: var(--c-green);
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+}
+.field-input::placeholder { color: var(--c-text3); }
+.btn-login {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--c-green-d), var(--c-green));
+  border: none; border-radius: var(--radius-md);
+  font-family: var(--font-body); font-size: 15px; font-weight: 600; color: #fff;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: opacity .2s, transform .1s;
+  box-shadow: 0 4px 16px rgba(16,185,129,0.3);
+}
+.btn-login:hover { opacity: .9; }
+.btn-login:active { transform: scale(.98); }
+.login-note {
+  text-align: center; color: var(--c-text3); font-size: 12px; margin-top: 16px;
+}
 
-/* CARDS */
-.card{background:#fff;border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
-.card-head{padding:16px 20px;border-bottom:2px solid var(--bg);display:flex;align-items:center;justify-content:space-between}
-.card-head h3{font-size:16px;font-weight:600}
+/* =============================================
+   LAYOUT
+============================================= */
+#adminApp { display: none; min-height: 100vh; }
+.layout { display: flex; }
 
-/* TABLES */
-.tbl-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:600px}
-th{padding:11px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;background:var(--bg);white-space:nowrap}
-td{padding:11px 16px;border-top:1px solid var(--bg);font-size:14px;vertical-align:middle}
-tr:hover td{background:#fafffe}
+/* =============================================
+   SIDEBAR
+============================================= */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--c-surface);
+  border-right: 1px solid var(--c-border);
+  min-height: 100vh;
+  flex-shrink: 0;
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.sidebar::after {
+  content: '';
+  position: absolute; inset-x: 0; bottom: 0; height: 120px;
+  background: linear-gradient(to top, var(--c-surface), transparent);
+  pointer-events: none;
+}
 
-/* BADGES */
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600}
-.b-green{background:#dcfce7;color:#16a34a}
-.b-yellow{background:#fef3c7;color:#d97706}
-.b-red{background:#fee2e2;color:#ef4444}
-.b-blue{background:#dbeafe;color:#2563eb}
-.b-gray{background:#f1f5f9;color:#64748b}
+.sb-brand {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--c-border);
+  display: flex; align-items: center; gap: 14px;
+}
+.sb-brand-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--c-green-d), var(--c-green));
+  border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 4px 12px rgba(16,185,129,0.25);
+  flex-shrink: 0;
+}
+.sb-brand-text h2 {
+  font-family: var(--font-head);
+  font-size: 16px; font-weight: 700; color: var(--c-text);
+}
+.sb-brand-text p { font-size: 11px; color: var(--c-text3); margin-top: 2px; }
 
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:.2s;text-decoration:none}
-.btn-sm{padding:5px 10px;font-size:12px}
-.btn-primary{background:var(--primary);color:#fff}
-.btn-primary:hover{background:var(--primary-dark)}
-.btn-danger{background:var(--danger);color:#fff}
-.btn-danger:hover{background:#dc2626}
-.btn-warning{background:var(--warning);color:#fff}
-.btn-secondary{background:var(--bg);color:var(--muted);border:1.5px solid var(--border)}
-.btn-info{background:var(--info);color:#fff}
-.btn:disabled{opacity:.5;pointer-events:none}
+.sb-section { padding: 10px 12px 0; }
+.sb-section-label {
+  font-size: 10px; font-weight: 700; color: var(--c-text3);
+  text-transform: uppercase; letter-spacing: 1px;
+  padding: 0 8px 6px;
+}
 
-/* USER AVATAR */
-.u-cell{display:flex;align-items:center;gap:10px}
-.u-cell img{width:36px;height:36px;border-radius:50%;object-fit:cover}
-.u-cell .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-light));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0}
-.u-name{font-weight:500;font-size:14px}
-.u-sub{font-size:12px;color:var(--muted)}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--c-text2);
+  cursor: pointer; transition: all .18s;
+  font-size: 14px; font-weight: 500;
+  position: relative;
+  margin-bottom: 2px;
+}
+.nav-item i { width: 18px; text-align: center; font-size: 15px; }
+.nav-item:hover { background: var(--c-surface2); color: var(--c-text); }
+.nav-item.active {
+  background: var(--c-green-dim);
+  color: var(--c-green);
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute; left: 0; top: 20%; height: 60%;
+  width: 3px; background: var(--c-green);
+  border-radius: 0 3px 3px 0;
+}
+.nav-badge {
+  background: var(--c-red);
+  color: #fff; border-radius: 99px;
+  padding: 2px 7px; font-size: 10px; font-weight: 700;
+  margin-left: auto;
+}
 
-/* REQUEST CARD */
-.req-card{border:2px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;transition:.2s}
-.req-card:hover{border-color:var(--primary);box-shadow:0 4px 16px rgba(22,163,74,0.12)}
-.req-card.approved{border-color:#16a34a;background:#f0fdf4}
-.req-card.rejected{opacity:.6}
-.req-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.req-top img{width:48px;height:48px;border-radius:50%;object-fit:cover}
-.req-top .av{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px;flex-shrink:0}
-.req-info{flex:1}
-.req-name{font-weight:600;font-size:15px}
-.req-meta{font-size:13px;color:var(--muted)}
-.req-detail{background:var(--bg);border-radius:10px;padding:12px;font-size:13px;margin-bottom:12px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.req-detail .di{color:var(--muted);font-size:12px}
-.req-actions{display:flex;gap:8px}
+.sb-flex { flex: 1; }
 
-/* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:20px}
-.modal-overlay.show{display:flex}
-.modal-box{background:#fff;border-radius:20px;padding:28px 24px;max-width:440px;width:100%;animation:popIn .25s ease}
-@keyframes popIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
-.modal-title{font-size:18px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.modal-field{margin-bottom:14px}
-.modal-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:6px;display:block}
-.modal-input,.modal-select{width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Kanit',sans-serif;font-size:14px;color:var(--text);outline:none;transition:.2s;appearance:none}
-.modal-input:focus,.modal-select:focus{border-color:var(--primary)}
-.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.sb-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--c-border);
+  margin-top: auto;
+  position: relative; z-index: 1;
+}
+.sb-admin-info {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.sb-admin-av {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--c-blue), var(--c-purple));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.sb-admin-label { font-size: 11px; color: var(--c-text3); }
+.sb-admin-id { font-size: 12px; color: var(--c-text2); font-weight: 500; }
 
-/* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;z-index:9999;display:none;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,0.2);max-width:320px}
-.toast.show{display:flex;animation:slideUp .3s ease}
-.toast.success{background:linear-gradient(135deg,#16a34a,#22c55e)}
-.toast.error{background:linear-gradient(135deg,#ef4444,#dc2626)}
-.toast.warning{background:linear-gradient(135deg,#f59e0b,#d97706)}
-@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+/* =============================================
+   TOPBAR
+============================================= */
+.main { flex: 1; overflow-x: hidden; background: var(--c-bg); }
+.topbar {
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+  padding: 0 28px;
+  height: var(--topbar-h);
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+  backdrop-filter: blur(12px);
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-crumb {
+  font-size: 12px; color: var(--c-text3); font-weight: 500;
+  display: flex; align-items: center; gap: 6px;
+}
+.topbar-crumb span { color: var(--c-text2); }
+.topbar h1 {
+  font-family: var(--font-head);
+  font-size: 18px; font-weight: 700; color: var(--c-text);
+}
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
 
-/* LOADING */
-.load-row{text-align:center;padding:40px;color:var(--muted)}
+/* =============================================
+   PAGES
+============================================= */
+.page { display: none; padding: 28px; }
+.page.active { display: block; animation: fadeIn .2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-/* SEARCH BAR */
-.search-row{padding:12px 16px;border-bottom:2px solid var(--bg);display:flex;gap:8px}
-.search-row input,.search-row select{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Kanit',sans-serif;font-size:14px;outline:none;flex:1}
-.search-row input:focus,.search-row select:focus{border-color:var(--primary)}
+/* =============================================
+   STAT CARDS
+============================================= */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px; margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  display: flex; align-items: center; gap: 18px;
+  position: relative; overflow: hidden;
+  transition: transform .2s, box-shadow .2s;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-card); }
+.stat-card::before {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  transform: translate(20px, -20px);
+  opacity: .06;
+}
+.stat-card.green::before { background: var(--c-green); }
+.stat-card.blue::before  { background: var(--c-blue); }
+.stat-card.amber::before { background: var(--c-amber); }
+.stat-card.red::before   { background: var(--c-red); }
 
-/* MOBILE */
-@media(max-width:760px){
-  .sidebar{display:none}
-  .stats-grid{grid-template-columns:1fr 1fr}
-  .page{padding:16px}
-  .req-detail{grid-template-columns:1fr}
+.stat-icon {
+  width: 50px; height: 50px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.stat-card.green .stat-icon { background: var(--c-green-dim); }
+.stat-card.blue  .stat-icon { background: var(--c-blue-dim); }
+.stat-card.amber .stat-icon { background: var(--c-amber-dim); }
+.stat-card.red   .stat-icon { background: var(--c-red-dim); }
+
+.stat-val {
+  font-family: var(--font-head);
+  font-size: 30px; font-weight: 700; line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-card.green .stat-val { color: var(--c-green); }
+.stat-card.blue  .stat-val { color: var(--c-blue); }
+.stat-card.amber .stat-val { color: var(--c-amber); }
+.stat-card.red   .stat-val { color: var(--c-red); }
+.stat-label { font-size: 13px; color: var(--c-text2); }
+
+/* =============================================
+   CARDS
+============================================= */
+.card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.card-head {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--c-border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title {
+  font-family: var(--font-head);
+  font-size: 15px; font-weight: 600; color: var(--c-text);
+  display: flex; align-items: center; gap: 8px;
+}
+.card-title-icon {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+
+/* =============================================
+   TABLES
+============================================= */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 600px; }
+thead th {
+  padding: 10px 18px;
+  text-align: left;
+  font-size: 11px; font-weight: 700;
+  color: var(--c-text3);
+  text-transform: uppercase; letter-spacing: .7px;
+  background: var(--c-surface2);
+  white-space: nowrap;
+}
+tbody td {
+  padding: 12px 18px;
+  border-top: 1px solid var(--c-border);
+  font-size: 14px; vertical-align: middle;
+}
+tbody tr { transition: background .15s; }
+tbody tr:hover td { background: var(--c-surface2); }
+
+/* =============================================
+   BADGES
+============================================= */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 99px;
+  font-size: 11px; font-weight: 700; white-space: nowrap;
+}
+.b-green  { background: var(--c-green-dim);  color: var(--c-green); }
+.b-blue   { background: var(--c-blue-dim);   color: var(--c-blue); }
+.b-amber  { background: var(--c-amber-dim);  color: var(--c-amber); }
+.b-red    { background: var(--c-red-dim);    color: var(--c-red); }
+.b-purple { background: var(--c-purple-dim); color: var(--c-purple); }
+.b-gray   { background: var(--c-surface3);   color: var(--c-text2); }
+/* Aliases */
+.b-yellow { background: var(--c-amber-dim);  color: var(--c-amber); }
+
+/* =============================================
+   BUTTONS
+============================================= */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 13px; font-weight: 600;
+  border: none; cursor: pointer; transition: all .18s;
+  white-space: nowrap;
+}
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-primary {
+  background: var(--c-green); color: #fff;
+  box-shadow: 0 2px 8px rgba(16,185,129,0.25);
+}
+.btn-primary:hover { background: var(--c-green-d); }
+.btn-danger { background: var(--c-red); color: #fff; }
+.btn-danger:hover { opacity: .85; }
+.btn-amber { background: var(--c-amber); color: #fff; }
+.btn-amber:hover { opacity: .85; }
+.btn-warning { background: var(--c-amber); color: #fff; }
+.btn-secondary {
+  background: var(--c-surface2);
+  border: 1px solid var(--c-border2);
+  color: var(--c-text2);
+}
+.btn-secondary:hover { background: var(--c-surface3); color: var(--c-text); }
+.btn-info { background: var(--c-blue); color: #fff; }
+.btn:disabled { opacity: .4; pointer-events: none; }
+.btn-icon { width: 32px; height: 32px; padding: 0; justify-content: center; border-radius: 8px; }
+
+/* =============================================
+   USER CELL
+============================================= */
+.u-cell { display: flex; align-items: center; gap: 10px; }
+.u-cell img, .u-av {
+  width: 36px; height: 36px;
+  border-radius: 50%; object-fit: cover; flex-shrink: 0;
+}
+.u-av {
+  background: linear-gradient(135deg, var(--c-green-d), var(--c-green));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 700; font-size: 14px;
+}
+.u-name { font-size: 14px; font-weight: 500; }
+.u-sub  { font-size: 11px; color: var(--c-text3); margin-top: 2px; }
+
+/* =============================================
+   REQUEST CARDS
+============================================= */
+.req-list { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.req-card {
+  background: var(--c-surface2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.req-card:hover { border-color: var(--c-border2); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.req-card.approved { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.04); }
+.req-card.rejected { opacity: .6; }
+
+.req-top {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+}
+.req-av-lg, .req-top img {
+  width: 52px; height: 52px;
+  border-radius: 50%; object-fit: cover; flex-shrink: 0;
+  border: 2px solid var(--c-border2);
+}
+.req-av-lg {
+  background: linear-gradient(135deg, var(--c-green-d), var(--c-green));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 700; font-size: 20px;
+}
+.req-name  { font-size: 15px; font-weight: 600; }
+.req-meta  { font-size: 12px; color: var(--c-text3); margin-top: 3px; }
+
+.req-info-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+  background: var(--c-surface); border-radius: var(--radius-sm);
+  padding: 12px 16px; margin-bottom: 14px;
+}
+.req-field-label { font-size: 11px; color: var(--c-text3); margin-bottom: 2px; }
+.req-field-val   { font-size: 13px; font-weight: 500; }
+
+.req-actions { display: flex; gap: 8px; }
+
+/* =============================================
+   SEARCH ROW
+============================================= */
+.search-row {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--c-border);
+  display: flex; gap: 8px;
+}
+.search-row input,
+.search-row select,
+.filter-select {
+  background: var(--c-surface2);
+  border: 1.5px solid var(--c-border2);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-family: var(--font-body); font-size: 13px; color: var(--c-text);
+  outline: none; flex: 1; transition: border-color .2s;
+  appearance: none;
+}
+.search-row input:focus,
+.search-row select:focus,
+.filter-select:focus { border-color: var(--c-green); }
+.search-row input::placeholder { color: var(--c-text3); }
+.search-row select { flex: 0 0 140px; cursor: pointer; }
+
+/* =============================================
+   MODAL
+============================================= */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 1000;
+  align-items: center; justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.show { display: flex; }
+.modal-box {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border2);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  max-width: 460px; width: 100%;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  animation: popIn .2s ease;
+}
+@keyframes popIn {
+  from { transform: scale(.9); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.modal-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 22px;
+}
+.modal-header-icon {
+  width: 40px; height: 40px;
+  background: var(--c-green-dim);
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--c-green); font-size: 18px;
+}
+.modal-title {
+  font-family: var(--font-head);
+  font-size: 17px; font-weight: 700;
+}
+.modal-field { margin-bottom: 14px; }
+.modal-label {
+  display: block;
+  font-size: 11px; font-weight: 700; color: var(--c-text3);
+  text-transform: uppercase; letter-spacing: .7px; margin-bottom: 7px;
+}
+.modal-input, .modal-select {
+  width: 100%;
+  background: var(--c-surface2);
+  border: 1.5px solid var(--c-border2);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-family: var(--font-body); font-size: 14px; color: var(--c-text);
+  outline: none; transition: border-color .2s, box-shadow .2s;
+  appearance: none;
+}
+.modal-input:focus, .modal-select:focus {
+  border-color: var(--c-green);
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.12);
+}
+.modal-input::placeholder { color: var(--c-text3); }
+.modal-footer {
+  display: flex; gap: 8px; justify-content: flex-end;
+  margin-top: 22px; padding-top: 18px;
+  border-top: 1px solid var(--c-border);
+}
+
+/* =============================================
+   TOAST
+============================================= */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  padding: 13px 18px; border-radius: 12px;
+  font-size: 14px; z-index: 9999;
+  display: none; align-items: center; gap: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  max-width: 340px; font-weight: 500;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.toast.show { display: flex; animation: slideUp .3s ease; }
+.toast.success { background: #065f46; color: #a7f3d0; }
+.toast.error   { background: #7f1d1d; color: #fca5a5; }
+.toast.warning { background: #78350f; color: #fcd34d; }
+.toast.info    { background: var(--c-surface2); color: var(--c-text); }
+@keyframes slideUp {
+  from { transform: translateY(16px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+/* =============================================
+   MISC
+============================================= */
+.empty-state {
+  text-align: center; padding: 52px 20px; color: var(--c-text3);
+}
+.empty-state .icon { font-size: 40px; margin-bottom: 10px; }
+.empty-state p { font-size: 14px; }
+.load-row { text-align: center; padding: 40px; color: var(--c-text3); }
+
+/* Divider */
+.sb-divider { height: 1px; background: var(--c-border); margin: 8px 12px; }
+
+/* Photo thumbnail */
+.tbl-photo {
+  width: 40px; height: 40px; object-fit: cover;
+  border-radius: 8px; border: 1px solid var(--c-border2);
+  cursor: pointer; transition: transform .2s;
+}
+.tbl-photo:hover { transform: scale(1.08); }
+
+/* Row actions */
+.row-actions { display: flex; gap: 6px; }
+
+/* Tag filter row */
+.filter-row {
+  display: flex; gap: 8px; align-items: center;
+  margin-bottom: 18px; flex-wrap: wrap;
+}
+.filter-row h2 {
+  font-family: var(--font-head); font-size: 16px; font-weight: 700; flex: 1;
+}
+
+/* =============================================
+   RESPONSIVE
+============================================= */
+@media (max-width: 760px) {
+  .sidebar { display: none; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .page { padding: 16px; }
+  .req-info-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
-<!-- ===== LOGIN ===== -->
+<!-- ==================== LOGIN ==================== -->
 <div id="loginScreen">
-  <div class="login-box">
-    <div class="logo">🛡️</div>
-    <h2>Admin Panel</h2>
-    <p>ระบบจัดการบันทึกการใช้รถ</p>
-    <input class="login-input" type="text" id="adminIdInput" placeholder="กรอก LINE User ID ของ Admin">
-    <button class="login-btn" onclick="adminLogin()">
-      <i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ
+  <div class="login-card">
+    <div class="login-logo">🛡️</div>
+    <h2 class="login-title">Admin Panel</h2>
+    <p class="login-sub">ระบบจัดการบันทึกการใช้รถ</p>
+    <label class="field-label" for="adminIdInput">LINE User ID</label>
+    <input class="field-input" type="text" id="adminIdInput" placeholder="กรอก LINE User ID ของ Admin"
+           onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="btn-login" onclick="adminLogin()">
+      <i class="fas fa-shield-alt"></i> เข้าสู่ระบบ
     </button>
-    <p style="margin-top:16px;font-size:12px;color:var(--muted)">เฉพาะ Admin เท่านั้น</p>
+    <p class="login-note">🔒 เฉพาะผู้ดูแลระบบเท่านั้น</p>
   </div>
 </div>
 
-<!-- ===== ADMIN APP ===== -->
+<!-- ==================== ADMIN APP ==================== -->
 <div id="adminApp">
-  <div class="layout">
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <div class="sidebar-logo">
-        <div class="icon">🚗</div>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-brand-icon">🚗</div>
+      <div class="sb-brand-text">
         <h2>Car System</h2>
         <p>Admin Panel v2.0</p>
       </div>
+    </div>
+
+    <div class="sb-section" style="margin-top:14px">
+      <div class="sb-section-label">เมนูหลัก</div>
       <div class="nav-item active" onclick="switchPage('dashboard')" id="nav-dashboard">
-        <i class="fas fa-tachometer-alt"></i> แดชบอร์ด
+        <i class="fas fa-chart-pie"></i> แดชบอร์ด
       </div>
       <div class="nav-item" onclick="switchPage('requests')" id="nav-requests">
         <i class="fas fa-user-clock"></i> คำขอสมัคร
         <span class="nav-badge" id="pendingBadge" style="display:none">0</span>
       </div>
+    </div>
+
+    <div class="sb-divider" style="margin-top:10px"></div>
+
+    <div class="sb-section">
+      <div class="sb-section-label">จัดการ</div>
       <div class="nav-item" onclick="switchPage('users')" id="nav-users">
-        <i class="fas fa-users"></i> จัดการผู้ใช้
+        <i class="fas fa-users"></i> ผู้ใช้งาน
       </div>
       <div class="nav-item" onclick="switchPage('records')" id="nav-records">
         <i class="fas fa-history"></i> ประวัติการใช้รถ
       </div>
-      <div class="sidebar-footer">
-        <div style="color:rgba(255,255,255,0.5);font-size:12px;margin-bottom:8px" id="adminLabel">-</div>
-        <div class="nav-item" style="padding:8px 0;border-left:none" onclick="adminLogout()">
-          <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
-        </div>
-      </div>
     </div>
 
-    <!-- Main -->
-    <div class="main">
-      <div class="topbar">
-        <h1 id="pageTitle">แดชบอร์ด</h1>
-        <div class="topbar-actions">
-          <button class="btn btn-secondary btn-sm" onclick="refreshAll()"><i class="fas fa-sync-alt"></i> รีเฟรช</button>
-          <a href="/history" class="btn btn-primary btn-sm"><i class="fas fa-external-link-alt"></i> ดูประวัติสาธารณะ</a>
+    <div class="sb-flex"></div>
+
+    <div class="sb-footer">
+      <div class="sb-admin-info">
+        <div class="sb-admin-av">👤</div>
+        <div>
+          <div class="sb-admin-label">ล็อกอินเป็น Admin</div>
+          <div class="sb-admin-id" id="adminLabel">—</div>
         </div>
       </div>
-
-      <!-- DASHBOARD -->
-      <div class="page active" id="page-dashboard">
-        <div class="stats-grid" id="statsGrid">
-          <div class="stat-card"><div class="stat-icon-box green">🚗</div><div><div class="stat-num" id="s-trips">-</div><div class="stat-label">เที่ยวทั้งหมด</div></div></div>
-          <div class="stat-card"><div class="stat-icon-box yellow">🔑</div><div><div class="stat-num" id="s-active">-</div><div class="stat-label">รถออกอยู่ตอนนี้</div></div></div>
-          <div class="stat-card"><div class="stat-icon-box blue">👥</div><div><div class="stat-num" id="s-users">-</div><div class="stat-label">ผู้ใช้งาน</div></div></div>
-          <div class="stat-card"><div class="stat-icon-box red">⏳</div><div><div class="stat-num" id="s-pending-req">-</div><div class="stat-label">รอการอนุมัติ</div></div></div>
-        </div>
-
-        <!-- Recent Records -->
-        <div class="card">
-          <div class="card-head"><h3>🕐 รายการล่าสุด</h3></div>
-          <div class="tbl-wrap">
-            <table>
-              <thead><tr><th>ผู้ใช้</th><th>ทะเบียนรถ</th><th>สาเหตุ</th><th>วันที่</th><th>สถานะ</th></tr></thead>
-              <tbody id="recentBody"><tr><td colspan="5" class="load-row">กำลังโหลด...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- REQUESTS -->
-      <div class="page" id="page-requests">
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
-          <h2 style="font-size:16px;font-weight:600;flex:1">คำขอสมัครใช้งาน</h2>
-          <select id="reqFilter" onchange="renderRequests()" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:Kanit,sans-serif;font-size:13px">
-            <option value="pending">รอการอนุมัติ</option>
-            <option value="approved">อนุมัติแล้ว</option>
-            <option value="rejected">ปฏิเสธแล้ว</option>
-            <option value="">ทั้งหมด</option>
-          </select>
-        </div>
-        <div id="requestsList"><div class="load-row">กำลังโหลด...</div></div>
-      </div>
-
-      <!-- USERS -->
-      <div class="page" id="page-users">
-        <div class="card">
-          <div class="card-head">
-            <h3>👥 รายชื่อผู้ใช้ทั้งหมด</h3>
-            <span class="badge b-blue" id="userCountBadge">-</span>
-          </div>
-          <div class="search-row">
-            <input type="text" id="userSearch" placeholder="🔍 ค้นหาชื่อ, แผนก..." oninput="renderUsers()">
-            <select id="userRoleFilter" onchange="renderUsers()" style="min-width:120px">
-              <option value="">ทุก role</option>
-              <option value="user">user</option>
-              <option value="admin">admin</option>
-              <option value="pending">pending</option>
-              <option value="inactive">inactive</option>
-            </select>
-          </div>
-          <div class="tbl-wrap">
-            <table>
-              <thead><tr><th>ผู้ใช้</th><th>เบอร์โทร</th><th>แผนก</th><th>Role</th><th>สถานะ</th><th>อัปเดตล่าสุด</th><th>จัดการ</th></tr></thead>
-              <tbody id="usersBody"><tr><td colspan="7" class="load-row">กำลังโหลด...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- RECORDS -->
-      <div class="page" id="page-records">
-        <div class="card">
-          <div class="card-head">
-            <h3>📋 ประวัติการใช้รถ (Admin View)</h3>
-          </div>
-          <div class="search-row">
-            <input type="text" id="recSearch" placeholder="🔍 ค้นหา..." oninput="renderRecords()">
-            <select id="recStatusFilter" onchange="renderRecords()" style="min-width:130px">
-              <option value="">ทุกสถานะ</option>
-              <option value="pending">กำลังใช้อยู่</option>
-              <option value="returned">คืนรถแล้ว</option>
-            </select>
-          </div>
-          <div class="tbl-wrap">
-            <table>
-              <thead><tr><th>ผู้ใช้</th><th>ทะเบียน</th><th>ไมล์</th><th>สาเหตุ</th><th>ระยะทาง</th><th>รูป</th><th>วันที่</th><th>สถานะ</th><th>คืนเมื่อ</th><th>ระยะเวลา</th></tr></thead>
-              <tbody id="recordsBody"><tr><td colspan="10" class="load-row">กำลังโหลด...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
+      <div class="nav-item" style="padding:8px 10px" onclick="adminLogout()">
+        <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
       </div>
     </div>
   </div>
-</div>
 
-<!-- EDIT USER MODAL -->
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1 id="pageTitle">แดชบอร์ด</h1>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary btn-sm" onclick="refreshAll()">
+          <i class="fas fa-sync-alt"></i> รีเฟรช
+        </button>
+        <a href="/history" class="btn btn-primary btn-sm">
+          <i class="fas fa-external-link-alt"></i> ดูประวัติสาธารณะ
+        </a>
+      </div>
+    </div>
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-icon">🚗</div>
+          <div>
+            <div class="stat-val" id="s-trips">—</div>
+            <div class="stat-label">เที่ยวทั้งหมด</div>
+          </div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-icon">🔑</div>
+          <div>
+            <div class="stat-val" id="s-active">—</div>
+            <div class="stat-label">รถออกอยู่ตอนนี้</div>
+          </div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">👥</div>
+          <div>
+            <div class="stat-val" id="s-users">—</div>
+            <div class="stat-label">ผู้ใช้งาน</div>
+          </div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon">⏳</div>
+          <div>
+            <div class="stat-val" id="s-pending-req">—</div>
+            <div class="stat-label">รอการอนุมัติ</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">
+            <div class="card-title-icon" style="background:var(--c-amber-dim);color:var(--c-amber)">🕐</div>
+            รายการล่าสุด
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ผู้ใช้</th>
+                <th>ทะเบียนรถ</th>
+                <th>สาเหตุ</th>
+                <th>วันที่</th>
+                <th>สถานะ</th>
+              </tr>
+            </thead>
+            <tbody id="recentBody">
+              <tr><td colspan="5" class="load-row"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== REQUESTS ===== -->
+    <div class="page" id="page-requests">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">
+            <div class="card-title-icon" style="background:var(--c-blue-dim);color:var(--c-blue)">
+              <i class="fas fa-user-clock"></i>
+            </div>
+            คำขอสมัครใช้งาน
+          </div>
+          <select id="reqFilter" onchange="renderRequests()" class="filter-select" style="max-width:160px;flex:none">
+            <option value="pending">⏳ รอการอนุมัติ</option>
+            <option value="approved">✅ อนุมัติแล้ว</option>
+            <option value="rejected">❌ ปฏิเสธแล้ว</option>
+            <option value="">ทั้งหมด</option>
+          </select>
+        </div>
+        <div id="requestsList" class="req-list">
+          <div class="load-row"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== USERS ===== -->
+    <div class="page" id="page-users">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">
+            <div class="card-title-icon" style="background:var(--c-purple-dim);color:var(--c-purple)">
+              <i class="fas fa-users"></i>
+            </div>
+            รายชื่อผู้ใช้ทั้งหมด
+          </div>
+          <span class="badge b-blue" id="userCountBadge">— คน</span>
+        </div>
+        <div class="search-row">
+          <input type="text" id="userSearch" placeholder="🔍 ค้นหาชื่อ, แผนก, ID..." oninput="renderUsers()">
+          <select id="userRoleFilter" onchange="renderUsers()">
+            <option value="">ทุก role</option>
+            <option value="user">user</option>
+            <option value="admin">admin</option>
+            <option value="pending">pending</option>
+            <option value="inactive">inactive</option>
+          </select>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ผู้ใช้</th>
+                <th>เบอร์โทร</th>
+                <th>แผนก</th>
+                <th>Role</th>
+                <th>สถานะ</th>
+                <th>อัปเดตล่าสุด</th>
+                <th>จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="usersBody">
+              <tr><td colspan="7" class="load-row"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RECORDS ===== -->
+    <div class="page" id="page-records">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">
+            <div class="card-title-icon" style="background:var(--c-green-dim);color:var(--c-green)">
+              <i class="fas fa-history"></i>
+            </div>
+            ประวัติการใช้รถ (Admin View)
+          </div>
+        </div>
+        <div class="search-row">
+          <input type="text" id="recSearch" placeholder="🔍 ค้นหาชื่อ, ทะเบียน, สาเหตุ..." oninput="renderRecords()">
+          <select id="recStatusFilter" onchange="renderRecords()">
+            <option value="">ทุกสถานะ</option>
+            <option value="pending">🔑 กำลังใช้อยู่</option>
+            <option value="returned">✅ คืนรถแล้ว</option>
+          </select>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ผู้ใช้</th>
+                <th>ทะเบียน</th>
+                <th>ไมล์</th>
+                <th>สาเหตุ</th>
+                <th>ระยะทาง</th>
+                <th>รูป</th>
+                <th>วันที่</th>
+                <th>สถานะ</th>
+                <th>คืนเมื่อ</th>
+                <th>ระยะเวลา</th>
+              </tr>
+            </thead>
+            <tbody id="recordsBody">
+              <tr><td colspan="10" class="load-row"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+</div><!-- /adminApp -->
+
+<!-- ===== EDIT USER MODAL ===== -->
 <div class="modal-overlay" id="editModal">
   <div class="modal-box">
-    <div class="modal-title"><i class="fas fa-user-edit" style="color:var(--primary)"></i> แก้ไขข้อมูลผู้ใช้</div>
+    <div class="modal-header">
+      <div class="modal-header-icon"><i class="fas fa-user-edit"></i></div>
+      <div class="modal-title">แก้ไขข้อมูลผู้ใช้</div>
+    </div>
     <input type="hidden" id="editUserId">
-    <div class="modal-field">
-      <label class="modal-label">ชื่อ-นามสกุล</label>
-      <input class="modal-input" type="text" id="editName">
-    </div>
-    <div class="modal-field">
-      <label class="modal-label">เบอร์โทร</label>
-      <input class="modal-input" type="text" id="editPhone">
-    </div>
-    <div class="modal-field">
-      <label class="modal-label">แผนก</label>
-      <input class="modal-input" type="text" id="editDept">
-    </div>
-    <div class="modal-field">
-      <label class="modal-label">Role</label>
-      <select class="modal-select" id="editRole">
-        <option value="user">user</option>
-        <option value="admin">admin</option>
-        <option value="pending">pending</option>
-        <option value="inactive">inactive</option>
-        <option value="rejected">rejected</option>
-      </select>
-    </div>
-    <div class="modal-field">
-      <label class="modal-label">สถานะ</label>
-      <select class="modal-select" id="editStatus">
-        <option value="active">active</option>
-        <option value="inactive">inactive</option>
-        <option value="pending">pending</option>
-      </select>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 14px">
+      <div class="modal-field" style="grid-column:1/-1">
+        <label class="modal-label">ชื่อ-นามสกุล</label>
+        <input class="modal-input" type="text" id="editName" placeholder="ชื่อ-นามสกุล">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">เบอร์โทร</label>
+        <input class="modal-input" type="text" id="editPhone" placeholder="0XX-XXX-XXXX">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">แผนก</label>
+        <input class="modal-input" type="text" id="editDept" placeholder="ชื่อแผนก">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Role</label>
+        <select class="modal-select" id="editRole">
+          <option value="user">user</option>
+          <option value="admin">admin</option>
+          <option value="pending">pending</option>
+          <option value="inactive">inactive</option>
+          <option value="rejected">rejected</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">สถานะ</label>
+        <select class="modal-select" id="editStatus">
+          <option value="active">active</option>
+          <option value="inactive">inactive</option>
+          <option value="pending">pending</option>
+        </select>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="saveUserEdit()"><i class="fas fa-save"></i> บันทึก</button>
+      <button class="btn btn-primary" onclick="saveUserEdit()">
+        <i class="fas fa-save"></i> บันทึก
+      </button>
     </div>
   </div>
 </div>
@@ -344,53 +967,51 @@ tr:hover td{background:#fafffe}
 <div class="toast" id="toast"></div>
 
 <script>
-// ======================================================
-// STATE
-// ======================================================
+/* =============================================
+   STATE
+============================================= */
 let adminId = '';
-let allData = { userMap: {}, requests: [], records: [], stats: {} };
+let allData = { userMap:{}, requests:[], records:[], stats:{} };
 
-// ======================================================
-// LOGIN
-// ======================================================
+/* =============================================
+   LOGIN
+============================================= */
 function adminLogin() {
   const id = document.getElementById('adminIdInput').value.trim();
   if (!id) { showToast('กรุณากรอก User ID', 'warning'); return; }
   adminId = id;
   loadAll();
 }
-
 function adminLogout() {
   adminId = '';
   document.getElementById('adminApp').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
 }
 
-// ======================================================
-// LOAD DATA
-// ======================================================
+/* =============================================
+   LOAD DATA
+============================================= */
 async function loadAll() {
   try {
     const res = await fetch('/admin-action', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'load', requestingUserId: adminId })
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'load', requestingUserId:adminId })
     });
     if (res.status === 403) { showToast('ไม่ใช่ Admin', 'error'); return; }
     const data = await res.json();
 
-    // Load records separately
     const recRes = await fetch('/admin-action', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'records', requestingUserId: adminId })
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'records', requestingUserId:adminId })
     });
     const recData = await recRes.json();
 
-    allData.userMap = data.userMap || {};
+    allData.userMap  = data.userMap  || {};
     allData.requests = data.requests || [];
-    allData.stats = data.stats || {};
-    allData.records = recData.records || [];
+    allData.stats    = data.stats    || {};
+    allData.records  = recData.records || [];
 
     updateStats();
     renderRequests();
@@ -400,70 +1021,62 @@ async function loadAll() {
 
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminApp').style.display = 'block';
-    document.getElementById('adminLabel').textContent = `Admin: ${adminId.slice(0,12)}...`;
-
-  } catch (e) {
+    document.getElementById('adminLabel').textContent = adminId.slice(0, 16) + '…';
+  } catch(e) {
     showToast('โหลดข้อมูลไม่ได้: ' + e.message, 'error');
   }
 }
-
 function refreshAll() { loadAll(); showToast('รีเฟรชแล้ว', 'success'); }
 
-// ======================================================
-// STATS
-// ======================================================
+/* =============================================
+   STATS
+============================================= */
 function updateStats() {
   const s = allData.stats;
-  document.getElementById('s-trips').textContent = s.total_records || allData.records.length || 0;
-  document.getElementById('s-active').textContent = s.cars_out || 0;
-  document.getElementById('s-users').textContent = s.total_users || Object.keys(allData.userMap).filter(k => allData.userMap[k].role === 'user').length;
+  document.getElementById('s-trips').textContent      = s.total_records || allData.records.length || 0;
+  document.getElementById('s-active').textContent     = s.cars_out || 0;
+  document.getElementById('s-users').textContent      = s.total_users || Object.keys(allData.userMap).filter(k => allData.userMap[k].role === 'user').length;
   const pendingCount = allData.requests.filter(r => r.status === 'pending').length;
   document.getElementById('s-pending-req').textContent = pendingCount;
-  if (pendingCount > 0) {
-    document.getElementById('pendingBadge').textContent = pendingCount;
-    document.getElementById('pendingBadge').style.display = 'inline';
-  } else {
-    document.getElementById('pendingBadge').style.display = 'none';
-  }
+  const badge = document.getElementById('pendingBadge');
+  badge.textContent = pendingCount;
+  badge.style.display = pendingCount > 0 ? 'inline' : 'none';
 }
 
-// ======================================================
-// RECENT RECORDS
-// ======================================================
+/* =============================================
+   RECENT RECORDS
+============================================= */
 function renderRecentRecords() {
   const recent = allData.records.slice(0, 8);
   document.getElementById('recentBody').innerHTML = recent.length === 0
-    ? '<tr><td colspan="5" class="load-row">ยังไม่มีรายการ</td></tr>'
+    ? '<tr><td colspan="5"><div class="empty-state"><div class="icon">📭</div><p>ยังไม่มีรายการ</p></div></td></tr>'
     : recent.map(r => {
         const badge = r.return_status === 'returned'
           ? '<span class="badge b-green">✅ คืนแล้ว</span>'
-          : '<span class="badge b-yellow">🔑 ใช้อยู่</span>';
+          : '<span class="badge b-amber">🔑 ใช้อยู่</span>';
         return `<tr>
           <td><div class="u-cell">
-            ${r.picture_url ? `<img src="${r.picture_url}" alt="">` : `<div class="av">${(r.name||'?').charAt(0)}</div>`}
-            <div class="u-name">${esc(r.name||'-')}</div>
+            ${avatar(r.picture_url, r.name)}
+            <div class="u-name">${esc(r.name||'—')}</div>
           </div></td>
-          <td><span class="badge b-blue">🚗 ${esc(r.car||'-')}</span></td>
-          <td style="font-size:13px;max-width:160px">${esc((r.reason||'').slice(0,40))}${(r.reason||'').length>40?'...':''}</td>
-          <td style="font-size:12px;white-space:nowrap">${fmtDate(r.timestamp)}</td>
+          <td><span class="badge b-blue">🚗 ${esc(r.car||'—')}</span></td>
+          <td style="font-size:13px;max-width:160px;color:var(--c-text2)">${esc((r.reason||'').slice(0,40))}${(r.reason||'').length>40?'…':''}</td>
+          <td style="font-size:12px;white-space:nowrap;color:var(--c-text3)">${fmtDate(r.timestamp)}</td>
           <td>${badge}</td>
         </tr>`;
       }).join('');
 }
 
-// ======================================================
-// REQUESTS
-// ======================================================
+/* =============================================
+   REQUESTS
+============================================= */
 function renderRequests() {
   const filter = document.getElementById('reqFilter').value;
   const list = allData.requests.filter(r => !filter || r.status === filter);
   const el = document.getElementById('requestsList');
 
   if (list.length === 0) {
-    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted)">
-      <div style="font-size:36px;margin-bottom:8px">📭</div>
-      <div>ไม่มีคำขอ${filter === 'pending' ? 'ที่รอการอนุมัติ' : ''}</div>
-    </div>`;
+    el.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>ไม่มีคำขอ${filter === 'pending' ? 'ที่รอการอนุมัติ' : ''}</p></div>`;
     return;
   }
 
@@ -473,22 +1086,22 @@ function renderRequests() {
       ? '<span class="badge b-green">✅ อนุมัติแล้ว</span>'
       : r.status === 'rejected'
       ? '<span class="badge b-red">❌ ปฏิเสธ</span>'
-      : '<span class="badge b-yellow">⏳ รอการอนุมัติ</span>';
+      : '<span class="badge b-amber">⏳ รอการอนุมัติ</span>';
 
     return `<div class="req-card ${r.status !== 'pending' ? r.status : ''}">
       <div class="req-top">
-        ${r.picture_url ? `<img src="${r.picture_url}" alt="">` : `<div class="av">${(r.display_name||r.full_name||'?').charAt(0)}</div>`}
-        <div class="req-info">
-          <div class="req-name">${esc(r.display_name || r.full_name || '-')}</div>
-          <div class="req-meta">ส่งเมื่อ ${fmtDate(r.submitted_at)}</div>
+        ${avatarLg(r.picture_url, r.display_name || r.full_name)}
+        <div class="req-info" style="flex:1">
+          <div class="req-name">${esc(r.display_name || r.full_name || '—')}</div>
+          <div class="req-meta"><i class="fas fa-clock" style="margin-right:4px"></i>ส่งเมื่อ ${fmtDate(r.submitted_at)}</div>
         </div>
         ${statusBadge}
       </div>
-      <div class="req-detail">
-        <div><div class="di">ชื่อจริง</div><strong>${esc(r.full_name||'-')}</strong></div>
-        <div><div class="di">เบอร์โทร</div>${esc(r.phone||'-')}</div>
-        <div><div class="di">แผนก</div>${esc(r.department||'-')}</div>
-        <div><div class="di">LINE ID</div><span style="font-size:11px;word-break:break-all">${esc(r.user_id||'-')}</span></div>
+      <div class="req-info-grid">
+        <div><div class="req-field-label">ชื่อจริง</div><div class="req-field-val">${esc(r.full_name||'—')}</div></div>
+        <div><div class="req-field-label">เบอร์โทร</div><div class="req-field-val">${esc(r.phone||'—')}</div></div>
+        <div><div class="req-field-label">แผนก</div><div class="req-field-val">${esc(r.department||'—')}</div></div>
+        <div><div class="req-field-label">LINE ID</div><div class="req-field-val" style="font-size:11px;word-break:break-all;color:var(--c-text3)">${esc(r.user_id||'—')}</div></div>
       </div>
       ${isPending ? `<div class="req-actions">
         <button class="btn btn-primary" onclick="approveRequest('${r.user_id}')">
@@ -506,22 +1119,15 @@ async function approveRequest(userId) {
   const req = allData.requests.find(r => r.user_id === userId);
   if (!req) return;
   if (!confirm(`อนุมัติ ${req.full_name || req.display_name}?`)) return;
-
   try {
     const res = await fetch('/admin-action', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'approve', requestingUserId: adminId, userId,
-        userData: { name: req.full_name, phone: req.phone, department: req.department, pictureUrl: req.picture_url }
-      })
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'approve', requestingUserId:adminId, userId,
+        userData:{ name:req.full_name, phone:req.phone, department:req.department, pictureUrl:req.picture_url } })
     });
     const d = await res.json();
-    if (d.success) {
-      showToast(`✅ อนุมัติ ${req.full_name} สำเร็จ`, 'success');
-      await loadAll();
-    }
-  } catch (e) { showToast('เกิดข้อผิดพลาด', 'error'); }
+    if (d.success) { showToast(`✅ อนุมัติ ${req.full_name} สำเร็จ`, 'success'); await loadAll(); }
+  } catch(e) { showToast('เกิดข้อผิดพลาด', 'error'); }
 }
 
 async function rejectRequest(userId) {
@@ -529,58 +1135,64 @@ async function rejectRequest(userId) {
   if (!confirm(`ปฏิเสธ ${req?.full_name || userId}?`)) return;
   try {
     const res = await fetch('/admin-action', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'reject', requestingUserId: adminId, userId })
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'reject', requestingUserId:adminId, userId })
     });
     const d = await res.json();
     if (d.success) { showToast('ปฏิเสธแล้ว', 'warning'); await loadAll(); }
-  } catch (e) { showToast('เกิดข้อผิดพลาด', 'error'); }
+  } catch(e) { showToast('เกิดข้อผิดพลาด', 'error'); }
 }
 
-// ======================================================
-// USERS
-// ======================================================
+/* =============================================
+   USERS
+============================================= */
 function renderUsers() {
-  const search = document.getElementById('userSearch').value.toLowerCase();
+  const search     = document.getElementById('userSearch').value.toLowerCase();
   const roleFilter = document.getElementById('userRoleFilter').value;
   const entries = Object.entries(allData.userMap).filter(([id, u]) => {
     if (roleFilter && u.role !== roleFilter) return false;
     if (search && !`${u.name} ${u.department} ${id}`.toLowerCase().includes(search)) return false;
     return true;
   });
-
   document.getElementById('userCountBadge').textContent = `${entries.length} คน`;
 
   if (entries.length === 0) {
-    document.getElementById('usersBody').innerHTML = '<tr><td colspan="7" class="load-row">ไม่พบผู้ใช้</td></tr>';
+    document.getElementById('usersBody').innerHTML =
+      '<tr><td colspan="7"><div class="empty-state"><div class="icon">🔍</div><p>ไม่พบผู้ใช้</p></div></td></tr>';
     return;
   }
 
   document.getElementById('usersBody').innerHTML = entries.map(([uid, u]) => {
-    const roleBadge = u.role === 'admin' ? '<span class="badge b-blue">admin</span>'
-      : u.role === 'user' ? '<span class="badge b-green">user</span>'
-      : u.role === 'pending' ? '<span class="badge b-yellow">pending</span>'
-      : '<span class="badge b-red">' + u.role + '</span>';
+    const roleBadge =
+      u.role === 'admin'   ? '<span class="badge b-purple">👑 admin</span>' :
+      u.role === 'user'    ? '<span class="badge b-green">✅ user</span>'   :
+      u.role === 'pending' ? '<span class="badge b-amber">⏳ pending</span>' :
+      `<span class="badge b-red">${u.role}</span>`;
 
-    const statusBadge = u.status === 'active' ? '<span class="badge b-green">active</span>'
-      : u.status === 'inactive' ? '<span class="badge b-red">inactive</span>'
-      : '<span class="badge b-gray">' + (u.status||'-') + '</span>';
+    const statusBadge =
+      u.status === 'active'   ? '<span class="badge b-green">● active</span>'   :
+      u.status === 'inactive' ? '<span class="badge b-red">● inactive</span>'   :
+      `<span class="badge b-gray">${u.status||'—'}</span>`;
 
     return `<tr>
       <td><div class="u-cell">
-        ${u.pictureUrl ? `<img src="${u.pictureUrl}" alt="">` : `<div class="av">${(u.name||'?').charAt(0)}</div>`}
-        <div><div class="u-name">${esc(u.name||'-')}</div><div class="u-sub" style="font-size:11px;word-break:break-all">${uid.slice(0,20)}...</div></div>
+        ${avatar(u.pictureUrl, u.name)}
+        <div>
+          <div class="u-name">${esc(u.name||'—')}</div>
+          <div class="u-sub">${uid.slice(0,22)}…</div>
+        </div>
       </div></td>
-      <td>${esc(u.phone||'-')}</td>
-      <td>${esc(u.department||'-')}</td>
+      <td style="color:var(--c-text2)">${esc(u.phone||'—')}</td>
+      <td style="color:var(--c-text2)">${esc(u.department||'—')}</td>
       <td>${roleBadge}</td>
       <td>${statusBadge}</td>
-      <td style="font-size:12px;white-space:nowrap">${fmtDate(u.updatedAt)}</td>
+      <td style="font-size:12px;white-space:nowrap;color:var(--c-text3)">${fmtDate(u.updatedAt)}</td>
       <td>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn btn-secondary btn-sm" onclick="openEditModal('${uid}')"><i class="fas fa-edit"></i></button>
-          <button class="btn ${u.status==='active'?'btn-warning':'btn-primary'} btn-sm" onclick="toggleUser('${uid}')">
+        <div class="row-actions">
+          <button class="btn btn-secondary btn-icon btn-sm" onclick="openEditModal('${uid}')" title="แก้ไข">
+            <i class="fas fa-pen"></i>
+          </button>
+          <button class="btn ${u.status==='active'?'btn-amber':'btn-primary'} btn-icon btn-sm" onclick="toggleUser('${uid}')" title="${u.status==='active'?'ระงับ':'เปิดใช้งาน'}">
             ${u.status==='active'?'<i class="fas fa-ban"></i>':'<i class="fas fa-check"></i>'}
           </button>
         </div>
@@ -593,60 +1205,54 @@ function openEditModal(uid) {
   const u = allData.userMap[uid];
   if (!u) return;
   document.getElementById('editUserId').value = uid;
-  document.getElementById('editName').value = u.name || '';
-  document.getElementById('editPhone').value = u.phone || '';
-  document.getElementById('editDept').value = u.department || '';
-  document.getElementById('editRole').value = u.role || 'user';
+  document.getElementById('editName').value   = u.name || '';
+  document.getElementById('editPhone').value  = u.phone || '';
+  document.getElementById('editDept').value   = u.department || '';
+  document.getElementById('editRole').value   = u.role || 'user';
   document.getElementById('editStatus').value = u.status || 'active';
   document.getElementById('editModal').classList.add('show');
 }
-
 function closeModal() { document.getElementById('editModal').classList.remove('show'); }
 
 async function saveUserEdit() {
   const uid = document.getElementById('editUserId').value;
   const userData = {
-    name: document.getElementById('editName').value,
-    phone: document.getElementById('editPhone').value,
+    name:       document.getElementById('editName').value,
+    phone:      document.getElementById('editPhone').value,
     department: document.getElementById('editDept').value,
-    role: document.getElementById('editRole').value,
-    status: document.getElementById('editStatus').value
+    role:       document.getElementById('editRole').value,
+    status:     document.getElementById('editStatus').value
   };
   try {
     const res = await fetch('/admin-action', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'save', requestingUserId: adminId, userId: uid, userData })
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'save', requestingUserId:adminId, userId:uid, userData })
     });
     const d = await res.json();
-    if (d.success) {
-      closeModal(); showToast('บันทึกแล้ว', 'success'); await loadAll();
-    }
-  } catch (e) { showToast('เกิดข้อผิดพลาด', 'error'); }
+    if (d.success) { closeModal(); showToast('บันทึกแล้ว ✅', 'success'); await loadAll(); }
+  } catch(e) { showToast('เกิดข้อผิดพลาด', 'error'); }
 }
 
 async function toggleUser(uid) {
   const u = allData.userMap[uid];
-  const newStatus = u.status === 'active' ? 'ระงับ' : 'เปิดใช้งาน';
-  if (!confirm(`${newStatus}ผู้ใช้ ${u.name}?`)) return;
+  const label = u.status === 'active' ? 'ระงับ' : 'เปิดใช้งาน';
+  if (!confirm(`${label}ผู้ใช้ ${u.name}?`)) return;
   try {
     const res = await fetch('/admin-action', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'toggle', requestingUserId: adminId, userId: uid })
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'toggle', requestingUserId:adminId, userId:uid })
     });
     const d = await res.json();
-    if (d.success) { showToast(`${newStatus}แล้ว`, 'success'); await loadAll(); }
-  } catch (e) { showToast('เกิดข้อผิดพลาด', 'error'); }
+    if (d.success) { showToast(`${label}แล้ว`, 'success'); await loadAll(); }
+  } catch(e) { showToast('เกิดข้อผิดพลาด', 'error'); }
 }
 
-// ======================================================
-// RECORDS
-// ======================================================
+/* =============================================
+   RECORDS
+============================================= */
 function renderRecords() {
-  const search = document.getElementById('recSearch').value.toLowerCase();
+  const search       = document.getElementById('recSearch').value.toLowerCase();
   const statusFilter = document.getElementById('recStatusFilter').value;
-
   const list = allData.records.filter(r => {
     if (statusFilter && r.return_status !== statusFilter) return false;
     if (search && !`${r.name} ${r.car} ${r.reason}`.toLowerCase().includes(search)) return false;
@@ -654,68 +1260,100 @@ function renderRecords() {
   });
 
   if (list.length === 0) {
-    document.getElementById('recordsBody').innerHTML = '<tr><td colspan="10" class="load-row">ไม่พบรายการ</td></tr>';
+    document.getElementById('recordsBody').innerHTML =
+      '<tr><td colspan="10"><div class="empty-state"><div class="icon">🔍</div><p>ไม่พบรายการ</p></div></td></tr>';
     return;
   }
 
   document.getElementById('recordsBody').innerHTML = list.slice(0, 100).map(r => {
     const badge = r.return_status === 'returned'
       ? '<span class="badge b-green">✅ คืนแล้ว</span>'
-      : '<span class="badge b-yellow">🔑 ใช้อยู่</span>';
+      : '<span class="badge b-amber">🔑 ใช้อยู่</span>';
+
     const photoCell = r.photo_key
-      ? `<a href="/get-photo?key=${encodeURIComponent(r.photo_key)}" target="_blank" title="ดูรูปเลขไมล์"><img src="/get-photo?key=${encodeURIComponent(r.photo_key)}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #e2e8f0;cursor:pointer"></a>`
-      : r.has_photo ? '📸' : '—';
+      ? `<a href="/get-photo?key=${encodeURIComponent(r.photo_key)}" target="_blank">
+           <img class="tbl-photo" src="/get-photo?key=${encodeURIComponent(r.photo_key)}" alt="รูปไมล์">
+         </a>`
+      : r.has_photo ? '<span class="badge b-gray">📸</span>' : '<span style="color:var(--c-text3)">—</span>';
+
     return `<tr>
       <td><div class="u-cell">
-        ${r.picture_url ? `<img src="${r.picture_url}" alt="">` : `<div class="av">${(r.name||'?').charAt(0)}</div>`}
-        <div><div class="u-name">${esc(r.name||'-')}</div>${r.department?`<div class="u-sub">${esc(r.department)}</div>`:''}</div>
+        ${avatar(r.picture_url, r.name)}
+        <div>
+          <div class="u-name">${esc(r.name||'—')}</div>
+          ${r.department?`<div class="u-sub">${esc(r.department)}</div>`:''}
+        </div>
       </div></td>
-      <td><span class="badge b-blue">🚗 ${esc(r.car||'-')}</span></td>
-      <td>${esc(r.mileage||'-')}</td>
-      <td style="font-size:13px;max-width:160px">${esc((r.reason||'').slice(0,50))}${(r.reason||'').length>50?'...':''}</td>
-      <td style="color:var(--primary);font-weight:600">${r.total_distance ? r.total_distance.toFixed(1)+' กม.' : '-'}</td>
+      <td><span class="badge b-blue">🚗 ${esc(r.car||'—')}</span></td>
+      <td style="color:var(--c-text2)">${esc(r.mileage||'—')}</td>
+      <td style="font-size:13px;max-width:150px;color:var(--c-text2)">${esc((r.reason||'').slice(0,50))}${(r.reason||'').length>50?'…':''}</td>
+      <td style="color:var(--c-green);font-weight:600">${r.total_distance ? r.total_distance.toFixed(1)+' กม.' : '—'}</td>
       <td style="text-align:center">${photoCell}</td>
-      <td style="font-size:12px;white-space:nowrap">${fmtDate(r.timestamp)}</td>
+      <td style="font-size:12px;white-space:nowrap;color:var(--c-text3)">${fmtDate(r.timestamp)}</td>
       <td>${badge}</td>
-      <td style="font-size:12px;white-space:nowrap">${r.returned_at ? fmtDate(r.returned_at) : '-'}</td>
-      <td style="font-size:13px">${r.duration_text || '-'}</td>
+      <td style="font-size:12px;white-space:nowrap;color:var(--c-text3)">${r.returned_at ? fmtDate(r.returned_at) : '—'}</td>
+      <td style="font-size:13px;color:var(--c-text2)">${r.duration_text || '—'}</td>
     </tr>`;
   }).join('');
 }
 
-// ======================================================
-// PAGE SWITCH
-// ======================================================
+/* =============================================
+   PAGE SWITCH
+============================================= */
 function switchPage(p) {
   document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   document.getElementById('page-' + p).classList.add('active');
-  document.getElementById('nav-' + p).classList.add('active');
+  document.getElementById('nav-'  + p).classList.add('active');
   const titles = { dashboard:'แดชบอร์ด', requests:'คำขอสมัคร', users:'จัดการผู้ใช้', records:'ประวัติการใช้รถ' };
   document.getElementById('pageTitle').textContent = titles[p] || p;
 }
 
-// ======================================================
-// HELPERS
-// ======================================================
+/* =============================================
+   HELPERS
+============================================= */
 function fmtDate(iso) {
-  if (!iso) return '-';
-  try { return new Date(iso).toLocaleString('th-TH',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+  if (!iso) return '—';
+  try { return new Date(iso).toLocaleString('th-TH', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }); }
   catch { return iso; }
 }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 
+/* LINE profile picture helpers */
+function avatar(url, name) {
+  const initial = (name||'?').charAt(0).toUpperCase();
+  if (url) {
+    return `<img src="${esc(url)}" alt="${esc(name)}" class="u-av"
+              onerror="this.outerHTML='<div class=\\'u-av\\'>${initial}</div>'">`;
+  }
+  return `<div class="u-av">${initial}</div>`;
+}
+function avatarLg(url, name) {
+  const initial = (name||'?').charAt(0).toUpperCase();
+  if (url) {
+    return `<img src="${esc(url)}" alt="${esc(name)}" class="req-av-lg"
+              onerror="this.outerHTML='<div class=\\'req-av-lg\\'>${initial}</div>'">`;
+  }
+  return `<div class="req-av-lg">${initial}</div>`;
+}
+
+/* Toast */
 let toastTimer;
-function showToast(msg, type='info') {
+function showToast(msg, type = 'info') {
   const t = document.getElementById('toast');
-  t.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':type==='error'?'fa-times-circle':'fa-info-circle'}"></i> ${msg}`;
+  const icons = { success:'fa-check-circle', error:'fa-times-circle', warning:'fa-exclamation-triangle', info:'fa-info-circle' };
+  t.innerHTML = `<i class="fas ${icons[type]||'fa-info-circle'}"></i> ${msg}`;
   t.className = `toast ${type} show`;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-// Click outside modal to close
-document.getElementById('editModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+/* Modal close on backdrop click */
+document.getElementById('editModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
 </script>
 </body>
 </html>
