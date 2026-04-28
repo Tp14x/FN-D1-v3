@@ -563,18 +563,19 @@ function calcStats(records) {
   document.getElementById('sUsersSub').textContent = `คน (ใช้รถเดือนนี้)`;
 }
 
-// ─── BUILD 12-MONTH CHART ───
+// ─── BUILD 12-MONTH CHART (ม.ค. → ธ.ค. ของปีปัจจุบัน) ───
 function buildChart(records) {
   const now = new Date();
+  const curYear = now.getFullYear();
   const months = [];
   const tripsData  = [];
   const kmData     = [];
   const labels     = [];
 
-  for (let i = 11; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const y = d.getFullYear(), m = d.getMonth();
-    months.push({ y, m });
+  // เรียงจากเดือน 0 (ม.ค.) ถึง 11 (ธ.ค.) — ถ้ายังไม่ถึงเดือนนั้นก็แสดง 0
+  for (let m = 0; m <= 11; m++) {
+    const d = new Date(curYear, m, 1);
+    months.push({ y: curYear, m });
     labels.push(d.toLocaleDateString('th-TH', { month: 'short', year: '2-digit' }));
   }
 
