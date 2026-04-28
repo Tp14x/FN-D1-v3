@@ -728,6 +728,50 @@ tbody tr:hover td { background: var(--c-surface2); }
   </div>
 </div>
 
+<!-- ─── EDIT RECORD MODAL ─── -->
+<div class="modal-overlay" id="editRecordModal">
+  <div class="modal-box" style="max-width:520px">
+    <div class="modal-header">
+      <div class="modal-header-icon" style="background:var(--c-amber-dim);color:var(--c-amber)"><i class="fas fa-file-alt"></i></div>
+      <div class="modal-title">แก้ไขข้อมูลการใช้รถ</div>
+    </div>
+    <input type="hidden" id="erRecordId">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 14px">
+      <div class="modal-field">
+        <label class="modal-label">ทะเบียนรถ</label>
+        <input class="modal-input" type="text" id="erCar" placeholder="เช่น กข-1234">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">เลขไมล์</label>
+        <input class="modal-input" type="text" id="erMileage" placeholder="เลขไมล์">
+      </div>
+      <div class="modal-field" style="grid-column:1/-1">
+        <label class="modal-label">สาเหตุการใช้รถ</label>
+        <input class="modal-input" type="text" id="erReason" placeholder="ระบุสาเหตุ">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">ระยะทาง (กม.)</label>
+        <input class="modal-input" type="number" id="erDistance" placeholder="0" step="0.1" min="0">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">สถานะ</label>
+        <select class="modal-select" id="erStatus">
+          <option value="pending">🔑 กำลังใช้อยู่</option>
+          <option value="returned">✅ คืนรถแล้ว</option>
+        </select>
+      </div>
+      <div class="modal-field" style="grid-column:1/-1">
+        <label class="modal-label">ระยะเวลา (แสดงผล)</label>
+        <input class="modal-input" type="text" id="erDuration" placeholder="เช่น 2 ชั่วโมง 30 นาที">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('editRecordModal')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveRecordEdit()"><i class="fas fa-save"></i> บันทึก</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -1189,7 +1233,11 @@ function renderRecords() {
       <td>${badge}</td>
       <td style="font-size:12px;white-space:nowrap;color:var(--c-text3)">${r.returned_at ? fmtDate(r.returned_at) : '—'}</td>
       <td style="font-size:13px;color:var(--c-text2)">${r.duration_text || '—'}</td>
-      <td><div class="row-actions">${forceBtn}</div></td>
+      <td><div class="row-actions">
+        ${forceBtn}
+        <button class="btn btn-secondary btn-icon btn-xs" onclick="openEditRecord(${JSON.stringify(r)})" title="แก้ไข"><i class="fas fa-pen"></i></button>
+        <button class="btn btn-danger btn-icon btn-xs" onclick="deleteRecord('${r.id}','${esc(r.name||'')}')" title="ลบ"><i class="fas fa-trash"></i></button>
+      </div></td>
     </tr>`;
   }).join('');
 
@@ -1294,7 +1342,8 @@ function confirmOk() {
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 document.getElementById('editModal').addEventListener('click', e => { if (e.target===e.currentTarget) closeModal('editModal'); });
 document.getElementById('confirmModal').addEventListener('click', e => { if (e.target===e.currentTarget) closeModal('confirmModal'); });
-document.addEventListener('keydown', e => { if (e.key==='Escape') { closeModal('editModal'); closeModal('confirmModal'); } });
+document.getElementById('editRecordModal').addEventListener('click', e => { if (e.target===e.currentTarget) closeModal('editRecordModal'); });
+document.addEventListener('keydown', e => { if (e.key==='Escape') { closeModal('editModal'); closeModal('editRecordModal'); closeModal('confirmModal'); } });
 
 /* ──────────────────────────────────────────
    HELPERS
@@ -1317,6 +1366,59 @@ function avatarLg(url, name) {
   return url
     ? `<img src="${esc(url)}" alt="${esc(name)}" class="req-av-lg" onerror="this.outerHTML='<div class=\\'req-av-lg\\'>${initial}</div>'">`
     : `<div class="req-av-lg">${initial}</div>`;
+}
+
+/* ──────────────────────────────────────────
+   EDIT RECORD
+────────────────────────────────────────── */
+function openEditRecord(r) {
+  document.getElementById('erRecordId').value   = r.id;
+  document.getElementById('erCar').value        = r.car || '';
+  document.getElementById('erMileage').value    = r.mileage || '';
+  document.getElementById('erReason').value     = r.reason || '';
+  document.getElementById('erDistance').value   = r.total_distance || 0;
+  document.getElementById('erStatus').value     = r.return_status || 'pending';
+  document.getElementById('erDuration').value   = r.duration_text || '';
+  document.getElementById('editRecordModal').classList.add('show');
+}
+
+async function saveRecordEdit() {
+  const recordId = document.getElementById('erRecordId').value;
+  const data = {
+    car:            document.getElementById('erCar').value.trim(),
+    mileage:        document.getElementById('erMileage').value.trim(),
+    reason:         document.getElementById('erReason').value.trim(),
+    total_distance: document.getElementById('erDistance').value,
+    return_status:  document.getElementById('erStatus').value,
+    duration_text:  document.getElementById('erDuration').value.trim()
+  };
+  if (!data.car) { showToast('กรุณาระบุทะเบียนรถ', 'warning'); return; }
+  try {
+    const res = await fetch('/admin-action', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'edit-record', requestingUserId:adminId, recordId, data }) });
+    const d = await res.json();
+    if (d.success) { closeModal('editRecordModal'); showToast('แก้ไขข้อมูลสำเร็จ ✅', 'success'); await loadAll(); }
+    else           { showToast('เกิดข้อผิดพลาด: ' + d.error, 'error'); }
+  } catch(e) { showToast('เกิดข้อผิดพลาด: ' + e.message, 'error'); }
+}
+
+/* ──────────────────────────────────────────
+   DELETE RECORD
+────────────────────────────────────────── */
+async function deleteRecord(recordId, name) {
+  showConfirm(
+    `ลบรายการของ <strong>${name}</strong>?<br><small style="color:var(--c-red)">⚠️ ไม่สามารถกู้คืนได้</small>`,
+    'ยืนยันการลบ', '🗑️', 'btn-danger',
+    async () => {
+      try {
+        const res = await fetch('/admin-action', { method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ action:'delete-record', requestingUserId:adminId, recordId }) });
+        const d = await res.json();
+        if (d.success) { showToast('ลบรายการแล้ว', 'warning'); await loadAll(); }
+        else           { showToast('เกิดข้อผิดพลาด: ' + d.error, 'error'); }
+      } catch(e) { showToast('เกิดข้อผิดพลาด: ' + e.message, 'error'); }
+    }
+  );
 }
 
 let toastTimer;
