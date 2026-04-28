@@ -92,6 +92,23 @@ export async function onRequestPost(context) {
       return ok({ success: true }, o);
     }
 
+    if (action === 'edit-record') {
+      const { recordId, data } = body;
+      if (!recordId) return err('Missing recordId', 400, o);
+      await env.DB.prepare(`
+        UPDATE records SET
+          car=?, mileage=?, reason=?, total_distance=?,
+          return_status=?, duration_text=?
+        WHERE id=?
+      `).bind(
+        data.car, data.mileage, data.reason,
+        parseFloat(data.total_distance) || 0,
+        data.return_status, data.duration_text || null,
+        recordId
+      ).run();
+      return ok({ success: true }, o);
+    }
+
     return err('Invalid action', 400, o);
   } catch (e) {
     return err(e.message, 500, o);
