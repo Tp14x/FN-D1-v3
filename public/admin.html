@@ -1235,7 +1235,7 @@ function renderRecords() {
       <td style="font-size:13px;color:var(--c-text2)">${r.duration_text || '—'}</td>
       <td><div class="row-actions">
         ${forceBtn}
-        <button class="btn btn-secondary btn-icon btn-xs" onclick="openEditRecord(${JSON.stringify(r)})" title="แก้ไข"><i class="fas fa-pen"></i></button>
+        <button class="btn btn-secondary btn-icon btn-xs" onclick="openEditRecord('${r.id}')" title="แก้ไข"><i class="fas fa-pen"></i></button>
         <button class="btn btn-danger btn-icon btn-xs" onclick="deleteRecord('${r.id}','${esc(r.name||'')}')" title="ลบ"><i class="fas fa-trash"></i></button>
       </div></td>
     </tr>`;
@@ -1371,7 +1371,9 @@ function avatarLg(url, name) {
 /* ──────────────────────────────────────────
    EDIT RECORD
 ────────────────────────────────────────── */
-function openEditRecord(r) {
+function openEditRecord(id) {
+  const r = allData.records.find(x => x.id === id);
+  if (!r) { showToast('ไม่พบข้อมูล', 'error'); return; }
   document.getElementById('erRecordId').value   = r.id;
   document.getElementById('erCar').value        = r.car || '';
   document.getElementById('erMileage').value    = r.mileage || '';
