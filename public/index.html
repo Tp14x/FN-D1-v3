@@ -43,23 +43,30 @@ html, body {
   background: linear-gradient(145deg, #14532d, #16a34a);
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  z-index: 9999; gap: 20px;
+  z-index: 9999; gap: 16px;
 }
-#appLoading .logo { font-size: 70px; animation: bounce 1s infinite; }
-#appLoading .title { color: #fff; font-size: 22px; font-weight: 600; }
-#appLoading .subtitle { color: rgba(255,255,255,0.7); font-size: 14px; }
-.loader-bar {
-  width: 200px; height: 4px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 99px; overflow: hidden;
+.loading-icon-wrap {
+  width: 90px; height: 90px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 26px;
+  display: flex; align-items: center; justify-content: center;
+  animation: loadPulse 1.8s ease-in-out infinite;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.25);
 }
-.loader-bar-fill {
-  height: 100%; background: #fff;
-  border-radius: 99px;
-  animation: load 1.5s ease-in-out infinite;
+.loading-icon-wrap i { font-size: 40px; color: #fff; }
+#appLoading .title { color: #fff; font-size: 20px; font-weight: 700; letter-spacing: 0.3px; }
+#appLoading .subtitle { color: rgba(255,255,255,0.65); font-size: 13px; }
+.loading-dots { display: flex; gap: 6px; }
+.loading-dots span {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  animation: dotBounce 1.4s infinite;
 }
-@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-@keyframes load { 0%{width:0;margin-left:0} 50%{width:60%;margin-left:20%} 100%{width:0;margin-left:100%} }
+.loading-dots span:nth-child(2) { animation-delay: .2s; }
+.loading-dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes loadPulse { 0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,255,255,0.3)} 50%{transform:scale(1.05);box-shadow:0 0 0 12px rgba(255,255,255,0)} }
+@keyframes dotBounce { 0%,80%,100%{transform:translateY(0);opacity:.5} 40%{transform:translateY(-8px);opacity:1} }
 
 /* ===== SCREENS ===== */
 .screen { display: none; min-height: 100vh; }
@@ -236,25 +243,31 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .photo-upload-area {
   border: 2px dashed var(--border);
   border-radius: var(--radius-sm);
-  padding: 20px; text-align: center;
-  cursor: pointer; transition: all 0.2s;
-  position: relative;
+  padding: 22px 16px; text-align: center;
+  cursor: pointer; transition: all 0.25s;
+  position: relative; background: #fafafa;
 }
 .photo-upload-area:hover { border-color: var(--primary); background: #f0fdf4; }
+.photo-upload-area.has-photo { border-color: var(--primary); border-style: solid; background: #f0fdf4; }
 .photo-upload-area input[type="file"] {
   position: absolute; inset: 0; opacity: 0;
   cursor: pointer; padding: 0; border: none;
   width: 100%; height: 100%;
 }
-.photo-preview {
-  display: none; max-width: 100%;
-  border-radius: var(--radius-sm);
-  margin-top: 12px; max-height: 200px;
-  object-fit: contain;
+.photo-upload-icon { font-size: 32px; color: var(--text-muted); margin-bottom: 8px; transition: all 0.2s; }
+.photo-upload-area.has-photo .photo-upload-icon { color: var(--primary); }
+.photo-upload-label { font-size: 13px; color: var(--text-muted); }
+.photo-preview-wrap {
+  margin-top: 12px; position: relative; display: none;
 }
-.photo-preview.show { display: block; }
-.photo-info { font-size: 12px; color: var(--primary); margin-top: 6px; display: none; }
-.photo-info.show { display: block; }
+.photo-preview-wrap.show { display: block; }
+.photo-preview {
+  max-width: 100%; max-height: 200px;
+  border-radius: var(--radius-sm);
+  object-fit: contain; border: 2px solid var(--primary);
+  box-shadow: 0 4px 16px rgba(22,163,74,0.15);
+}
+.photo-info { font-size: 12px; color: var(--primary); margin-top: 6px; font-weight: 500; }
 
 /* ===== PENDING / STATUS SCREENS ===== */
 #screen-pending, #screen-suspended {
@@ -343,12 +356,21 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   letter-spacing: 2px; margin: 12px 0;
 }
 .location-status {
-  background: #dcfce7; border-radius: 12px;
+  background: #f1f5f9; border-radius: 12px;
   padding: 12px 14px; margin: 12px 0;
-  text-align: left; font-size: 13px;
+  text-align: left; font-size: 13px; color: var(--text-muted);
 }
-.location-status.error { background: #fee2e2; }
-.location-status.success { background: #dcfce7; }
+.location-status.error   { background: #fee2e2; color: #dc2626; }
+.location-status.success { background: #dcfce7; color: #16a34a; }
+.location-status.loading { background: #fef3c7; color: #d97706; }
+.accuracy-badge {
+  display: inline-block; margin-top: 6px;
+  background: rgba(0,0,0,0.06); border-radius: 99px;
+  padding: 2px 10px; font-size: 11px; font-weight: 600;
+}
+.accuracy-good { background: #dcfce7; color: #16a34a; }
+.accuracy-ok   { background: #fef3c7; color: #d97706; }
+.accuracy-bad  { background: #fee2e2; color: #dc2626; }
 
 /* ===== POPUP MODAL ===== */
 .modal-overlay {
@@ -407,6 +429,46 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .badge-warning { background: #fef3c7; color: #d97706; }
 .badge-danger { background: #fee2e2; color: #ef4444; }
 
+/* ===== CONFIRM SUBMIT MODAL ===== */
+.confirm-modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55); z-index: 9500;
+  align-items: flex-end; justify-content: center;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  backdrop-filter: blur(4px);
+}
+.confirm-modal-overlay.show { display: flex; }
+.confirm-sheet {
+  background: #fff; border-radius: 28px 28px 0 0;
+  padding: 28px 20px 32px;
+  width: 100%; max-width: 480px;
+  animation: slideUp2 0.3s ease;
+  max-height: 85vh; overflow-y: auto;
+}
+@keyframes slideUp2 { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.confirm-sheet-handle {
+  width: 40px; height: 4px; border-radius: 2px;
+  background: #e2e8f0; margin: 0 auto 20px;
+}
+.confirm-sheet-title {
+  font-size: 18px; font-weight: 700;
+  margin-bottom: 16px; text-align: center;
+}
+.confirm-summary {
+  background: #f8fafc; border-radius: 16px;
+  padding: 16px; margin-bottom: 20px;
+}
+.confirm-row {
+  display: flex; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+}
+.confirm-row:last-child { border-bottom: none; }
+.confirm-row .lbl { color: var(--text-muted); flex-shrink: 0; width: 90px; }
+.confirm-row .val { font-weight: 600; color: var(--text); flex: 1; word-break: break-word; }
+.confirm-btns { display: flex; gap: 10px; }
+.confirm-btns .btn { flex: 1; }
+
 /* ===== ANIMATIONS ===== */
 @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
 .animate-in { animation: fadeIn 0.4s ease forwards; }
@@ -418,10 +480,14 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
 <!-- ===== LOADING ===== -->
 <div id="appLoading">
-  <div class="logo">🚗</div>
+  <div class="loading-icon-wrap">
+    <i class="fas fa-car"></i>
+  </div>
   <div class="title">ระบบบันทึกการใช้รถ</div>
-  <div class="subtitle">กำลังโหลด...</div>
-  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  <div class="subtitle">กำลังเชื่อมต่อ LINE...</div>
+  <div class="loading-dots">
+    <span></span><span></span><span></span>
+  </div>
 </div>
 
 <!-- ===== MAIN SCREEN ===== -->
@@ -442,6 +508,22 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   </div>
 
   <div class="content">
+    <!-- History Card -->
+    <div class="card animate-in" style="margin-bottom:16px">
+      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="icon" style="width:30px;height:30px;font-size:14px"><i class="fas fa-history"></i></div>
+          <h3 style="font-size:14px">ประวัติการใช้รถของฉัน</h3>
+        </div>
+        <a href="/history" style="font-size:12px;color:var(--primary);font-weight:600">ดูทั้งหมด →</a>
+      </div>
+      <div id="userHistorySection" style="padding:0 16px 12px">
+        <div style="text-align:center;color:#94a3b8;font-size:13px;padding:12px 0">
+          <i class="fas fa-spinner fa-spin"></i> กำลังโหลด...
+        </div>
+      </div>
+    </div>
+
     <!-- Form Card -->
     <div class="card animate-in">
       <div class="card-header">
@@ -490,14 +572,16 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
           <label class="form-label">รูปเลขไมล์ (ไม่บังคับ)</label>
           <div class="photo-upload-area" id="photoArea">
             <input type="file" id="mileagePhoto" accept="image/*" capture="environment">
-            <i class="fas fa-camera" style="font-size:28px;color:var(--primary);margin-bottom:6px"></i>
-            <div style="font-size:13px;color:var(--text-muted)">แตะเพื่อถ่ายรูป / เลือกรูปภาพ</div>
+            <div class="photo-upload-icon"><i class="fas fa-camera"></i></div>
+            <div class="photo-upload-label">แตะเพื่อถ่ายรูปเลขไมล์ <span style="color:#94a3b8">(ไม่บังคับ)</span></div>
           </div>
-          <img class="photo-preview" id="photoPreview" alt="preview">
-          <div class="photo-info" id="photoInfo"></div>
-          <button type="button" id="removePhotoBtn" onclick="clearPhoto()" style="display:none;margin-top:8px;background:none;border:none;color:var(--danger);font-family:Kanit,sans-serif;font-size:13px;cursor:pointer;padding:4px 0">
-            <i class="fas fa-trash"></i> ลบรูป
-          </button>
+          <div class="photo-preview-wrap" id="photoPreviewWrap">
+            <img class="photo-preview" id="photoPreview" alt="preview">
+            <div class="photo-info" id="photoInfo"></div>
+            <button type="button" id="removePhotoBtn" onclick="clearPhoto()" style="margin-top:8px;width:100%;background:none;border:1px solid #e2e8f0;border-radius:8px;color:var(--danger);font-family:Kanit,sans-serif;font-size:13px;cursor:pointer;padding:7px 0">
+              <i class="fas fa-trash"></i> ลบรูป
+            </button>
+          </div>
         </div>
       </form>
     </div>
@@ -644,7 +728,7 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
       </div>
     </div>
 
-    <div class="timer-display" id="timerDisplay">00:00:00</div>
+    <div class="timer-display" id="timerDisplay" style="font-size:52px;letter-spacing:2px;font-weight:700;color:#16a34a;text-align:center;padding:12px 0">00:00:00</div>
 
     <div class="location-status" id="locationStatus">
       <i class="fas fa-map-marker-alt"></i>
@@ -656,13 +740,30 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
       <i class="fas fa-location-dot"></i> ดึงตำแหน่งปัจจุบัน
     </button>
 
-    <button class="btn btn-danger" id="returnCarBtn" onclick="handleReturnCar()" disabled style="opacity:0.5">
-      <i class="fas fa-undo-alt"></i> คืนรถ (ต้องดึงตำแหน่งก่อน)
+    <button class="btn btn-danger" id="returnCarBtn" onclick="handleReturnCar()">
+      <i class="fas fa-undo-alt"></i> คืนรถ
     </button>
 
     <button class="btn btn-secondary" onclick="handleCancelUsage()" style="margin-top:10px;font-size:13px">
       <i class="fas fa-times"></i> ยกเลิกการใช้รถ (ไม่ได้ใช้จริง)
     </button>
+  </div>
+</div>
+
+<!-- ─── CONFIRM SUBMIT SHEET ─── -->
+<div class="confirm-modal-overlay" id="confirmSubmitModal">
+  <div class="confirm-sheet">
+    <div class="confirm-sheet-handle"></div>
+    <div class="confirm-sheet-title">📋 ยืนยันการบันทึก</div>
+    <div class="confirm-summary" id="confirmSummaryContent"></div>
+    <div class="confirm-btns">
+      <button class="btn btn-outline" onclick="closeConfirmSubmit()">
+        <i class="fas fa-times"></i> ยกเลิก
+      </button>
+      <button class="btn btn-primary" id="confirmSubmitOkBtn" onclick="doSubmit()">
+        <i class="fas fa-share-alt"></i> ยืนยัน & แชร์
+      </button>
+    </div>
   </div>
 </div>
 
@@ -774,10 +875,15 @@ document.getElementById('mileagePhoto').addEventListener('change', e => {
   cachedPhotoBase64 = null;
   cachedPhotoFile = null;
   const preview = document.getElementById('photoPreview');
+  const previewWrap = document.getElementById('photoPreviewWrap');
   const info = document.getElementById('photoInfo');
-  const removeBtn = document.getElementById('removePhotoBtn');
+  const photoArea = document.getElementById('photoArea');
 
-  if (!file) { preview.classList.remove('show'); info.classList.remove('show'); removeBtn.style.display='none'; return; }
+  if (!file) {
+    previewWrap.classList.remove('show');
+    photoArea.classList.remove('has-photo');
+    return;
+  }
 
   const validTypes = ['image/jpeg','image/png','image/gif','image/webp'];
   if (!validTypes.includes(file.type)) { showToast('รองรับ JPG, PNG, GIF, WEBP เท่านั้น', 'warning'); e.target.value=''; return; }
@@ -789,10 +895,9 @@ document.getElementById('mileagePhoto').addEventListener('change', e => {
   reader.onloadend = () => {
     cachedPhotoBase64 = reader.result;    // ✅ เก็บไว้ก่อน
     preview.src = reader.result;
-    preview.classList.add('show');
+    previewWrap.classList.add('show');
+    photoArea.classList.add('has-photo');
     info.textContent = `✅ ${file.name} (${(file.size/1024/1024).toFixed(2)} MB)`;
-    info.classList.add('show');
-    removeBtn.style.display = 'block';
   };
   reader.readAsDataURL(file);
 });
@@ -801,9 +906,9 @@ function clearPhoto() {
   document.getElementById('mileagePhoto').value = '';
   cachedPhotoBase64 = null;
   cachedPhotoFile = null;
-  document.getElementById('photoPreview').classList.remove('show');
-  document.getElementById('photoInfo').classList.remove('show');
-  document.getElementById('removePhotoBtn').style.display = 'none';
+  document.getElementById('photoPreviewWrap').classList.remove('show');
+  document.getElementById('photoArea').classList.remove('has-photo');
+  document.getElementById('photoInfo').textContent = '';
 }
 
 // ======================================================
@@ -1132,6 +1237,9 @@ function validateForm() {
 // ======================================================
 // MAIN FORM SUBMIT — ✅ shareTargetPicker เรียกทันที (ไม่มี await ก่อน)
 // ======================================================
+// ─── pending submit data ───
+let _pendingSubmit = null;
+
 document.getElementById('mainForm').addEventListener('submit', async function(e) {
   e.preventDefault();
 
@@ -1139,21 +1247,42 @@ document.getElementById('mainForm').addEventListener('submit', async function(e)
   if (usage) { showCarInUseScreen(usage); return; }
   if (!currentUser) { showToast('กรุณาเข้าสู่ระบบก่อน', 'warning'); return; }
 
-  // ✅ 1. Validate แบบ sync
   if (!validateForm()) return;
 
-  const car     = document.getElementById('car').value;
-  const mileage = document.getElementById('mileage').value;
-  const reason  = document.getElementById('reason').value.trim();
-  const routeEl = document.getElementById('routeInfo');
+  const car      = document.getElementById('car').value;
+  const mileage  = document.getElementById('mileage').value;
+  const reason   = document.getElementById('reason').value.trim();
+  const routeEl  = document.getElementById('routeInfo');
   const routeText = routeEl ? routeEl.innerText : '';
   const name  = currentUser.name || currentUser.displayName || 'ไม่ระบุชื่อ';
   const phone = currentUser.phone || '-';
 
-  // ✅ 2. สร้าง Flex Message แบบ sync (ใช้ cachedPhotoBase64 ที่โหลดไว้แล้ว)
+  // Show confirm sheet
+  _pendingSubmit = { car, mileage, reason, routeText, name, phone };
+  const distMatch = routeText.match(/ระยะทางรวม:\s*([\d.]+)/);
+  const timeMatch = routeText.match(/เวลาโดยประมาณ:\s*(\d+)/);
+  document.getElementById('confirmSummaryContent').innerHTML = `
+    <div class="confirm-row"><span class="lbl">👤 ชื่อ</span><span class="val">${name}</span></div>
+    <div class="confirm-row"><span class="lbl">🚗 ทะเบียน</span><span class="val">${car}</span></div>
+    <div class="confirm-row"><span class="lbl">📍 ไมล์</span><span class="val">${mileage}</span></div>
+    <div class="confirm-row"><span class="lbl">📝 สาเหตุ</span><span class="val">${reason}</span></div>
+    <div class="confirm-row"><span class="lbl">🛣️ ระยะ</span><span class="val">${distMatch ? distMatch[1]+' กม.' : 'ไม่ระบุ'}</span></div>
+    <div class="confirm-row"><span class="lbl">📸 รูปไมล์</span><span class="val">${cachedPhotoFile ? '✅ มีรูป' : '—'}</span></div>`;
+  document.getElementById('confirmSubmitModal').classList.add('show');
+});
+
+function closeConfirmSubmit() {
+  document.getElementById('confirmSubmitModal').classList.remove('show');
+}
+
+async function doSubmit() {
+  closeConfirmSubmit();
+  if (!_pendingSubmit) return;
+  const { car, mileage, reason, routeText, name, phone } = _pendingSubmit;
+  _pendingSubmit = null;
+
   const message = buildFlexMessage(name, phone, car, mileage, reason, markers, routeText, !!cachedPhotoBase64);
 
-  // ✅ 3. เรียก shareTargetPicker ทันที — ไม่มี await ใดๆ นำหน้า!
   const submitBtn = document.getElementById('submitBtn');
   let shareSuccess = false;
 
@@ -1256,14 +1385,11 @@ function showCarInUseScreen(usage) {
   document.getElementById('infoStartTime').textContent = usage.startedAt
     ? new Date(usage.startedAt).toLocaleString('th-TH') : '-';
 
-  // Reset return button
-  const returnBtn = document.getElementById('returnCarBtn');
-  returnBtn.disabled = true;
-  returnBtn.style.opacity = '0.5';
-  returnBtn.innerHTML = '<i class="fas fa-undo-alt"></i> คืนรถ (ต้องดึงตำแหน่งก่อน)';
+  // Reset state
   returnLocation = null;
+  document.getElementById('returnCarBtn').innerHTML = '<i class="fas fa-undo-alt"></i> คืนรถ';
   document.getElementById('locationStatus').className = 'location-status';
-  document.getElementById('locationStatus').innerHTML = '<i class="fas fa-map-marker-alt"></i> ⏳ ยังไม่ได้ระบุตำแหน่งคืนรถ';
+  document.getElementById('locationStatus').innerHTML = '<i class="fas fa-map-marker-alt"></i> ยังไม่ได้ดึงตำแหน่ง (ไม่บังคับ)';
   document.getElementById('locationDetail').style.display = 'none';
 
   showScreen('screen-car-in-use');
@@ -1286,48 +1412,78 @@ function startTimer(startedAt) {
 }
 
 async function getReturnLocation() {
-  const btn = document.getElementById('getLocationBtn');
+  const btn    = document.getElementById('getLocationBtn');
   const status = document.getElementById('locationStatus');
+  const detail = document.getElementById('locationDetail');
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังดึงตำแหน่ง...';
-  status.className = 'location-status';
-  status.innerHTML = 'กำลังดึงตำแหน่ง GPS...';
+  status.className = 'location-status loading';
+  status.innerHTML = '⏳ กำลังรับสัญญาณ GPS... (อาจใช้เวลา 10-20 วินาที)';
+  detail.style.display = 'none';
 
-  try {
-    const pos = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject, {
-        enableHighAccuracy: true, timeout: 10000, maximumAge: 0
-      });
-    });
-    returnLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy };
-
-    status.className = 'location-status success';
-    status.innerHTML = '✅ ดึงตำแหน่งสำเร็จ!';
-
-    const detail = document.getElementById('locationDetail');
-    const mapsUrl = `https://www.google.com/maps?q=${returnLocation.lat},${returnLocation.lng}`;
-    detail.style.display = 'block';
-    detail.innerHTML = `📍 ${returnLocation.lat.toFixed(6)}, ${returnLocation.lng.toFixed(6)}&nbsp;
-      <a href="${mapsUrl}" target="_blank" style="color:var(--info)"><i class="fas fa-external-link-alt"></i> เปิดแผนที่</a>`;
-
-    const returnBtn = document.getElementById('returnCarBtn');
-    returnBtn.disabled = false;
-    returnBtn.style.opacity = '1';
-    returnBtn.innerHTML = '<i class="fas fa-undo-alt"></i> คืนรถ';
-
-    btn.innerHTML = '<i class="fas fa-check-circle"></i> ดึงตำแหน่งสำเร็จ';
-    btn.style.background = 'linear-gradient(135deg,#16a34a,#22c55e)';
-  } catch (err) {
+  if (!navigator.geolocation) {
     status.className = 'location-status error';
-    status.innerHTML = `❌ ดึงตำแหน่งไม่ได้: ${err.code === 1 ? 'กรุณาอนุญาต GPS' : err.message}`;
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-redo"></i> ลองอีกครั้ง';
+    status.innerHTML = '❌ เบราว์เซอร์นี้ไม่รองรับ GPS';
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-redo"></i> ลองอีกครั้ง';
+    return;
   }
+
+  // รวบตำแหน่งหลายครั้ง แล้วเลือกที่แม่นสุด (accuracy ต่ำสุด)
+  const readings = [];
+  const COLLECT_MS  = 8000;   // รวบนาน 8 วินาที
+  const MAX_WAIT_MS = 20000;  // timeout รวม
+
+  await new Promise((resolve) => {
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        readings.push({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          accuracy: pos.coords.accuracy
+        });
+        const acc = pos.coords.accuracy;
+        const accClass = acc <= 20 ? 'accuracy-good' : acc <= 60 ? 'accuracy-ok' : 'accuracy-bad';
+        const accLabel = acc <= 20 ? '🎯 แม่นมาก' : acc <= 60 ? '👍 พอใช้ได้' : '⚠️ สัญญาณอ่อน';
+        status.innerHTML = `⏳ กำลังปรับความแม่นยำ... (${readings.length} readings)<br>
+          <span class="accuracy-badge ${accClass}">±${acc.toFixed(0)} ม. — ${accLabel}</span>`;
+        // ถ้าแม่นมากพอ (≤15m) หยุดได้เลย
+        if (acc <= 15) { navigator.geolocation.clearWatch(watchId); resolve(); }
+      },
+      (err) => { navigator.geolocation.clearWatch(watchId); resolve(); },
+      { enableHighAccuracy: true, timeout: MAX_WAIT_MS, maximumAge: 0 }
+    );
+    // หยุดหลัง COLLECT_MS ไม่ว่ายังไง
+    setTimeout(() => { navigator.geolocation.clearWatch(watchId); resolve(); }, COLLECT_MS);
+  });
+
+  if (readings.length === 0) {
+    status.className = 'location-status error';
+    status.innerHTML = '❌ ดึงตำแหน่งไม่ได้ กรุณาอนุญาต GPS และลองใหม่';
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-redo"></i> ลองอีกครั้ง';
+    return;
+  }
+
+  // เลือก reading ที่ accuracy ดีสุด
+  const best = readings.reduce((a, b) => a.accuracy < b.accuracy ? a : b);
+  returnLocation = best;
+
+  const acc = best.accuracy;
+  const accClass = acc <= 20 ? 'accuracy-good' : acc <= 60 ? 'accuracy-ok' : 'accuracy-bad';
+  const accLabel = acc <= 20 ? '🎯 แม่นมาก' : acc <= 60 ? '👍 พอใช้ได้' : '⚠️ สัญญาณอ่อน';
+  status.className = 'location-status success';
+  status.innerHTML = `✅ ได้ตำแหน่งแล้ว (จาก ${readings.length} readings)<br>
+    <span class="accuracy-badge ${accClass}">±${acc.toFixed(0)} ม. — ${accLabel}</span>`;
+
+  const mapsUrl = `https://www.google.com/maps?q=${best.lat},${best.lng}`;
+  detail.style.display = 'block';
+  detail.innerHTML = `📍 ${best.lat.toFixed(6)}, ${best.lng.toFixed(6)} &nbsp;
+    <a href="${mapsUrl}" target="_blank" style="color:var(--info)"><i class="fas fa-external-link-alt"></i> เปิดแผนที่</a>`;
+
+  btn.innerHTML = '<i class="fas fa-check-circle"></i> ดึงตำแหน่งสำเร็จ';
+  btn.style.background = 'linear-gradient(135deg,#16a34a,#22c55e)';
 }
 
-// ✅ Return car — shareTargetPicker ก็ต้องเรียก sync เช่นกัน
 async function handleReturnCar() {
-  if (!returnLocation) { showToast('กรุณาดึงตำแหน่งก่อน', 'warning'); return; }
   const usage = loadUsage();
   if (!usage) { showToast('ไม่พบข้อมูลการใช้รถ', 'error'); return; }
 
@@ -1402,7 +1558,7 @@ async function handleReturnCar() {
 }
 
 function handleCancelUsage() {
-  if (!confirm('ยืนยันยกเลิกการใช้รถ? บันทึกก่อนหน้าจะไม่ถูกอัปเดต')) return;
+  if (!window.confirm('ยืนยันยกเลิกการใช้รถ? บันทึกก่อนหน้าจะไม่ถูกอัปเดต')) return;
   clearUsage();
   clearInterval(timerInterval);
   showToast('ยกเลิกการใช้รถแล้ว', 'info');
@@ -1435,6 +1591,33 @@ function setUserCard(name, pictureUrl, dept) {
   } else {
     av.textContent = name.charAt(0);
   }
+}
+
+async function loadUserHistory(userId) {
+  const el = document.getElementById('userHistorySection');
+  if (!el) return;
+  try {
+    const res  = await fetch(`/get-records?userId=${encodeURIComponent(userId)}&limit=5`);
+    const data = await res.json();
+    const recs = data.records || [];
+    if (recs.length === 0) {
+      el.innerHTML = '<div style="text-align:center;color:#94a3b8;font-size:13px;padding:12px 0">ยังไม่มีประวัติการใช้รถ</div>';
+      return;
+    }
+    el.innerHTML = recs.map(r => {
+      const badge = r.returnStatus === 'returned'
+        ? `<span style="color:#16a34a;font-size:11px;font-weight:600">✅ คืนแล้ว</span>`
+        : `<span style="color:#f59e0b;font-size:11px;font-weight:600">🔑 ใช้อยู่</span>`;
+      const d = r.timestamp ? new Date(r.timestamp).toLocaleDateString('th-TH',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9">
+        <div>
+          <div style="font-size:14px;font-weight:600">🚗 ${r.car || '—'}</div>
+          <div style="font-size:12px;color:#64748b;margin-top:2px">${r.reason ? r.reason.slice(0,30)+(r.reason.length>30?'…':'') : '—'} · ${d}</div>
+        </div>
+        <div style="text-align:right">${badge}<div style="font-size:11px;color:#94a3b8;margin-top:2px">${r.totalDistance ? r.totalDistance.toFixed(1)+' กม.' : ''}</div></div>
+      </div>`;
+    }).join('');
+  } catch { el.innerHTML = '<div style="color:#94a3b8;font-size:13px;text-align:center;padding:12px">โหลดประวัติไม่ได้</div>'; }
 }
 
 // ======================================================
@@ -1597,6 +1780,7 @@ async function initApp() {
       // Normal user / admin
       setUserCard(currentUser.name, profile.pictureUrl, currentUser.department);
       showScreen('screen-main');
+      loadUserHistory(profile.userId);
     }
 
   } catch (err) {
