@@ -6,10 +6,9 @@
 <title>Admin Panel — ระบบบันทึกการใช้รถ</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-/* =============================================
-   DESIGN TOKENS
-============================================= */
+/* ─── TOKENS ─── */
 :root {
   --c-bg:        #0b0f1a;
   --c-surface:   #111827;
@@ -20,7 +19,6 @@
   --c-text:      #f0f4ff;
   --c-text2:     #8899bb;
   --c-text3:     #5a6a88;
-
   --c-green:     #10b981;
   --c-green-d:   #059669;
   --c-green-dim: rgba(16,185,129,0.12);
@@ -32,45 +30,25 @@
   --c-red-dim:   rgba(239,68,68,0.12);
   --c-purple:    #8b5cf6;
   --c-purple-dim:rgba(139,92,246,0.12);
-
   --radius-sm:   8px;
   --radius-md:   14px;
   --radius-lg:   20px;
   --radius-xl:   28px;
-
   --shadow-card: 0 2px 24px rgba(0,0,0,0.35);
-  --shadow-glow: 0 0 32px rgba(16,185,129,0.15);
-
-  --font-body: 'Sarabun', sans-serif;
-  --font-head: 'Prompt', sans-serif;
-
-  --sidebar-w: 260px;
-  --topbar-h:  64px;
+  --font-body:   'Sarabun', sans-serif;
+  --font-head:   'Prompt', sans-serif;
+  --sidebar-w:   260px;
+  --topbar-h:    64px;
 }
-
-/* =============================================
-   RESET / BASE
-============================================= */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-body {
-  font-family: var(--font-body);
-  background: var(--c-bg);
-  color: var(--c-text);
-  font-size: 15px;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
+body { font-family: var(--font-body); background: var(--c-bg); color: var(--c-text); font-size: 15px; min-height: 100vh; -webkit-font-smoothing: antialiased; }
 a { color: inherit; text-decoration: none; }
-
-/* Scrollbar */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--c-surface3); border-radius: 99px; }
 
-/* =============================================
-   LOGIN SCREEN
-============================================= */
+/* ─── LOGIN ─── */
 #loginScreen {
   position: fixed; inset: 0; z-index: 9000;
   display: flex; align-items: center; justify-content: center;
@@ -78,14 +56,11 @@ a { color: inherit; text-decoration: none; }
   padding: 20px;
 }
 #loginScreen::before {
-  content: '';
-  position: absolute; inset: 0;
-  background-image:
-    radial-gradient(circle at 20% 80%, rgba(16,185,129,0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(59,130,246,0.06) 0%, transparent 50%);
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 20% 80%, rgba(16,185,129,0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(59,130,246,0.06) 0%, transparent 50%);
   pointer-events: none;
 }
-
 .login-card {
   position: relative; z-index: 1;
   background: var(--c-surface);
@@ -96,576 +71,361 @@ a { color: inherit; text-decoration: none; }
   box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
   animation: fadeUp .5s ease both;
 }
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: none; }
-}
-
+@keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
 .login-logo {
   width: 72px; height: 72px;
   background: linear-gradient(135deg, var(--c-green-d), var(--c-green));
   border-radius: 22px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 34px;
-  margin: 0 auto 24px;
+  font-size: 34px; margin: 0 auto 24px;
   box-shadow: 0 8px 32px rgba(16,185,129,0.3);
 }
-.login-title {
-  font-family: var(--font-head);
-  font-size: 24px; font-weight: 700;
-  text-align: center; margin-bottom: 6px;
-}
-.login-sub {
-  text-align: center; color: var(--c-text2); font-size: 14px; margin-bottom: 32px;
-}
-.field-label {
-  font-size: 12px; font-weight: 600; color: var(--c-text2);
-  text-transform: uppercase; letter-spacing: .8px;
-  margin-bottom: 8px; display: block;
-}
+.login-title { font-family: var(--font-head); font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 6px; }
+.login-sub { text-align: center; color: var(--c-text2); font-size: 14px; margin-bottom: 32px; }
+.field-label { font-size: 12px; font-weight: 600; color: var(--c-text2); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; display: block; }
 .field-input {
-  width: 100%;
-  background: var(--c-surface2);
-  border: 1.5px solid var(--c-border2);
-  border-radius: var(--radius-md);
-  padding: 12px 16px;
+  width: 100%; background: var(--c-surface2); border: 1.5px solid var(--c-border2);
+  border-radius: var(--radius-md); padding: 12px 16px;
   font-family: var(--font-body); font-size: 14px; color: var(--c-text);
-  outline: none; transition: border-color .2s, box-shadow .2s;
-  margin-bottom: 16px;
+  outline: none; transition: border-color .2s, box-shadow .2s; margin-bottom: 10px;
 }
-.field-input:focus {
-  border-color: var(--c-green);
-  box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
-}
+.field-input:focus { border-color: var(--c-green); box-shadow: 0 0 0 3px rgba(16,185,129,0.15); }
 .field-input::placeholder { color: var(--c-text3); }
+.remember-row { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+.remember-row input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--c-green); cursor: pointer; }
+.remember-row label { font-size: 13px; color: var(--c-text2); cursor: pointer; }
 .btn-login {
-  width: 100%;
-  padding: 13px;
+  width: 100%; padding: 13px;
   background: linear-gradient(135deg, var(--c-green-d), var(--c-green));
   border: none; border-radius: var(--radius-md);
   font-family: var(--font-body); font-size: 15px; font-weight: 600; color: #fff;
   cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-  transition: opacity .2s, transform .1s;
-  box-shadow: 0 4px 16px rgba(16,185,129,0.3);
+  transition: opacity .2s, transform .1s; box-shadow: 0 4px 16px rgba(16,185,129,0.3);
 }
-.btn-login:hover { opacity: .9; }
-.btn-login:active { transform: scale(.98); }
-.login-note {
-  text-align: center; color: var(--c-text3); font-size: 12px; margin-top: 16px;
-}
+.btn-login:hover { opacity: .9; } .btn-login:active { transform: scale(.98); }
+.login-note { text-align: center; color: var(--c-text3); font-size: 12px; margin-top: 16px; }
 
-/* =============================================
-   LAYOUT
-============================================= */
+/* ─── LAYOUT ─── */
 #adminApp { display: none; min-height: 100vh; }
 .layout { display: flex; }
 
-/* =============================================
-   SIDEBAR
-============================================= */
+/* ─── SIDEBAR ─── */
 .sidebar {
-  width: var(--sidebar-w);
-  background: var(--c-surface);
+  width: var(--sidebar-w); background: var(--c-surface);
   border-right: 1px solid var(--c-border);
-  min-height: 100vh;
-  flex-shrink: 0;
+  min-height: 100vh; flex-shrink: 0;
   position: sticky; top: 0; height: 100vh;
-  display: flex; flex-direction: column;
-  overflow: hidden;
+  display: flex; flex-direction: column; overflow: hidden;
+  transition: transform .3s ease;
+  z-index: 200;
 }
 .sidebar::after {
-  content: '';
-  position: absolute; inset-x: 0; bottom: 0; height: 120px;
+  content: ''; position: absolute; inset-x: 0; bottom: 0; height: 120px;
   background: linear-gradient(to top, var(--c-surface), transparent);
   pointer-events: none;
 }
-
 .sb-brand {
-  padding: 24px 20px 20px;
-  border-bottom: 1px solid var(--c-border);
+  padding: 24px 20px 20px; border-bottom: 1px solid var(--c-border);
   display: flex; align-items: center; gap: 14px;
 }
 .sb-brand-icon {
   width: 44px; height: 44px;
   background: linear-gradient(135deg, var(--c-green-d), var(--c-green));
-  border-radius: 13px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
-  box-shadow: 0 4px 12px rgba(16,185,129,0.25);
-  flex-shrink: 0;
+  border-radius: 13px; display: flex; align-items: center; justify-content: center;
+  font-size: 22px; box-shadow: 0 4px 12px rgba(16,185,129,0.25); flex-shrink: 0;
 }
-.sb-brand-text h2 {
-  font-family: var(--font-head);
-  font-size: 16px; font-weight: 700; color: var(--c-text);
-}
+.sb-brand-text h2 { font-family: var(--font-head); font-size: 16px; font-weight: 700; color: var(--c-text); }
 .sb-brand-text p { font-size: 11px; color: var(--c-text3); margin-top: 2px; }
-
 .sb-section { padding: 10px 12px 0; }
-.sb-section-label {
-  font-size: 10px; font-weight: 700; color: var(--c-text3);
-  text-transform: uppercase; letter-spacing: 1px;
-  padding: 0 8px 6px;
-}
-
+.sb-section-label { font-size: 10px; font-weight: 700; color: var(--c-text3); text-transform: uppercase; letter-spacing: 1px; padding: 0 8px 6px; }
 .nav-item {
   display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  color: var(--c-text2);
-  cursor: pointer; transition: all .18s;
-  font-size: 14px; font-weight: 500;
-  position: relative;
-  margin-bottom: 2px;
+  padding: 10px 12px; border-radius: var(--radius-sm);
+  color: var(--c-text2); cursor: pointer; transition: all .18s;
+  font-size: 14px; font-weight: 500; position: relative; margin-bottom: 2px;
 }
 .nav-item i { width: 18px; text-align: center; font-size: 15px; }
 .nav-item:hover { background: var(--c-surface2); color: var(--c-text); }
-.nav-item.active {
-  background: var(--c-green-dim);
-  color: var(--c-green);
-}
+.nav-item.active { background: var(--c-green-dim); color: var(--c-green); }
 .nav-item.active::before {
-  content: '';
-  position: absolute; left: 0; top: 20%; height: 60%;
-  width: 3px; background: var(--c-green);
-  border-radius: 0 3px 3px 0;
+  content: ''; position: absolute; left: 0; top: 20%; height: 60%;
+  width: 3px; background: var(--c-green); border-radius: 0 3px 3px 0;
 }
 .nav-badge {
-  background: var(--c-red);
-  color: #fff; border-radius: 99px;
-  padding: 2px 7px; font-size: 10px; font-weight: 700;
-  margin-left: auto;
+  background: var(--c-red); color: #fff; border-radius: 99px;
+  padding: 2px 7px; font-size: 10px; font-weight: 700; margin-left: auto;
 }
-
 .sb-flex { flex: 1; }
-
-.sb-footer {
-  padding: 16px 20px;
-  border-top: 1px solid var(--c-border);
-  margin-top: auto;
-  position: relative; z-index: 1;
-}
-.sb-admin-info {
-  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
-}
+.sb-footer { padding: 16px 20px; border-top: 1px solid var(--c-border); margin-top: auto; position: relative; z-index: 1; }
+.sb-admin-info { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .sb-admin-av {
   width: 36px; height: 36px;
   background: linear-gradient(135deg, var(--c-blue), var(--c-purple));
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
   font-size: 16px; flex-shrink: 0;
 }
 .sb-admin-label { font-size: 11px; color: var(--c-text3); }
-.sb-admin-id { font-size: 12px; color: var(--c-text2); font-weight: 500; }
+.sb-admin-name { font-size: 13px; color: var(--c-text); font-weight: 600; }
+.sb-admin-id { font-size: 11px; color: var(--c-text3); }
+.sb-divider { height: 1px; background: var(--c-border); margin: 8px 12px; }
 
-/* =============================================
-   TOPBAR
-============================================= */
-.main { flex: 1; overflow-x: hidden; background: var(--c-bg); }
+/* ─── TOPBAR ─── */
+.main { flex: 1; overflow-x: hidden; background: var(--c-bg); min-width: 0; }
 .topbar {
-  background: var(--c-surface);
-  border-bottom: 1px solid var(--c-border);
-  padding: 0 28px;
-  height: var(--topbar-h);
+  background: var(--c-surface); border-bottom: 1px solid var(--c-border);
+  padding: 0 24px; height: var(--topbar-h);
   display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; z-index: 50;
-  backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px);
 }
 .topbar-left { display: flex; align-items: center; gap: 12px; }
-.topbar-crumb {
-  font-size: 12px; color: var(--c-text3); font-weight: 500;
-  display: flex; align-items: center; gap: 6px;
+.btn-hamburger {
+  display: none; width: 36px; height: 36px;
+  background: var(--c-surface2); border: 1px solid var(--c-border2);
+  border-radius: var(--radius-sm); align-items: center; justify-content: center;
+  color: var(--c-text2); cursor: pointer; font-size: 15px; flex-shrink: 0;
 }
-.topbar-crumb span { color: var(--c-text2); }
-.topbar h1 {
-  font-family: var(--font-head);
-  font-size: 18px; font-weight: 700; color: var(--c-text);
-}
+.topbar-crumb { font-size: 12px; color: var(--c-text3); display: flex; align-items: center; gap: 6px; }
+.topbar-crumb i { font-size: 10px; }
+.topbar-crumb .crumb-page { color: var(--c-text2); font-weight: 500; }
 .topbar-actions { display: flex; gap: 8px; align-items: center; }
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6); z-index: 199; backdrop-filter: blur(2px);
+}
+.sidebar-overlay.show { display: block; }
 
-/* =============================================
-   PAGES
-============================================= */
+/* ─── PAGES ─── */
 .page { display: none; padding: 28px; }
 .page.active { display: block; animation: fadeIn .2s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
 
-/* =============================================
-   STAT CARDS
-============================================= */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px; margin-bottom: 28px;
-}
+/* ─── STAT CARDS ─── */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
 .stat-card {
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-lg);
-  padding: 22px;
+  background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg); padding: 22px;
   display: flex; align-items: center; gap: 18px;
   position: relative; overflow: hidden;
   transition: transform .2s, box-shadow .2s;
 }
 .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-card); }
 .stat-card::before {
-  content: '';
-  position: absolute; top: 0; right: 0;
-  width: 80px; height: 80px;
-  border-radius: 50%;
-  transform: translate(20px, -20px);
-  opacity: .06;
+  content: ''; position: absolute; top: 0; right: 0;
+  width: 80px; height: 80px; border-radius: 50%;
+  transform: translate(20px, -20px); opacity: .06;
 }
 .stat-card.green::before { background: var(--c-green); }
 .stat-card.blue::before  { background: var(--c-blue); }
 .stat-card.amber::before { background: var(--c-amber); }
 .stat-card.red::before   { background: var(--c-red); }
-
-.stat-icon {
-  width: 50px; height: 50px;
-  border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
-}
-.stat-card.green .stat-icon { background: var(--c-green-dim); }
-.stat-card.blue  .stat-icon { background: var(--c-blue-dim); }
-.stat-card.amber .stat-icon { background: var(--c-amber-dim); }
-.stat-card.red   .stat-icon { background: var(--c-red-dim); }
-
-.stat-val {
-  font-family: var(--font-head);
-  font-size: 30px; font-weight: 700; line-height: 1;
-  margin-bottom: 4px;
-}
+.stat-icon { width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.stat-card.green .stat-icon { background: var(--c-green-dim); color: var(--c-green); }
+.stat-card.blue  .stat-icon { background: var(--c-blue-dim);  color: var(--c-blue);  }
+.stat-card.amber .stat-icon { background: var(--c-amber-dim); color: var(--c-amber); }
+.stat-card.red   .stat-icon { background: var(--c-red-dim);   color: var(--c-red);   }
+.stat-val { font-family: var(--font-head); font-size: 30px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
 .stat-card.green .stat-val { color: var(--c-green); }
 .stat-card.blue  .stat-val { color: var(--c-blue); }
 .stat-card.amber .stat-val { color: var(--c-amber); }
 .stat-card.red   .stat-val { color: var(--c-red); }
 .stat-label { font-size: 13px; color: var(--c-text2); }
 
-/* =============================================
-   CARDS
-============================================= */
-.card {
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-.card-head {
-  padding: 18px 22px;
-  border-bottom: 1px solid var(--c-border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.card-title {
-  font-family: var(--font-head);
-  font-size: 15px; font-weight: 600; color: var(--c-text);
-  display: flex; align-items: center; gap: 8px;
-}
-.card-title-icon {
-  width: 30px; height: 30px;
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
-}
+/* ─── CHARTS ─── */
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+.chart-card { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-lg); padding: 22px; }
+.chart-card.full { grid-column: 1 / -1; }
+.chart-title { font-family: var(--font-head); font-size: 14px; font-weight: 600; color: var(--c-text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.chart-title i { color: var(--c-green); }
+.chart-wrap { position: relative; height: 220px; }
 
-/* =============================================
-   TABLES
-============================================= */
+/* ─── ACTIVE CARS ─── */
+.active-cars-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; padding: 16px 20px; }
+.active-car-card {
+  background: var(--c-surface2); border: 1px solid var(--c-border2);
+  border-radius: var(--radius-md); padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  border-left: 3px solid var(--c-amber);
+}
+.active-car-plate {
+  background: var(--c-amber-dim); color: var(--c-amber);
+  border-radius: var(--radius-sm); padding: 6px 12px;
+  font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+.active-car-name { font-size: 13px; font-weight: 600; }
+.active-car-since { font-size: 11px; color: var(--c-text3); margin-top: 3px; }
+
+/* ─── CARDS ─── */
+.card { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
+.card-head { padding: 18px 22px; border-bottom: 1px solid var(--c-border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.card-title { font-family: var(--font-head); font-size: 15px; font-weight: 600; color: var(--c-text); display: flex; align-items: center; gap: 8px; }
+.card-title-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+
+/* ─── TABLES ─── */
 .tbl-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 600px; }
 thead th {
-  padding: 10px 18px;
-  text-align: left;
-  font-size: 11px; font-weight: 700;
-  color: var(--c-text3);
+  padding: 10px 18px; text-align: left;
+  font-size: 11px; font-weight: 700; color: var(--c-text3);
   text-transform: uppercase; letter-spacing: .7px;
-  background: var(--c-surface2);
-  white-space: nowrap;
+  background: var(--c-surface2); white-space: nowrap;
 }
-tbody td {
-  padding: 12px 18px;
-  border-top: 1px solid var(--c-border);
-  font-size: 14px; vertical-align: middle;
-}
+tbody td { padding: 12px 18px; border-top: 1px solid var(--c-border); font-size: 14px; vertical-align: middle; }
 tbody tr { transition: background .15s; }
 tbody tr:hover td { background: var(--c-surface2); }
 
-/* =============================================
-   BADGES
-============================================= */
-.badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 3px 10px; border-radius: 99px;
-  font-size: 11px; font-weight: 700; white-space: nowrap;
-}
+/* ─── SKELETON ─── */
+.skeleton { background: linear-gradient(90deg, var(--c-surface2) 25%, var(--c-surface3) 50%, var(--c-surface2) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px; }
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.sk-row td { padding: 14px 18px; }
+.sk-line { height: 12px; border-radius: 6px; }
+.sk-av { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; }
+
+/* ─── BADGES ─── */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; white-space: nowrap; }
 .b-green  { background: var(--c-green-dim);  color: var(--c-green); }
 .b-blue   { background: var(--c-blue-dim);   color: var(--c-blue); }
 .b-amber  { background: var(--c-amber-dim);  color: var(--c-amber); }
 .b-red    { background: var(--c-red-dim);    color: var(--c-red); }
 .b-purple { background: var(--c-purple-dim); color: var(--c-purple); }
 .b-gray   { background: var(--c-surface3);   color: var(--c-text2); }
-/* Aliases */
 .b-yellow { background: var(--c-amber-dim);  color: var(--c-amber); }
 
-/* =============================================
-   BUTTONS
-============================================= */
-.btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 16px; border-radius: var(--radius-sm);
-  font-family: var(--font-body); font-size: 13px; font-weight: 600;
-  border: none; cursor: pointer; transition: all .18s;
-  white-space: nowrap;
-}
+/* ─── BUTTONS ─── */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all .18s; white-space: nowrap; }
 .btn-sm { padding: 6px 12px; font-size: 12px; }
-.btn-primary {
-  background: var(--c-green); color: #fff;
-  box-shadow: 0 2px 8px rgba(16,185,129,0.25);
-}
+.btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 6px; }
+.btn-primary { background: var(--c-green); color: #fff; box-shadow: 0 2px 8px rgba(16,185,129,0.25); }
 .btn-primary:hover { background: var(--c-green-d); }
-.btn-danger { background: var(--c-red); color: #fff; }
-.btn-danger:hover { opacity: .85; }
-.btn-amber { background: var(--c-amber); color: #fff; }
+.btn-danger  { background: var(--c-red);  color: #fff; }
+.btn-danger:hover  { opacity: .85; }
+.btn-amber   { background: var(--c-amber); color: #fff; }
 .btn-amber:hover { opacity: .85; }
-.btn-warning { background: var(--c-amber); color: #fff; }
-.btn-secondary {
-  background: var(--c-surface2);
-  border: 1px solid var(--c-border2);
-  color: var(--c-text2);
-}
+.btn-secondary { background: var(--c-surface2); border: 1px solid var(--c-border2); color: var(--c-text2); }
 .btn-secondary:hover { background: var(--c-surface3); color: var(--c-text); }
-.btn-info { background: var(--c-blue); color: #fff; }
+.btn-info    { background: var(--c-blue); color: #fff; }
 .btn:disabled { opacity: .4; pointer-events: none; }
 .btn-icon { width: 32px; height: 32px; padding: 0; justify-content: center; border-radius: 8px; }
 
-/* =============================================
-   USER CELL
-============================================= */
+/* ─── USER CELL ─── */
 .u-cell { display: flex; align-items: center; gap: 10px; }
-.u-cell img, .u-av {
-  width: 36px; height: 36px;
-  border-radius: 50%; object-fit: cover; flex-shrink: 0;
-}
-.u-av {
-  background: linear-gradient(135deg, var(--c-green-d), var(--c-green));
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-weight: 700; font-size: 14px;
-}
+.u-cell img, .u-av { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.u-av { background: linear-gradient(135deg, var(--c-green-d), var(--c-green)); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; }
 .u-name { font-size: 14px; font-weight: 500; }
 .u-sub  { font-size: 11px; color: var(--c-text3); margin-top: 2px; }
 
-/* =============================================
-   REQUEST CARDS
-============================================= */
+/* ─── REQUEST CARDS ─── */
 .req-list { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
-.req-card {
-  background: var(--c-surface2);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-md);
-  padding: 18px;
-  transition: border-color .2s, box-shadow .2s;
-}
-.req-card:hover { border-color: var(--c-border2); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.req-card { background: var(--c-surface2); border: 1px solid var(--c-border); border-radius: var(--radius-md); padding: 18px; transition: border-color .2s; }
+.req-card:hover { border-color: var(--c-border2); }
 .req-card.approved { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.04); }
 .req-card.rejected { opacity: .6; }
-
-.req-top {
-  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
-}
-.req-av-lg, .req-top img {
-  width: 52px; height: 52px;
-  border-radius: 50%; object-fit: cover; flex-shrink: 0;
-  border: 2px solid var(--c-border2);
-}
-.req-av-lg {
-  background: linear-gradient(135deg, var(--c-green-d), var(--c-green));
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-weight: 700; font-size: 20px;
-}
-.req-name  { font-size: 15px; font-weight: 600; }
-.req-meta  { font-size: 12px; color: var(--c-text3); margin-top: 3px; }
-
-.req-info-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 10px 16px;
-  background: var(--c-surface); border-radius: var(--radius-sm);
-  padding: 12px 16px; margin-bottom: 14px;
-}
+.req-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.req-av-lg, .req-top img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--c-border2); }
+.req-av-lg { background: linear-gradient(135deg, var(--c-green-d), var(--c-green)); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 20px; }
+.req-name { font-size: 15px; font-weight: 600; }
+.req-meta { font-size: 12px; color: var(--c-text3); margin-top: 3px; }
+.req-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; background: var(--c-surface); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 14px; }
 .req-field-label { font-size: 11px; color: var(--c-text3); margin-bottom: 2px; }
 .req-field-val   { font-size: 13px; font-weight: 500; }
-
 .req-actions { display: flex; gap: 8px; }
 
-/* =============================================
-   SEARCH ROW
-============================================= */
-.search-row {
-  padding: 12px 18px;
-  border-bottom: 1px solid var(--c-border);
-  display: flex; gap: 8px;
-}
-.search-row input,
-.search-row select,
-.filter-select {
-  background: var(--c-surface2);
-  border: 1.5px solid var(--c-border2);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
+/* ─── SEARCH/FILTER ─── */
+.search-row { padding: 12px 18px; border-bottom: 1px solid var(--c-border); display: flex; gap: 8px; flex-wrap: wrap; }
+.search-row input, .search-row select, .filter-select {
+  background: var(--c-surface2); border: 1.5px solid var(--c-border2);
+  border-radius: var(--radius-sm); padding: 8px 12px;
   font-family: var(--font-body); font-size: 13px; color: var(--c-text);
-  outline: none; flex: 1; transition: border-color .2s;
-  appearance: none;
+  outline: none; flex: 1; min-width: 120px; transition: border-color .2s; appearance: none;
 }
-.search-row input:focus,
-.search-row select:focus,
-.filter-select:focus { border-color: var(--c-green); }
+.search-row input:focus, .search-row select:focus, .filter-select:focus { border-color: var(--c-green); }
 .search-row input::placeholder { color: var(--c-text3); }
 .search-row select { flex: 0 0 140px; cursor: pointer; }
+.search-row input[type=date] { flex: 0 0 150px; color-scheme: dark; }
 
-/* =============================================
-   MODAL
-============================================= */
-.modal-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.65);
-  z-index: 1000;
-  align-items: center; justify-content: center;
-  padding: 20px;
-  backdrop-filter: blur(4px);
+/* ─── PAGINATION ─── */
+.pagination { display: flex; align-items: center; gap: 6px; padding: 16px 20px; border-top: 1px solid var(--c-border); flex-wrap: wrap; }
+.pg-btn {
+  min-width: 34px; height: 34px; border-radius: var(--radius-sm);
+  background: var(--c-surface2); border: 1px solid var(--c-border2);
+  color: var(--c-text2); cursor: pointer; font-family: var(--font-body);
+  font-size: 13px; display: inline-flex; align-items: center; justify-content: center;
+  transition: all .15s;
 }
+.pg-btn:hover:not(:disabled) { background: var(--c-surface3); color: var(--c-text); }
+.pg-btn.active { background: var(--c-green); color: #fff; border-color: var(--c-green); }
+.pg-btn:disabled { opacity: .3; cursor: not-allowed; }
+.pg-info { font-size: 12px; color: var(--c-text3); padding: 0 4px; }
+.rec-count-badge { font-size: 12px; color: var(--c-text3); margin-left: auto; }
+
+/* ─── MODAL ─── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 1000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
 .modal-overlay.show { display: flex; }
-.modal-box {
-  background: var(--c-surface);
-  border: 1px solid var(--c-border2);
-  border-radius: var(--radius-xl);
-  padding: 28px;
-  max-width: 460px; width: 100%;
-  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
-  animation: popIn .2s ease;
-}
-@keyframes popIn {
-  from { transform: scale(.9); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
-}
-.modal-header {
-  display: flex; align-items: center; gap: 10px;
-  margin-bottom: 22px;
-}
-.modal-header-icon {
-  width: 40px; height: 40px;
-  background: var(--c-green-dim);
-  border-radius: 11px;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--c-green); font-size: 18px;
-}
-.modal-title {
-  font-family: var(--font-head);
-  font-size: 17px; font-weight: 700;
-}
+.modal-box { background: var(--c-surface); border: 1px solid var(--c-border2); border-radius: var(--radius-xl); padding: 28px; max-width: 460px; width: 100%; box-shadow: 0 32px 80px rgba(0,0,0,0.6); animation: popIn .2s ease; }
+@keyframes popIn { from { transform:scale(.9); opacity:0; } to { transform:scale(1); opacity:1; } }
+.modal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+.modal-header-icon { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.modal-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; }
 .modal-field { margin-bottom: 14px; }
-.modal-label {
-  display: block;
-  font-size: 11px; font-weight: 700; color: var(--c-text3);
-  text-transform: uppercase; letter-spacing: .7px; margin-bottom: 7px;
-}
-.modal-input, .modal-select {
-  width: 100%;
-  background: var(--c-surface2);
-  border: 1.5px solid var(--c-border2);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  font-family: var(--font-body); font-size: 14px; color: var(--c-text);
-  outline: none; transition: border-color .2s, box-shadow .2s;
-  appearance: none;
-}
-.modal-input:focus, .modal-select:focus {
-  border-color: var(--c-green);
-  box-shadow: 0 0 0 3px rgba(16,185,129,0.12);
-}
-.modal-input::placeholder { color: var(--c-text3); }
-.modal-footer {
-  display: flex; gap: 8px; justify-content: flex-end;
-  margin-top: 22px; padding-top: 18px;
-  border-top: 1px solid var(--c-border);
-}
+.modal-label { display: block; font-size: 11px; font-weight: 700; color: var(--c-text3); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 7px; }
+.modal-input, .modal-select { width: 100%; background: var(--c-surface2); border: 1.5px solid var(--c-border2); border-radius: var(--radius-sm); padding: 10px 14px; font-family: var(--font-body); font-size: 14px; color: var(--c-text); outline: none; transition: border-color .2s; appearance: none; }
+.modal-input:focus, .modal-select:focus { border-color: var(--c-green); box-shadow: 0 0 0 3px rgba(16,185,129,0.12); }
+.modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--c-border); }
 
-/* =============================================
-   TOAST
-============================================= */
-.toast {
-  position: fixed; bottom: 24px; right: 24px;
-  padding: 13px 18px; border-radius: 12px;
-  font-size: 14px; z-index: 9999;
-  display: none; align-items: center; gap: 10px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-  max-width: 340px; font-weight: 500;
-  border: 1px solid rgba(255,255,255,0.1);
-}
+/* ─── CONFIRM MODAL ─── */
+#confirmModal .modal-box { max-width: 380px; text-align: center; }
+.confirm-icon { font-size: 40px; margin-bottom: 16px; }
+.confirm-msg { font-size: 16px; color: var(--c-text2); margin-bottom: 24px; line-height: 1.6; }
+
+/* ─── TOAST ─── */
+.toast { position: fixed; bottom: 24px; right: 24px; padding: 13px 18px; border-radius: 12px; font-size: 14px; z-index: 9999; display: none; align-items: center; gap: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); max-width: 340px; font-weight: 500; border: 1px solid rgba(255,255,255,0.1); }
 .toast.show { display: flex; animation: slideUp .3s ease; }
 .toast.success { background: #065f46; color: #a7f3d0; }
 .toast.error   { background: #7f1d1d; color: #fca5a5; }
 .toast.warning { background: #78350f; color: #fcd34d; }
 .toast.info    { background: var(--c-surface2); color: var(--c-text); }
-@keyframes slideUp {
-  from { transform: translateY(16px); opacity: 0; }
-  to   { transform: none; opacity: 1; }
-}
+@keyframes slideUp { from { transform:translateY(16px); opacity:0; } to { transform:none; opacity:1; } }
 
-/* =============================================
-   MISC
-============================================= */
-.empty-state {
-  text-align: center; padding: 52px 20px; color: var(--c-text3);
-}
+/* ─── MISC ─── */
+.empty-state { text-align: center; padding: 52px 20px; color: var(--c-text3); }
 .empty-state .icon { font-size: 40px; margin-bottom: 10px; }
 .empty-state p { font-size: 14px; }
 .load-row { text-align: center; padding: 40px; color: var(--c-text3); }
-
-/* Divider */
-.sb-divider { height: 1px; background: var(--c-border); margin: 8px 12px; }
-
-/* Photo thumbnail */
-.tbl-photo {
-  width: 40px; height: 40px; object-fit: cover;
-  border-radius: 8px; border: 1px solid var(--c-border2);
-  cursor: pointer; transition: transform .2s;
-}
+.tbl-photo { width: 40px; height: 40px; object-fit: cover; border-radius: 8px; border: 1px solid var(--c-border2); cursor: pointer; transition: transform .2s; }
 .tbl-photo:hover { transform: scale(1.08); }
+.row-actions { display: flex; gap: 4px; flex-wrap: nowrap; }
+.filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 18px; flex-wrap: wrap; }
 
-/* Row actions */
-.row-actions { display: flex; gap: 6px; }
-
-/* Tag filter row */
-.filter-row {
-  display: flex; gap: 8px; align-items: center;
-  margin-bottom: 18px; flex-wrap: wrap;
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  .charts-grid { grid-template-columns: 1fr; }
 }
-.filter-row h2 {
-  font-family: var(--font-head); font-size: 16px; font-weight: 700; flex: 1;
-}
-
-/* =============================================
-   RESPONSIVE
-============================================= */
 @media (max-width: 760px) {
-  .sidebar { display: none; }
+  .sidebar { position: fixed; top: 0; left: 0; height: 100vh; transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .btn-hamburger { display: flex; }
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .page { padding: 16px; }
   .req-info-grid { grid-template-columns: 1fr; }
+  .topbar { padding: 0 16px; }
+  .charts-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
-<!-- ==================== LOGIN ==================== -->
+<!-- ────────── LOGIN ────────── -->
 <div id="loginScreen">
   <div class="login-card">
-    <div class="login-logo">🛡️</div>
+    <div class="login-logo"><i class="fas fa-shield-alt" style="color:#fff;font-size:30px"></i></div>
     <h2 class="login-title">Admin Panel</h2>
     <p class="login-sub">ระบบจัดการบันทึกการใช้รถ</p>
     <label class="field-label" for="adminIdInput">LINE User ID</label>
     <input class="field-input" type="text" id="adminIdInput" placeholder="กรอก LINE User ID ของ Admin"
            onkeydown="if(event.key==='Enter')adminLogin()">
+    <div class="remember-row">
+      <input type="checkbox" id="rememberMe">
+      <label for="rememberMe">จดจำการเข้าสู่ระบบ</label>
+    </div>
     <button class="btn-login" onclick="adminLogin()">
       <i class="fas fa-shield-alt"></i> เข้าสู่ระบบ
     </button>
@@ -673,17 +433,18 @@ tbody tr:hover td { background: var(--c-surface2); }
   </div>
 </div>
 
-<!-- ==================== ADMIN APP ==================== -->
+<!-- ────────── ADMIN APP ────────── -->
 <div id="adminApp">
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="layout">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div class="sb-brand">
-      <div class="sb-brand-icon">🚗</div>
+      <div class="sb-brand-icon"><i class="fas fa-car" style="color:#fff"></i></div>
       <div class="sb-brand-text">
         <h2>Car System</h2>
-        <p>Admin Panel v2.0</p>
+        <p>Admin Panel v3.0</p>
       </div>
     </div>
 
@@ -714,9 +475,10 @@ tbody tr:hover td { background: var(--c-surface2); }
 
     <div class="sb-footer">
       <div class="sb-admin-info">
-        <div class="sb-admin-av">👤</div>
+        <div class="sb-admin-av"><i class="fas fa-user-shield"></i></div>
         <div>
           <div class="sb-admin-label">ล็อกอินเป็น Admin</div>
+          <div class="sb-admin-name" id="adminName">—</div>
           <div class="sb-admin-id" id="adminLabel">—</div>
         </div>
       </div>
@@ -730,14 +492,24 @@ tbody tr:hover td { background: var(--c-surface2); }
   <div class="main">
     <div class="topbar">
       <div class="topbar-left">
-        <h1 id="pageTitle">แดชบอร์ด</h1>
+        <button class="btn-hamburger" id="hamburgerBtn" onclick="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="topbar-crumb">
+          <i class="fas fa-home"></i>
+          <i class="fas fa-chevron-right"></i>
+          <span class="crumb-page" id="crumbPage">แดชบอร์ด</span>
+        </div>
       </div>
       <div class="topbar-actions">
         <button class="btn btn-secondary btn-sm" onclick="refreshAll()">
           <i class="fas fa-sync-alt"></i> รีเฟรช
         </button>
+        <button class="btn btn-secondary btn-sm" id="exportBtn" onclick="exportCSV()" style="display:none">
+          <i class="fas fa-download"></i> CSV
+        </button>
         <a href="/history" class="btn btn-primary btn-sm">
-          <i class="fas fa-external-link-alt"></i> ดูประวัติสาธารณะ
+          <i class="fas fa-external-link-alt"></i> ประวัติสาธารณะ
         </a>
       </div>
     </div>
@@ -746,55 +518,61 @@ tbody tr:hover td { background: var(--c-surface2); }
     <div class="page active" id="page-dashboard">
       <div class="stats-grid">
         <div class="stat-card green">
-          <div class="stat-icon">🚗</div>
-          <div>
-            <div class="stat-val" id="s-trips">—</div>
-            <div class="stat-label">เที่ยวทั้งหมด</div>
-          </div>
+          <div class="stat-icon"><i class="fas fa-route"></i></div>
+          <div><div class="stat-val" id="s-trips">—</div><div class="stat-label">เที่ยวทั้งหมด</div></div>
         </div>
         <div class="stat-card amber">
-          <div class="stat-icon">🔑</div>
-          <div>
-            <div class="stat-val" id="s-active">—</div>
-            <div class="stat-label">รถออกอยู่ตอนนี้</div>
-          </div>
+          <div class="stat-icon"><i class="fas fa-key"></i></div>
+          <div><div class="stat-val" id="s-active">—</div><div class="stat-label">รถออกอยู่ตอนนี้</div></div>
         </div>
         <div class="stat-card blue">
-          <div class="stat-icon">👥</div>
-          <div>
-            <div class="stat-val" id="s-users">—</div>
-            <div class="stat-label">ผู้ใช้งาน</div>
-          </div>
+          <div class="stat-icon"><i class="fas fa-users"></i></div>
+          <div><div class="stat-val" id="s-users">—</div><div class="stat-label">ผู้ใช้งาน</div></div>
         </div>
         <div class="stat-card red">
-          <div class="stat-icon">⏳</div>
-          <div>
-            <div class="stat-val" id="s-pending-req">—</div>
-            <div class="stat-label">รอการอนุมัติ</div>
-          </div>
+          <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+          <div><div class="stat-val" id="s-pending-req">—</div><div class="stat-label">รอการอนุมัติ</div></div>
         </div>
       </div>
 
+      <!-- Charts -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-title"><i class="fas fa-chart-bar"></i> เที่ยวรายเดือน (ม.ค.–ธ.ค.)</div>
+          <div class="chart-wrap"><canvas id="tripsChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title"><i class="fas fa-chart-pie"></i> สัดส่วนการใช้รถแต่ละคัน</div>
+          <div class="chart-wrap"><canvas id="carsChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Active Cars Now -->
       <div class="card">
         <div class="card-head">
           <div class="card-title">
-            <div class="card-title-icon" style="background:var(--c-amber-dim);color:var(--c-amber)">🕐</div>
+            <div class="card-title-icon" style="background:var(--c-amber-dim);color:var(--c-amber)"><i class="fas fa-key"></i></div>
+            รถที่กำลังใช้อยู่ตอนนี้
+          </div>
+          <span class="badge b-amber" id="activeCarsCount">0 คัน</span>
+        </div>
+        <div id="activeCarsSection"></div>
+      </div>
+
+      <!-- Recent -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">
+            <div class="card-title-icon" style="background:var(--c-green-dim);color:var(--c-green)"><i class="fas fa-clock"></i></div>
             รายการล่าสุด
           </div>
         </div>
         <div class="tbl-wrap">
           <table>
-            <thead>
-              <tr>
-                <th>ผู้ใช้</th>
-                <th>ทะเบียนรถ</th>
-                <th>สาเหตุ</th>
-                <th>วันที่</th>
-                <th>สถานะ</th>
-              </tr>
-            </thead>
+            <thead><tr><th>ผู้ใช้</th><th>ทะเบียนรถ</th><th>สาเหตุ</th><th>วันที่</th><th>สถานะ</th></tr></thead>
             <tbody id="recentBody">
-              <tr><td colspan="5" class="load-row"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</td></tr>
+              <tr class="sk-row"><td><div class="u-cell"><div class="sk-av skeleton"></div><div class="sk-line skeleton" style="width:120px"></div></div></td><td><div class="sk-line skeleton" style="width:80px"></div></td><td><div class="sk-line skeleton" style="width:140px"></div></td><td><div class="sk-line skeleton" style="width:100px"></div></td><td><div class="sk-line skeleton" style="width:80px"></div></td></tr>
+              <tr class="sk-row"><td><div class="u-cell"><div class="sk-av skeleton"></div><div class="sk-line skeleton" style="width:100px"></div></div></td><td><div class="sk-line skeleton" style="width:70px"></div></td><td><div class="sk-line skeleton" style="width:120px"></div></td><td><div class="sk-line skeleton" style="width:90px"></div></td><td><div class="sk-line skeleton" style="width:70px"></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -806,9 +584,7 @@ tbody tr:hover td { background: var(--c-surface2); }
       <div class="card">
         <div class="card-head">
           <div class="card-title">
-            <div class="card-title-icon" style="background:var(--c-blue-dim);color:var(--c-blue)">
-              <i class="fas fa-user-clock"></i>
-            </div>
+            <div class="card-title-icon" style="background:var(--c-blue-dim);color:var(--c-blue)"><i class="fas fa-user-clock"></i></div>
             คำขอสมัครใช้งาน
           </div>
           <select id="reqFilter" onchange="renderRequests()" class="filter-select" style="max-width:160px;flex:none">
@@ -829,9 +605,7 @@ tbody tr:hover td { background: var(--c-surface2); }
       <div class="card">
         <div class="card-head">
           <div class="card-title">
-            <div class="card-title-icon" style="background:var(--c-purple-dim);color:var(--c-purple)">
-              <i class="fas fa-users"></i>
-            </div>
+            <div class="card-title-icon" style="background:var(--c-purple-dim);color:var(--c-purple)"><i class="fas fa-users"></i></div>
             รายชื่อผู้ใช้ทั้งหมด
           </div>
           <span class="badge b-blue" id="userCountBadge">— คน</span>
@@ -848,17 +622,7 @@ tbody tr:hover td { background: var(--c-surface2); }
         </div>
         <div class="tbl-wrap">
           <table>
-            <thead>
-              <tr>
-                <th>ผู้ใช้</th>
-                <th>เบอร์โทร</th>
-                <th>แผนก</th>
-                <th>Role</th>
-                <th>สถานะ</th>
-                <th>อัปเดตล่าสุด</th>
-                <th>จัดการ</th>
-              </tr>
-            </thead>
+            <thead><tr><th>ผู้ใช้</th><th>เบอร์โทร</th><th>แผนก</th><th>Role</th><th>สถานะ</th><th>อัปเดตล่าสุด</th><th>จัดการ</th></tr></thead>
             <tbody id="usersBody">
               <tr><td colspan="7" class="load-row"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</td></tr>
             </tbody>
@@ -872,41 +636,31 @@ tbody tr:hover td { background: var(--c-surface2); }
       <div class="card">
         <div class="card-head">
           <div class="card-title">
-            <div class="card-title-icon" style="background:var(--c-green-dim);color:var(--c-green)">
-              <i class="fas fa-history"></i>
-            </div>
+            <div class="card-title-icon" style="background:var(--c-green-dim);color:var(--c-green)"><i class="fas fa-history"></i></div>
             ประวัติการใช้รถ (Admin View)
           </div>
+          <span class="badge b-gray" id="recTotalBadge">— รายการ</span>
         </div>
         <div class="search-row">
-          <input type="text" id="recSearch" placeholder="🔍 ค้นหาชื่อ, ทะเบียน, สาเหตุ..." oninput="renderRecords()">
-          <select id="recStatusFilter" onchange="renderRecords()">
+          <input type="text" id="recSearch" placeholder="🔍 ค้นหาชื่อ, ทะเบียน, สาเหตุ..." oninput="recFilter()">
+          <select id="recStatusFilter" onchange="recFilter()">
             <option value="">ทุกสถานะ</option>
             <option value="pending">🔑 กำลังใช้อยู่</option>
             <option value="returned">✅ คืนรถแล้ว</option>
           </select>
+          <input type="text" id="recCarFilter" placeholder="ทะเบียนรถ..." oninput="recFilter()" style="flex:0 0 130px">
+          <input type="date" id="recDateFilter" onchange="recFilter()" style="flex:0 0 150px;color-scheme:dark">
+          <button class="btn btn-secondary btn-sm" onclick="resetRecFilter()"><i class="fas fa-times"></i> ล้าง</button>
         </div>
         <div class="tbl-wrap">
           <table>
-            <thead>
-              <tr>
-                <th>ผู้ใช้</th>
-                <th>ทะเบียน</th>
-                <th>ไมล์</th>
-                <th>สาเหตุ</th>
-                <th>ระยะทาง</th>
-                <th>รูป</th>
-                <th>วันที่</th>
-                <th>สถานะ</th>
-                <th>คืนเมื่อ</th>
-                <th>ระยะเวลา</th>
-              </tr>
-            </thead>
+            <thead><tr><th>ผู้ใช้</th><th>ทะเบียน</th><th>ไมล์</th><th>สาเหตุ</th><th>ระยะทาง</th><th>รูป</th><th>วันที่</th><th>สถานะ</th><th>คืนเมื่อ</th><th>ระยะเวลา</th><th>จัดการ</th></tr></thead>
             <tbody id="recordsBody">
-              <tr><td colspan="10" class="load-row"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</td></tr>
+              <tr><td colspan="11" class="load-row"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</td></tr>
             </tbody>
           </table>
         </div>
+        <div class="pagination" id="recPagination" style="display:none"></div>
       </div>
     </div>
 
@@ -914,11 +668,11 @@ tbody tr:hover td { background: var(--c-surface2); }
 </div><!-- /layout -->
 </div><!-- /adminApp -->
 
-<!-- ===== EDIT USER MODAL ===== -->
+<!-- ─── EDIT USER MODAL ─── -->
 <div class="modal-overlay" id="editModal">
   <div class="modal-box">
     <div class="modal-header">
-      <div class="modal-header-icon"><i class="fas fa-user-edit"></i></div>
+      <div class="modal-header-icon" style="background:var(--c-green-dim);color:var(--c-green)"><i class="fas fa-user-edit"></i></div>
       <div class="modal-title">แก้ไขข้อมูลผู้ใช้</div>
     </div>
     <input type="hidden" id="editUserId">
@@ -955,10 +709,21 @@ tbody tr:hover td { background: var(--c-surface2); }
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="saveUserEdit()">
-        <i class="fas fa-save"></i> บันทึก
-      </button>
+      <button class="btn btn-secondary" onclick="closeModal('editModal')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveUserEdit()"><i class="fas fa-save"></i> บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CONFIRM MODAL ─── -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <div class="confirm-icon" id="confirmIcon">⚠️</div>
+    <div class="modal-title" id="confirmTitle" style="text-align:center;margin-bottom:10px">ยืนยัน</div>
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="modal-footer" style="justify-content:center;gap:12px">
+      <button class="btn btn-secondary" onclick="closeModal('confirmModal')">ยกเลิก</button>
+      <button class="btn" id="confirmOkBtn" onclick="confirmOk()"><i class="fas fa-check"></i> ยืนยัน</button>
     </div>
   </div>
 </div>
@@ -967,45 +732,70 @@ tbody tr:hover td { background: var(--c-surface2); }
 <div class="toast" id="toast"></div>
 
 <script>
-/* =============================================
+/* ──────────────────────────────────────────
    STATE
-============================================= */
+────────────────────────────────────────── */
 let adminId = '';
 let allData = { userMap:{}, requests:[], records:[], stats:{} };
+let tripsChartInst = null, carsChartInst = null;
 
-/* =============================================
+/* ──────────────────────────────────────────
+   SIDEBAR MOBILE
+────────────────────────────────────────── */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+/* ──────────────────────────────────────────
    LOGIN
-============================================= */
+────────────────────────────────────────── */
 function adminLogin() {
   const id = document.getElementById('adminIdInput').value.trim();
   if (!id) { showToast('กรุณากรอก User ID', 'warning'); return; }
   adminId = id;
+  if (document.getElementById('rememberMe').checked) {
+    localStorage.setItem('admin_id', id);
+  } else {
+    localStorage.removeItem('admin_id');
+  }
   loadAll();
 }
 function adminLogout() {
   adminId = '';
+  if (tripsChartInst) { tripsChartInst.destroy(); tripsChartInst = null; }
+  if (carsChartInst)  { carsChartInst.destroy();  carsChartInst  = null; }
   document.getElementById('adminApp').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
 }
 
-/* =============================================
+// Auto-fill saved ID
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('admin_id');
+  if (saved) {
+    document.getElementById('adminIdInput').value = saved;
+    document.getElementById('rememberMe').checked = true;
+  }
+});
+
+/* ──────────────────────────────────────────
    LOAD DATA
-============================================= */
+────────────────────────────────────────── */
 async function loadAll() {
   try {
-    const res = await fetch('/admin-action', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'load', requestingUserId:adminId })
-    });
-    if (res.status === 403) { showToast('ไม่ใช่ Admin', 'error'); return; }
-    const data = await res.json();
+    const [mainRes, recRes] = await Promise.all([
+      fetch('/admin-action', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'load', requestingUserId:adminId }) }),
+      fetch('/admin-action', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'records', requestingUserId:adminId }) })
+    ]);
+    if (mainRes.status === 403) { showToast('ไม่ใช่ Admin', 'error'); return; }
 
-    const recRes = await fetch('/admin-action', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'records', requestingUserId:adminId })
-    });
+    const data    = await mainRes.json();
     const recData = await recRes.json();
 
     allData.userMap  = data.userMap  || {};
@@ -1013,52 +803,162 @@ async function loadAll() {
     allData.stats    = data.stats    || {};
     allData.records  = recData.records || [];
 
+    // ชื่อ admin ใน sidebar
+    const adminUser = allData.userMap[adminId];
+    document.getElementById('adminName').textContent = adminUser?.name || 'Administrator';
+    document.getElementById('adminLabel').textContent = adminId.slice(0, 18) + '…';
+
     updateStats();
+    buildDashboardCharts();
+    renderActiveCars();
+    renderRecentRecords();
     renderRequests();
     renderUsers();
-    renderRecords();
-    renderRecentRecords();
+    recPage = 1; recFilter();
 
     document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('adminApp').style.display = 'block';
-    document.getElementById('adminLabel').textContent = adminId.slice(0, 16) + '…';
+    document.getElementById('adminApp').style.display    = 'block';
   } catch(e) {
     showToast('โหลดข้อมูลไม่ได้: ' + e.message, 'error');
   }
 }
 function refreshAll() { loadAll(); showToast('รีเฟรชแล้ว', 'success'); }
 
-/* =============================================
+/* ──────────────────────────────────────────
    STATS
-============================================= */
+────────────────────────────────────────── */
 function updateStats() {
   const s = allData.stats;
-  document.getElementById('s-trips').textContent      = s.total_records || allData.records.length || 0;
-  document.getElementById('s-active').textContent     = s.cars_out || 0;
-  document.getElementById('s-users').textContent      = s.total_users || Object.keys(allData.userMap).filter(k => allData.userMap[k].role === 'user').length;
-  const pendingCount = allData.requests.filter(r => r.status === 'pending').length;
-  document.getElementById('s-pending-req').textContent = pendingCount;
+  document.getElementById('s-trips').textContent     = (s.total_records || allData.records.length || 0).toLocaleString();
+  document.getElementById('s-active').textContent    = s.cars_out || 0;
+  document.getElementById('s-users').textContent     = s.total_users || Object.values(allData.userMap).filter(u => u.role === 'user').length;
+  const pending = allData.requests.filter(r => r.status === 'pending').length;
+  document.getElementById('s-pending-req').textContent = pending;
   const badge = document.getElementById('pendingBadge');
-  badge.textContent = pendingCount;
-  badge.style.display = pendingCount > 0 ? 'inline' : 'none';
+  badge.textContent = pending;
+  badge.style.display = pending > 0 ? 'inline' : 'none';
 }
 
-/* =============================================
+/* ──────────────────────────────────────────
+   DASHBOARD CHARTS
+────────────────────────────────────────── */
+function buildDashboardCharts() {
+  const records = allData.records;
+  const curYear = new Date().getFullYear();
+
+  // 1) Bar chart: trips per month (ม.ค.–ธ.ค.)
+  const monthLabels = [];
+  const monthTrips  = [];
+  for (let m = 0; m <= 11; m++) {
+    const d = new Date(curYear, m, 1);
+    monthLabels.push(d.toLocaleDateString('th-TH', { month: 'short' }));
+    monthTrips.push(records.filter(r => {
+      if (!r.timestamp) return false;
+      const rd = new Date(r.timestamp);
+      return rd.getFullYear() === curYear && rd.getMonth() === m;
+    }).length);
+  }
+
+  if (tripsChartInst) tripsChartInst.destroy();
+  tripsChartInst = new Chart(document.getElementById('tripsChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: monthLabels,
+      datasets: [{
+        label: 'จำนวนเที่ยว',
+        data: monthTrips,
+        backgroundColor: monthTrips.map((_, i) => i === new Date().getMonth() ? 'rgba(16,185,129,0.9)' : 'rgba(16,185,129,0.45)'),
+        borderColor: 'rgba(16,185,129,1)',
+        borderWidth: 1.5, borderRadius: 6, borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(17,24,39,0.95)',
+          titleFont: { family: 'Sarabun', size: 12 },
+          bodyFont:  { family: 'Sarabun', size: 12 },
+          padding: 10, cornerRadius: 8,
+          callbacks: { label: ctx => ` ${ctx.parsed.y} เที่ยว` }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#5a6a88', font: { family: 'Sarabun', size: 11 } } },
+        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#5a6a88', font: { family: 'Sarabun', size: 11 }, precision: 0 } }
+      }
+    }
+  });
+
+  // 2) Donut chart: trips per car
+  const carCount = {};
+  records.forEach(r => { if (r.car) carCount[r.car] = (carCount[r.car] || 0) + 1; });
+  const carEntries = Object.entries(carCount).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const carColors  = ['#10b981','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#f97316','#84cc16'];
+
+  if (carsChartInst) carsChartInst.destroy();
+  if (carEntries.length === 0) {
+    document.getElementById('carsChart').closest('.chart-card').innerHTML +=
+      '<p style="text-align:center;color:var(--c-text3);font-size:13px;margin-top:20px">ยังไม่มีข้อมูล</p>';
+    return;
+  }
+  carsChartInst = new Chart(document.getElementById('carsChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: carEntries.map(([k]) => k),
+      datasets: [{ data: carEntries.map(([,v]) => v), backgroundColor: carColors, borderWidth: 0, hoverOffset: 8 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: { position: 'right', labels: { color: '#8899bb', font: { family: 'Sarabun', size: 11 }, padding: 12, boxWidth: 12 } },
+        tooltip: {
+          backgroundColor: 'rgba(17,24,39,0.95)',
+          titleFont: { family: 'Sarabun', size: 12 }, bodyFont: { family: 'Sarabun', size: 12 },
+          callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} เที่ยว` }
+        }
+      }
+    }
+  });
+}
+
+/* ──────────────────────────────────────────
+   ACTIVE CARS NOW
+────────────────────────────────────────── */
+function renderActiveCars() {
+  const active = allData.records.filter(r => r.return_status === 'pending');
+  document.getElementById('activeCarsCount').textContent = `${active.length} คัน`;
+  const el = document.getElementById('activeCarsSection');
+  if (active.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">✅</div><p>ทุกคันกลับแล้ว</p></div>';
+    return;
+  }
+  el.innerHTML = `<div class="active-cars-grid">${active.map(r => `
+    <div class="active-car-card">
+      <div class="active-car-plate">🚗 ${esc(r.car||'—')}</div>
+      <div>
+        <div class="active-car-name">${esc(r.name||'—')}</div>
+        <div class="active-car-since"><i class="fas fa-clock" style="margin-right:4px"></i>${fmtDate(r.timestamp)}</div>
+        ${r.department ? `<div class="active-car-since">${esc(r.department)}</div>` : ''}
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+/* ──────────────────────────────────────────
    RECENT RECORDS
-============================================= */
+────────────────────────────────────────── */
 function renderRecentRecords() {
   const recent = allData.records.slice(0, 8);
   document.getElementById('recentBody').innerHTML = recent.length === 0
     ? '<tr><td colspan="5"><div class="empty-state"><div class="icon">📭</div><p>ยังไม่มีรายการ</p></div></td></tr>'
     : recent.map(r => {
         const badge = r.return_status === 'returned'
-          ? '<span class="badge b-green">✅ คืนแล้ว</span>'
-          : '<span class="badge b-amber">🔑 ใช้อยู่</span>';
+          ? '<span class="badge b-green"><i class="fas fa-check"></i> คืนแล้ว</span>'
+          : '<span class="badge b-amber"><i class="fas fa-key"></i> ใช้อยู่</span>';
         return `<tr>
-          <td><div class="u-cell">
-            ${avatar(r.picture_url, r.name)}
-            <div class="u-name">${esc(r.name||'—')}</div>
-          </div></td>
+          <td><div class="u-cell">${avatar(r.picture_url, r.name)}<div class="u-name">${esc(r.name||'—')}</div></div></td>
           <td><span class="badge b-blue">🚗 ${esc(r.car||'—')}</span></td>
           <td style="font-size:13px;max-width:160px;color:var(--c-text2)">${esc((r.reason||'').slice(0,40))}${(r.reason||'').length>40?'…':''}</td>
           <td style="font-size:12px;white-space:nowrap;color:var(--c-text3)">${fmtDate(r.timestamp)}</td>
@@ -1067,19 +967,17 @@ function renderRecentRecords() {
       }).join('');
 }
 
-/* =============================================
+/* ──────────────────────────────────────────
    REQUESTS
-============================================= */
+────────────────────────────────────────── */
 function renderRequests() {
   const filter = document.getElementById('reqFilter').value;
-  const list = allData.requests.filter(r => !filter || r.status === filter);
-  const el = document.getElementById('requestsList');
-
+  const list   = allData.requests.filter(r => !filter || r.status === filter);
+  const el     = document.getElementById('requestsList');
   if (list.length === 0) {
-    el.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>ไม่มีคำขอ${filter === 'pending' ? 'ที่รอการอนุมัติ' : ''}</p></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>ไม่มีคำขอ${filter==='pending'?'ที่รอการอนุมัติ':''}</p></div>`;
     return;
   }
-
   el.innerHTML = list.map(r => {
     const isPending = r.status === 'pending';
     const statusBadge = r.status === 'approved'
@@ -1087,11 +985,10 @@ function renderRequests() {
       : r.status === 'rejected'
       ? '<span class="badge b-red">❌ ปฏิเสธ</span>'
       : '<span class="badge b-amber">⏳ รอการอนุมัติ</span>';
-
     return `<div class="req-card ${r.status !== 'pending' ? r.status : ''}">
       <div class="req-top">
         ${avatarLg(r.picture_url, r.display_name || r.full_name)}
-        <div class="req-info" style="flex:1">
+        <div style="flex:1">
           <div class="req-name">${esc(r.display_name || r.full_name || '—')}</div>
           <div class="req-meta"><i class="fas fa-clock" style="margin-right:4px"></i>ส่งเมื่อ ${fmtDate(r.submitted_at)}</div>
         </div>
@@ -1104,12 +1001,8 @@ function renderRequests() {
         <div><div class="req-field-label">LINE ID</div><div class="req-field-val" style="font-size:11px;word-break:break-all;color:var(--c-text3)">${esc(r.user_id||'—')}</div></div>
       </div>
       ${isPending ? `<div class="req-actions">
-        <button class="btn btn-primary" onclick="approveRequest('${r.user_id}')">
-          <i class="fas fa-check"></i> อนุมัติ
-        </button>
-        <button class="btn btn-danger" onclick="rejectRequest('${r.user_id}')">
-          <i class="fas fa-times"></i> ปฏิเสธ
-        </button>
+        <button class="btn btn-primary" onclick="approveRequest('${r.user_id}')"><i class="fas fa-check"></i> อนุมัติ</button>
+        <button class="btn btn-danger"  onclick="rejectRequest('${r.user_id}')"><i class="fas fa-times"></i> ปฏิเสธ</button>
       </div>` : ''}
     </div>`;
   }).join('');
@@ -1118,85 +1011,70 @@ function renderRequests() {
 async function approveRequest(userId) {
   const req = allData.requests.find(r => r.user_id === userId);
   if (!req) return;
-  if (!confirm(`อนุมัติ ${req.full_name || req.display_name}?`)) return;
-  try {
-    const res = await fetch('/admin-action', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'approve', requestingUserId:adminId, userId,
-        userData:{ name:req.full_name, phone:req.phone, department:req.department, pictureUrl:req.picture_url } })
-    });
-    const d = await res.json();
-    if (d.success) { showToast(`✅ อนุมัติ ${req.full_name} สำเร็จ`, 'success'); await loadAll(); }
-  } catch(e) { showToast('เกิดข้อผิดพลาด', 'error'); }
+  showConfirm(`อนุมัติ <strong>${req.full_name || req.display_name}</strong>?`, 'ยืนยันการอนุมัติ', '✅', 'btn-primary', async () => {
+    try {
+      const res = await fetch('/admin-action', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'approve', requestingUserId:adminId, userId, userData:{ name:req.full_name, phone:req.phone, department:req.department, pictureUrl:req.picture_url } }) });
+      const d = await res.json();
+      if (d.success) { showToast(`✅ อนุมัติ ${req.full_name} สำเร็จ`, 'success'); await loadAll(); }
+    } catch { showToast('เกิดข้อผิดพลาด', 'error'); }
+  });
 }
 
 async function rejectRequest(userId) {
   const req = allData.requests.find(r => r.user_id === userId);
-  if (!confirm(`ปฏิเสธ ${req?.full_name || userId}?`)) return;
-  try {
-    const res = await fetch('/admin-action', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'reject', requestingUserId:adminId, userId })
-    });
-    const d = await res.json();
-    if (d.success) { showToast('ปฏิเสธแล้ว', 'warning'); await loadAll(); }
-  } catch(e) { showToast('เกิดข้อผิดพลาด', 'error'); }
+  showConfirm(`ปฏิเสธ <strong>${req?.full_name || userId}</strong>?`, 'ยืนยันการปฏิเสธ', '❌', 'btn-danger', async () => {
+    try {
+      const res = await fetch('/admin-action', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'reject', requestingUserId:adminId, userId }) });
+      const d = await res.json();
+      if (d.success) { showToast('ปฏิเสธแล้ว', 'warning'); await loadAll(); }
+    } catch { showToast('เกิดข้อผิดพลาด', 'error'); }
+  });
 }
 
-/* =============================================
+/* ──────────────────────────────────────────
    USERS
-============================================= */
+────────────────────────────────────────── */
 function renderUsers() {
   const search     = document.getElementById('userSearch').value.toLowerCase();
   const roleFilter = document.getElementById('userRoleFilter').value;
-  const entries = Object.entries(allData.userMap).filter(([id, u]) => {
+  const entries    = Object.entries(allData.userMap).filter(([id, u]) => {
     if (roleFilter && u.role !== roleFilter) return false;
     if (search && !`${u.name} ${u.department} ${id}`.toLowerCase().includes(search)) return false;
     return true;
   });
   document.getElementById('userCountBadge').textContent = `${entries.length} คน`;
-
   if (entries.length === 0) {
-    document.getElementById('usersBody').innerHTML =
-      '<tr><td colspan="7"><div class="empty-state"><div class="icon">🔍</div><p>ไม่พบผู้ใช้</p></div></td></tr>';
+    document.getElementById('usersBody').innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="icon">🔍</div><p>ไม่พบผู้ใช้</p></div></td></tr>';
     return;
   }
-
   document.getElementById('usersBody').innerHTML = entries.map(([uid, u]) => {
     const roleBadge =
-      u.role === 'admin'   ? '<span class="badge b-purple">👑 admin</span>' :
-      u.role === 'user'    ? '<span class="badge b-green">✅ user</span>'   :
-      u.role === 'pending' ? '<span class="badge b-amber">⏳ pending</span>' :
+      u.role === 'admin'   ? '<span class="badge b-purple"><i class="fas fa-crown"></i> admin</span>' :
+      u.role === 'user'    ? '<span class="badge b-green"><i class="fas fa-check"></i> user</span>'   :
+      u.role === 'pending' ? '<span class="badge b-amber"><i class="fas fa-hourglass"></i> pending</span>' :
       `<span class="badge b-red">${u.role}</span>`;
-
     const statusBadge =
       u.status === 'active'   ? '<span class="badge b-green">● active</span>'   :
       u.status === 'inactive' ? '<span class="badge b-red">● inactive</span>'   :
       `<span class="badge b-gray">${u.status||'—'}</span>`;
-
     return `<tr>
-      <td><div class="u-cell">
-        ${avatar(u.pictureUrl, u.name)}
-        <div>
-          <div class="u-name">${esc(u.name||'—')}</div>
-          <div class="u-sub">${uid.slice(0,22)}…</div>
-        </div>
-      </div></td>
+      <td><div class="u-cell">${avatar(u.picture_url||u.pictureUrl, u.name)}<div>
+        <div class="u-name">${esc(u.name||'—')}</div>
+        <div class="u-sub">${uid.slice(0,22)}…</div>
+      </div></div></td>
       <td style="color:var(--c-text2)">${esc(u.phone||'—')}</td>
       <td style="color:var(--c-text2)">${esc(u.department||'—')}</td>
       <td>${roleBadge}</td>
       <td>${statusBadge}</td>
-      <td style="font-size:12px;white-space:nowrap;color:var(--c-text3)">${fmtDate(u.updatedAt)}</td>
-      <td>
-        <div class="row-actions">
-          <button class="btn btn-secondary btn-icon btn-sm" onclick="openEditModal('${uid}')" title="แก้ไข">
-            <i class="fas fa-pen"></i>
-          </button>
-          <button class="btn ${u.status==='active'?'btn-amber':'btn-primary'} btn-icon btn-sm" onclick="toggleUser('${uid}')" title="${u.status==='active'?'ระงับ':'เปิดใช้งาน'}">
-            ${u.status==='active'?'<i class="fas fa-ban"></i>':'<i class="fas fa-check"></i>'}
-          </button>
-        </div>
-      </td>
+      <td style="font-size:12px;white-space:nowrap;color:var(--c-text3)">${fmtDate(u.updated_at||u.updatedAt)}</td>
+      <td><div class="row-actions">
+        <button class="btn btn-secondary btn-icon btn-sm" onclick="openEditModal('${uid}')" title="แก้ไข"><i class="fas fa-pen"></i></button>
+        <button class="btn ${u.status==='active'?'btn-amber':'btn-primary'} btn-icon btn-sm" onclick="toggleUser('${uid}')" title="${u.status==='active'?'ระงับ':'เปิดใช้งาน'}">
+          ${u.status==='active'?'<i class="fas fa-ban"></i>':'<i class="fas fa-check"></i>'}
+        </button>
+      </div></td>
     </tr>`;
   }).join('');
 }
@@ -1212,10 +1090,9 @@ function openEditModal(uid) {
   document.getElementById('editStatus').value = u.status || 'active';
   document.getElementById('editModal').classList.add('show');
 }
-function closeModal() { document.getElementById('editModal').classList.remove('show'); }
 
 async function saveUserEdit() {
-  const uid = document.getElementById('editUserId').value;
+  const uid      = document.getElementById('editUserId').value;
   const userData = {
     name:       document.getElementById('editName').value,
     phone:      document.getElementById('editPhone').value,
@@ -1224,124 +1101,226 @@ async function saveUserEdit() {
     status:     document.getElementById('editStatus').value
   };
   try {
-    const res = await fetch('/admin-action', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'save', requestingUserId:adminId, userId:uid, userData })
-    });
+    const res = await fetch('/admin-action', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'save', requestingUserId:adminId, userId:uid, userData }) });
     const d = await res.json();
-    if (d.success) { closeModal(); showToast('บันทึกแล้ว ✅', 'success'); await loadAll(); }
-  } catch(e) { showToast('เกิดข้อผิดพลาด', 'error'); }
+    if (d.success) { closeModal('editModal'); showToast('บันทึกแล้ว ✅', 'success'); await loadAll(); }
+  } catch { showToast('เกิดข้อผิดพลาด', 'error'); }
 }
 
 async function toggleUser(uid) {
   const u = allData.userMap[uid];
   const label = u.status === 'active' ? 'ระงับ' : 'เปิดใช้งาน';
-  if (!confirm(`${label}ผู้ใช้ ${u.name}?`)) return;
-  try {
-    const res = await fetch('/admin-action', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'toggle', requestingUserId:adminId, userId:uid })
-    });
-    const d = await res.json();
-    if (d.success) { showToast(`${label}แล้ว`, 'success'); await loadAll(); }
-  } catch(e) { showToast('เกิดข้อผิดพลาด', 'error'); }
+  showConfirm(`${label}ผู้ใช้ <strong>${u.name}</strong>?`, `ยืนยัน: ${label}`, u.status==='active'?'🚫':'✅',
+    u.status==='active'?'btn-amber':'btn-primary', async () => {
+    try {
+      const res = await fetch('/admin-action', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'toggle', requestingUserId:adminId, userId:uid }) });
+      const d = await res.json();
+      if (d.success) { showToast(`${label}แล้ว`, 'success'); await loadAll(); }
+    } catch { showToast('เกิดข้อผิดพลาด', 'error'); }
+  });
 }
 
-/* =============================================
-   RECORDS
-============================================= */
-function renderRecords() {
-  const search       = document.getElementById('recSearch').value.toLowerCase();
-  const statusFilter = document.getElementById('recStatusFilter').value;
-  const list = allData.records.filter(r => {
-    if (statusFilter && r.return_status !== statusFilter) return false;
+/* ──────────────────────────────────────────
+   RECORDS with PAGINATION
+────────────────────────────────────────── */
+let filteredRec = [];
+let recPage     = 1;
+const REC_PAGE  = 25;
+
+function recFilter() {
+  const search = document.getElementById('recSearch').value.toLowerCase();
+  const status = document.getElementById('recStatusFilter').value;
+  const car    = document.getElementById('recCarFilter').value.toLowerCase();
+  const date   = document.getElementById('recDateFilter').value;
+  filteredRec  = allData.records.filter(r => {
+    if (status && r.return_status !== status) return false;
+    if (car    && !(r.car||'').toLowerCase().includes(car)) return false;
+    if (date   && r.timestamp && !r.timestamp.startsWith(date)) return false;
     if (search && !`${r.name} ${r.car} ${r.reason}`.toLowerCase().includes(search)) return false;
     return true;
   });
+  recPage = 1;
+  renderRecords();
+}
 
-  if (list.length === 0) {
-    document.getElementById('recordsBody').innerHTML =
-      '<tr><td colspan="10"><div class="empty-state"><div class="icon">🔍</div><p>ไม่พบรายการ</p></div></td></tr>';
+function resetRecFilter() {
+  ['recSearch','recCarFilter','recDateFilter'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('recStatusFilter').value = '';
+  recFilter();
+}
+
+function renderRecords() {
+  const total = filteredRec.length;
+  document.getElementById('recTotalBadge').textContent = `${total} รายการ`;
+  document.getElementById('exportBtn').style.display = total > 0 ? 'inline-flex' : 'none';
+
+  if (total === 0) {
+    document.getElementById('recordsBody').innerHTML = '<tr><td colspan="11"><div class="empty-state"><div class="icon">🔍</div><p>ไม่พบรายการ</p></div></td></tr>';
+    document.getElementById('recPagination').style.display = 'none';
     return;
   }
 
-  document.getElementById('recordsBody').innerHTML = list.slice(0, 100).map(r => {
+  const start = (recPage - 1) * REC_PAGE;
+  const page  = filteredRec.slice(start, start + REC_PAGE);
+
+  document.getElementById('recordsBody').innerHTML = page.map(r => {
     const badge = r.return_status === 'returned'
-      ? '<span class="badge b-green">✅ คืนแล้ว</span>'
-      : '<span class="badge b-amber">🔑 ใช้อยู่</span>';
-
+      ? '<span class="badge b-green"><i class="fas fa-check"></i> คืนแล้ว</span>'
+      : '<span class="badge b-amber"><i class="fas fa-key"></i> ใช้อยู่</span>';
     const photoCell = r.photo_key
-      ? `<a href="/get-photo?key=${encodeURIComponent(r.photo_key)}" target="_blank">
-           <img class="tbl-photo" src="/get-photo?key=${encodeURIComponent(r.photo_key)}" alt="รูปไมล์">
-         </a>`
+      ? `<a href="/get-photo?key=${encodeURIComponent(r.photo_key)}" target="_blank"><img class="tbl-photo" src="/get-photo?key=${encodeURIComponent(r.photo_key)}" alt="รูปไมล์"></a>`
       : r.has_photo ? '<span class="badge b-gray">📸</span>' : '<span style="color:var(--c-text3)">—</span>';
-
+    const forceBtn = r.return_status === 'pending'
+      ? `<button class="btn btn-amber btn-xs" onclick="forceReturn('${r.id}','${esc(r.name||'')}')" title="บังคับคืนรถ"><i class="fas fa-flag-checkered"></i></button>`
+      : '';
     return `<tr>
-      <td><div class="u-cell">
-        ${avatar(r.picture_url, r.name)}
-        <div>
-          <div class="u-name">${esc(r.name||'—')}</div>
-          ${r.department?`<div class="u-sub">${esc(r.department)}</div>`:''}
-        </div>
-      </div></td>
+      <td><div class="u-cell">${avatar(r.picture_url, r.name)}<div>
+        <div class="u-name">${esc(r.name||'—')}</div>
+        ${r.department?`<div class="u-sub">${esc(r.department)}</div>`:''}
+      </div></div></td>
       <td><span class="badge b-blue">🚗 ${esc(r.car||'—')}</span></td>
       <td style="color:var(--c-text2)">${esc(r.mileage||'—')}</td>
-      <td style="font-size:13px;max-width:150px;color:var(--c-text2)">${esc((r.reason||'').slice(0,50))}${(r.reason||'').length>50?'…':''}</td>
+      <td style="font-size:13px;max-width:130px;color:var(--c-text2)">${esc((r.reason||'').slice(0,40))}${(r.reason||'').length>40?'…':''}</td>
       <td style="color:var(--c-green);font-weight:600">${r.total_distance ? r.total_distance.toFixed(1)+' กม.' : '—'}</td>
       <td style="text-align:center">${photoCell}</td>
       <td style="font-size:12px;white-space:nowrap;color:var(--c-text3)">${fmtDate(r.timestamp)}</td>
       <td>${badge}</td>
       <td style="font-size:12px;white-space:nowrap;color:var(--c-text3)">${r.returned_at ? fmtDate(r.returned_at) : '—'}</td>
       <td style="font-size:13px;color:var(--c-text2)">${r.duration_text || '—'}</td>
+      <td><div class="row-actions">${forceBtn}</div></td>
     </tr>`;
   }).join('');
+
+  // pagination
+  const pages = Math.ceil(total / REC_PAGE);
+  const pag   = document.getElementById('recPagination');
+  if (pages <= 1) { pag.style.display = 'none'; return; }
+  pag.style.display = 'flex';
+  let h = `<button class="pg-btn" onclick="goRecPage(${recPage-1})" ${recPage===1?'disabled':''}>‹</button>`;
+  for (let i = 1; i <= pages; i++) {
+    if (i===1 || i===pages || (i>=recPage-1 && i<=recPage+1))
+      h += `<button class="pg-btn ${i===recPage?'active':''}" onclick="goRecPage(${i})">${i}</button>`;
+    else if (i===recPage-2 || i===recPage+2)
+      h += `<span class="pg-info">…</span>`;
+  }
+  h += `<button class="pg-btn" onclick="goRecPage(${recPage+1})" ${recPage===pages?'disabled':''}>›</button>`;
+  h += `<span class="pg-info rec-count-badge">แสดง ${start+1}–${Math.min(start+REC_PAGE,total)} จาก ${total}</span>`;
+  pag.innerHTML = h;
 }
 
-/* =============================================
+function goRecPage(p) {
+  const pages = Math.ceil(filteredRec.length / REC_PAGE);
+  if (p < 1 || p > pages) return;
+  recPage = p; renderRecords();
+  document.getElementById('page-records').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ──────────────────────────────────────────
+   FORCE RETURN
+────────────────────────────────────────── */
+async function forceReturn(recordId, name) {
+  showConfirm(`บังคับคืนรถให้ <strong>${name}</strong>?<br><small style="color:var(--c-text3)">สถานะจะเปลี่ยนเป็น "คืนแล้ว" ทันที</small>`,
+    'บังคับคืนรถ (Admin)', '🚩', 'btn-amber', async () => {
+    try {
+      const res = await fetch('/admin-action', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'force-return', requestingUserId:adminId, recordId }) });
+      const d = await res.json();
+      if (d.success) { showToast('บังคับคืนรถสำเร็จ ✅', 'success'); await loadAll(); }
+      else           { showToast('เกิดข้อผิดพลาด: ' + d.error, 'error'); }
+    } catch(e) { showToast('เกิดข้อผิดพลาด: ' + e.message, 'error'); }
+  });
+}
+
+/* ──────────────────────────────────────────
+   EXPORT CSV
+────────────────────────────────────────── */
+function exportCSV() {
+  const data    = filteredRec.length ? filteredRec : allData.records;
+  const headers = ['ชื่อ','เบอร์โทร','แผนก','ทะเบียนรถ','เลขไมล์','สาเหตุ','ระยะทาง(กม)','วันเริ่มใช้','สถานะ','วันคืนรถ','ระยะเวลา'];
+  const rows    = data.map(r => [
+    r.name||'', r.phone||'', r.department||'', r.car||'', r.mileage||'',
+    r.reason||'', r.total_distance||0, r.timestamp||'',
+    r.return_status==='returned'?'คืนแล้ว':'กำลังใช้',
+    r.returned_at||'', r.duration_text||''
+  ]);
+  const csv = '\uFEFF' + [headers, ...rows].map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = `car-records-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('ดาวน์โหลด CSV แล้ว ✅', 'success');
+}
+
+/* ──────────────────────────────────────────
    PAGE SWITCH
-============================================= */
+────────────────────────────────────────── */
+const PAGE_TITLES = { dashboard:'แดชบอร์ด', requests:'คำขอสมัคร', users:'จัดการผู้ใช้', records:'ประวัติการใช้รถ' };
 function switchPage(p) {
   document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   document.getElementById('page-' + p).classList.add('active');
   document.getElementById('nav-'  + p).classList.add('active');
-  const titles = { dashboard:'แดชบอร์ด', requests:'คำขอสมัคร', users:'จัดการผู้ใช้', records:'ประวัติการใช้รถ' };
-  document.getElementById('pageTitle').textContent = titles[p] || p;
+  const title = PAGE_TITLES[p] || p;
+  document.getElementById('crumbPage').textContent = title;
+  // show export only on records
+  document.getElementById('exportBtn').style.display = (p === 'records' && filteredRec.length > 0) ? 'inline-flex' : 'none';
+  closeSidebar();
 }
 
-/* =============================================
+/* ──────────────────────────────────────────
+   CUSTOM CONFIRM MODAL
+────────────────────────────────────────── */
+let _confirmCallback = null;
+function showConfirm(msg, title, icon, btnClass, cb) {
+  document.getElementById('confirmMsg').innerHTML   = msg;
+  document.getElementById('confirmTitle').textContent = title || 'ยืนยัน';
+  document.getElementById('confirmIcon').textContent  = icon  || '⚠️';
+  const okBtn = document.getElementById('confirmOkBtn');
+  okBtn.className = `btn ${btnClass || 'btn-primary'}`;
+  _confirmCallback = cb;
+  document.getElementById('confirmModal').classList.add('show');
+}
+function confirmOk() {
+  closeModal('confirmModal');
+  if (_confirmCallback) _confirmCallback();
+  _confirmCallback = null;
+}
+
+/* ──────────────────────────────────────────
+   MODALS
+────────────────────────────────────────── */
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+document.getElementById('editModal').addEventListener('click', e => { if (e.target===e.currentTarget) closeModal('editModal'); });
+document.getElementById('confirmModal').addEventListener('click', e => { if (e.target===e.currentTarget) closeModal('confirmModal'); });
+document.addEventListener('keydown', e => { if (e.key==='Escape') { closeModal('editModal'); closeModal('confirmModal'); } });
+
+/* ──────────────────────────────────────────
    HELPERS
-============================================= */
+────────────────────────────────────────── */
 function fmtDate(iso) {
   if (!iso) return '—';
   try { return new Date(iso).toLocaleString('th-TH', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }); }
   catch { return iso; }
 }
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-/* LINE profile picture helpers */
 function avatar(url, name) {
   const initial = (name||'?').charAt(0).toUpperCase();
-  if (url) {
-    return `<img src="${esc(url)}" alt="${esc(name)}" class="u-av"
-              onerror="this.outerHTML='<div class=\\'u-av\\'>${initial}</div>'">`;
-  }
-  return `<div class="u-av">${initial}</div>`;
+  return url
+    ? `<img src="${esc(url)}" alt="${esc(name)}" class="u-av" onerror="this.outerHTML='<div class=\\'u-av\\'>${initial}</div>'">`
+    : `<div class="u-av">${initial}</div>`;
 }
 function avatarLg(url, name) {
   const initial = (name||'?').charAt(0).toUpperCase();
-  if (url) {
-    return `<img src="${esc(url)}" alt="${esc(name)}" class="req-av-lg"
-              onerror="this.outerHTML='<div class=\\'req-av-lg\\'>${initial}</div>'">`;
-  }
-  return `<div class="req-av-lg">${initial}</div>`;
+  return url
+    ? `<img src="${esc(url)}" alt="${esc(name)}" class="req-av-lg" onerror="this.outerHTML='<div class=\\'req-av-lg\\'>${initial}</div>'">`
+    : `<div class="req-av-lg">${initial}</div>`;
 }
 
-/* Toast */
 let toastTimer;
-function showToast(msg, type = 'info') {
+function showToast(msg, type='info') {
   const t = document.getElementById('toast');
   const icons = { success:'fa-check-circle', error:'fa-times-circle', warning:'fa-exclamation-triangle', info:'fa-info-circle' };
   t.innerHTML = `<i class="fas ${icons[type]||'fa-info-circle'}"></i> ${msg}`;
@@ -1349,11 +1328,6 @@ function showToast(msg, type = 'info') {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
 }
-
-/* Modal close on backdrop click */
-document.getElementById('editModal').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeModal();
-});
 </script>
 </body>
 </html>
