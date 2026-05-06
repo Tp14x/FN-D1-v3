@@ -165,12 +165,13 @@ input, select, textarea {
   border: 2px solid var(--border);
   border-radius: var(--radius-sm);
   font-family: 'Kanit', sans-serif;
-  font-size: 15px; color: var(--text);
+  font-size: 16px; color: var(--text); /* 16px ป้องกัน iOS zoom เมื่อ focus */
   background: #fff;
   transition: border-color 0.2s, box-shadow 0.2s;
   appearance: none; -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
 }
-textarea { padding-left: 14px; min-height: 90px; resize: vertical; line-height: 1.6; }
+textarea { padding-left: 14px; min-height: 90px; resize: vertical; line-height: 1.6; font-size: 16px; /* ป้องกัน iOS zoom */ }
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--primary);
@@ -193,6 +194,9 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   border: none; cursor: pointer;
   transition: all 0.2s; width: 100%;
   text-decoration: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 48px; /* iOS Human Interface Guidelines minimum touch target */
 }
 .btn-primary {
   background: linear-gradient(135deg, var(--primary), var(--primary-light));
@@ -206,7 +210,7 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .btn:disabled { opacity: 0.6; pointer-events: none; }
 
 /* ===== MAP ===== */
-#map { width: 100%; height: 320px; border-radius: var(--radius-sm); overflow: hidden; }
+#map { width: 100%; height: 300px; border-radius: var(--radius-sm); overflow: hidden; touch-action: pan-x pan-y; }
 .search-bar {
   display: flex; gap: 8px; margin-bottom: 12px;
 }
@@ -230,14 +234,17 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   display: flex; gap: 8px; margin-top: 10px;
 }
 .map-fab-row button {
-  flex: 1; padding: 10px 8px;
+  flex: 1; padding: 12px 8px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: #fff; font-family: 'Kanit', sans-serif;
-  font-size: 12px; color: var(--text-muted);
+  font-size: 13px; color: var(--text-muted);
   cursor: pointer; transition: all 0.2s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
 }
-.map-fab-row button:hover { background: var(--bg); border-color: var(--primary); color: var(--primary); }
+.map-fab-row button:active { background: var(--bg); border-color: var(--primary); color: var(--primary); }
 
 /* ===== PHOTO UPLOAD ===== */
 .photo-upload-area {
@@ -413,7 +420,9 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   position: fixed; bottom: 0; left: 0; right: 0;
   background: rgba(255,255,255,0.95);
   backdrop-filter: blur(12px);
-  padding: 14px 16px env(safe-area-inset-bottom,14px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 12px 16px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
   box-shadow: 0 -4px 24px rgba(0,0,0,0.1);
   z-index: 100;
 }
@@ -434,16 +443,18 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   display: none; position: fixed; inset: 0;
   background: rgba(0,0,0,0.55); z-index: 9500;
   align-items: flex-end; justify-content: center;
-  padding-bottom: env(safe-area-inset-bottom, 0);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 .confirm-modal-overlay.show { display: flex; }
 .confirm-sheet {
   background: #fff; border-radius: 28px 28px 0 0;
-  padding: 28px 20px 32px;
+  padding: 28px 20px;
+  padding-bottom: max(28px, calc(env(safe-area-inset-bottom, 0px) + 16px));
   width: 100%; max-width: 480px;
   animation: slideUp2 0.3s ease;
-  max-height: 85vh; overflow-y: auto;
+  max-height: 88vh; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 @keyframes slideUp2 { from{transform:translateY(100%)} to{transform:translateY(0)} }
 .confirm-sheet-handle {
@@ -474,6 +485,53 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .animate-in { animation: fadeIn 0.4s ease forwards; }
 
 @media (prefers-color-scheme: dark) { /* keep light */ }
+
+/* ===== MOBILE RESPONSIVE ===== */
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  overscroll-behavior-y: contain; /* ป้องกัน pull-to-refresh ที่ไม่ต้องการ */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* สำหรับจอเล็กมาก (< 375px) */
+@media (max-width: 374px) {
+  .content { padding: 20px 12px 90px; }
+  .card { padding: 16px; }
+  .card-header h3 { font-size: 14px; }
+  .btn { font-size: 14px; padding: 13px 18px; }
+  .app-header { padding: 16px 16px 26px; }
+  .app-header .logo-row .app-title { font-size: 16px; }
+  .user-card { padding: 12px 14px; }
+  .car-in-use-card { padding: 22px 16px; }
+  .timer-display { font-size: 40px !important; }
+}
+
+/* สำหรับจอกลาง (375–480px) */
+@media (min-width: 375px) and (max-width: 480px) {
+  #map { height: 280px; }
+}
+
+/* ปรับ photo upload area ให้กดง่ายขึ้น */
+.photo-upload-area {
+  min-height: 90px;
+}
+
+/* active states สำหรับ touch */
+.btn-primary:active { transform: scale(0.97); }
+.btn-danger:active  { transform: scale(0.97); }
+.btn-info:active    { transform: scale(0.97); }
+.card:active        { /* no scale - cards aren't interactive */ }
+
+/* แก้ user-history section ให้อ่านง่ายบนมือถือ */
+#userHistorySection { font-size: 14px; }
+
+/* ปรับ timer ให้ responsive */
+.timer-display {
+  font-size: clamp(36px, 10vw, 52px) !important;
+}
 </style>
 </head>
 <body>
@@ -1504,9 +1562,11 @@ async function handleReturnCar() {
   } else {
     durationText = `${durationSec} วินาที`;
   }
-  
-  // ✅ สร้าง message sync ก่อน
-  const message = buildReturnFlexMessage(usage.carPlate, usage.userName, returnTime, durationText, returnLocation);
+
+  // ✅ FIX: ตรวจสอบ returnLocation ก่อนสร้าง message
+  // ถ้าไม่มีตำแหน่ง ใช้ placeholder ป้องกัน crash
+  const safeLoc = returnLocation || { lat: 0, lng: 0 };
+  const message = buildReturnFlexMessage(usage.carPlate, usage.userName, returnTime, durationText, safeLoc);
 
   const returnBtn = document.getElementById('returnCarBtn');
   let shareSuccess = false;
@@ -1587,10 +1647,27 @@ function setUserCard(name, pictureUrl, dept) {
   document.getElementById('userDept').textContent = dept || '';
   const av = document.getElementById('userAvatar');
   if (pictureUrl) {
-    av.innerHTML = `<img src="${pictureUrl}" alt="${name}" onerror="this.parentElement.textContent='${name.charAt(0)}'">`;
+    const img = document.createElement('img');
+    img.src = pictureUrl;
+    img.alt = name;
+    // ✅ FIX: ใช้ addEventListener แทน onerror inline เพื่อป้องกัน XSS
+    img.addEventListener('error', () => { av.textContent = name.charAt(0); });
+    av.innerHTML = '';
+    av.appendChild(img);
   } else {
     av.textContent = name.charAt(0);
   }
+}
+
+// ✅ Security: escape HTML to prevent XSS from DB data
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 async function loadUserHistory(userId) {
@@ -1609,10 +1686,12 @@ async function loadUserHistory(userId) {
         ? `<span style="color:#16a34a;font-size:11px;font-weight:600">✅ คืนแล้ว</span>`
         : `<span style="color:#f59e0b;font-size:11px;font-weight:600">🔑 ใช้อยู่</span>`;
       const d = r.timestamp ? new Date(r.timestamp).toLocaleDateString('th-TH',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+      const carSafe    = escapeHtml(r.car);
+      const reasonSafe = escapeHtml(r.reason ? r.reason.slice(0,30)+(r.reason.length>30?'…':'') : '—');
       return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9">
         <div>
-          <div style="font-size:14px;font-weight:600">🚗 ${r.car || '—'}</div>
-          <div style="font-size:12px;color:#64748b;margin-top:2px">${r.reason ? r.reason.slice(0,30)+(r.reason.length>30?'…':'') : '—'} · ${d}</div>
+          <div style="font-size:14px;font-weight:600">🚗 ${carSafe}</div>
+          <div style="font-size:12px;color:#64748b;margin-top:2px">${reasonSafe} · ${d}</div>
         </div>
         <div style="text-align:right">${badge}<div style="font-size:11px;color:#94a3b8;margin-top:2px">${r.totalDistance ? r.totalDistance.toFixed(1)+' กม.' : ''}</div></div>
       </div>`;
@@ -1626,7 +1705,14 @@ async function loadUserHistory(userId) {
 function showRegisterScreen(user) {
   const av = document.getElementById('regAvatar');
   if (user.pictureUrl) {
-    av.outerHTML = `<img id="regAvatar" class="avatar" src="${user.pictureUrl}" alt="${user.displayName}" style="width:80px;height:80px;border-radius:50%;border:3px solid rgba(255,255,255,0.6);margin:0 auto 12px;display:block;object-fit:cover">`;
+    // ✅ FIX: ใช้ DOM API แทน outerHTML string เพื่อป้องกัน XSS
+    const img = document.createElement('img');
+    img.id = 'regAvatar';
+    img.className = 'avatar';
+    img.src = user.pictureUrl;
+    img.alt = user.displayName || '';
+    img.style.cssText = 'width:80px;height:80px;border-radius:50%;border:3px solid rgba(255,255,255,0.6);margin:0 auto 12px;display:block;object-fit:cover';
+    av.replaceWith(img);
   } else {
     av.textContent = user.displayName?.charAt(0) || '👤';
   }
@@ -1761,7 +1847,17 @@ async function initApp() {
     const status = currentUser.status;
 
     if (role === 'inactive' || status === 'inactive' || role === 'rejected') {
-      document.getElementById('suspendedMsg').innerHTML = `คุณ ${profile.displayName}<br>บัญชีถูกระงับการใช้งาน<br>กรุณาติดต่อผู้ดูแลระบบ`;
+      // ✅ FIX: ใช้ textContent แทน innerHTML เพื่อป้องกัน XSS
+      const suspMsg = document.getElementById('suspendedMsg');
+      suspMsg.textContent = '';
+      const line1 = document.createElement('span');
+      line1.textContent = `คุณ ${profile.displayName}`;
+      const line2 = document.createTextNode('\nบัญชีถูกระงับการใช้งาน\nกรุณาติดต่อผู้ดูแลระบบ');
+      suspMsg.appendChild(line1);
+      suspMsg.appendChild(document.createElement('br'));
+      suspMsg.appendChild(document.createTextNode('บัญชีถูกระงับการใช้งาน'));
+      suspMsg.appendChild(document.createElement('br'));
+      suspMsg.appendChild(document.createTextNode('กรุณาติดต่อผู้ดูแลระบบ'));
       showScreen('screen-suspended');
     } else if (role === 'pending') {
       // Check if already submitted request
