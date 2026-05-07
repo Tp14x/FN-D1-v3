@@ -3,975 +3,1008 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>ระบบบันทึกการใช้รถ</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<title>CarTrack — ระบบบันทึกการใช้รถ</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-/* ─────────────────────────────────────────
-   DESIGN TOKENS — Fresh Sage Office
-   ───────────────────────────────────────── */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TOKENS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 :root{
-  /* Greens */
-  --g50:  #f0fdf4;
-  --g100: #dcfce7;
-  --g200: #bbf7d0;
-  --g300: #86efac;
-  --g400: #4ade80;
-  --g500: #22c55e;
-  --g600: #16a34a;
-  --g700: #15803d;
-  --g800: #166534;
+  --mint-50:#f0fdf6; --mint-100:#dcfcec; --mint-200:#b8f5d4;
+  --mint-300:#82edb3; --mint-400:#4ddd8e; --mint-500:#25c96e;
+  --mint-600:#18a857; --mint-700:#148543; --mint-800:#116637;
 
-  /* Neutrals (warm, not cold gray) */
-  --n0:   #ffffff;
-  --n50:  #f8fdf9;
-  --n100: #f1f8f3;
-  --n200: #e4f0e7;
-  --n300: #c8dece;
-  --n400: #9ab8a2;
-  --n500: #6b8c73;
-  --n600: #4a6652;
-  --n700: #2d4233;
-  --n800: #1a2b1e;
+  --sage-50:#f5faf6; --sage-100:#eaf4ed; --sage-200:#d4e9d9;
+  --sage-400:#88b894; --sage-600:#4d7a59;
 
-  /* Semantic */
-  --bg:        var(--g50);
-  --surface:   var(--n0);
-  --border:    var(--n200);
-  --border-md: var(--n300);
-  --text:      var(--n800);
-  --text-2:    var(--n600);
-  --text-m:    var(--n500);
-  --primary:   var(--g600);
-  --primary-l: var(--g100);
-  --primary-m: var(--g300);
-  --accent:    var(--g500);
+  --neutral-0:#ffffff; --neutral-50:#f9fbfa;
+  --neutral-100:#f2f6f3; --neutral-200:#e5ede7;
+  --neutral-300:#cddacf; --neutral-400:#a3b9a6;
+  --neutral-500:#6e8872; --neutral-600:#4a6050;
+  --neutral-700:#2d3d30; --neutral-800:#1a2b1d;
 
-  --danger:    #ef4444;
-  --danger-l:  #fef2f2;
-  --warning:   #f59e0b;
-  --warning-l: #fffbeb;
-  --info:      #3b82f6;
-  --info-l:    #eff6ff;
+  --red:#ef4444; --red-l:#fef2f2;
+  --amber:#f59e0b; --amber-l:#fffbeb;
+  --blue:#3b82f6; --blue-l:#eff6ff;
+  --blue-d:#1d4ed8;
 
-  /* Radii */
-  --r-xs: 8px;
-  --r-sm: 12px;
-  --r-md: 16px;
-  --r-lg: 22px;
-  --r-xl: 28px;
-  --r-full: 999px;
+  --bg:var(--mint-50);
+  --surface:var(--neutral-0);
+  --surface-raised:var(--neutral-0);
+  --border:var(--neutral-200);
+  --border-soft:var(--neutral-100);
+  --text-primary:var(--neutral-800);
+  --text-secondary:var(--neutral-600);
+  --text-muted:var(--neutral-500);
+  --primary:var(--mint-600);
+  --primary-hover:var(--mint-700);
+  --primary-light:var(--mint-100);
 
-  /* Shadows */
-  --sh-xs: 0 1px 3px rgba(0,80,30,0.07);
-  --sh-sm: 0 2px 8px rgba(0,80,30,0.09);
-  --sh-md: 0 4px 20px rgba(0,80,30,0.11);
-  --sh-lg: 0 8px 40px rgba(0,80,30,0.14);
+  --r1:6px; --r2:10px; --r3:14px; --r4:18px; --r5:24px; --r6:32px; --rFull:999px;
+  --shadow-xs:0 1px 2px rgba(0,50,20,.06);
+  --shadow-sm:0 2px 6px rgba(0,50,20,.08);
+  --shadow-md:0 4px 16px rgba(0,50,20,.10);
+  --shadow-lg:0 8px 32px rgba(0,50,20,.13);
+  --shadow-xl:0 16px 48px rgba(0,50,20,.16);
 }
 
-/* ─────────────────────────────────────────
-   RESET & BASE
-   ───────────────────────────────────────── */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   RESET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 *{box-sizing:border-box;margin:0;padding:0;}
-html{
-  -webkit-text-size-adjust:100%;
-  scroll-behavior:smooth;
-  height:100%;
-}
+html{-webkit-text-size-adjust:100%;height:100%;}
 body{
-  font-family:'Sarabun',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  min-height:100%;
-  font-size:15px;
-  line-height:1.6;
+  font-family:'IBM Plex Sans Thai',sans-serif;
+  background:var(--bg);color:var(--text-primary);
+  min-height:100%;line-height:1.55;
   -webkit-tap-highlight-color:transparent;
   overscroll-behavior-y:contain;
   -webkit-overflow-scrolling:touch;
 }
 
-/* ─────────────────────────────────────────
-   LOADING SCREEN
-   ───────────────────────────────────────── */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   LOADING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 #appLoading{
   position:fixed;inset:0;z-index:9999;
-  background:linear-gradient(160deg, #e8f8ee 0%, #f0fdf4 50%, #d1fae5 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  background:linear-gradient(145deg,#e8f8ee 0%,#f4fcf7 40%,#daf5e8 100%);
 }
-.load-logo-wrap{
-  position:relative;
-  width:100px;height:100px;
-  display:flex;align-items:center;justify-content:center;
+.ld-car{
+  font-size:52px;
+  animation:ldBounce 1.4s cubic-bezier(.36,.07,.19,.97) infinite;
 }
-.load-ring{
-  position:absolute;inset:0;border-radius:50%;
-  border:3px solid var(--g200);
-  border-top-color:var(--g500);
-  animation:spin .9s linear infinite;
+@keyframes ldBounce{
+  0%,100%{transform:translateY(0) scaleX(1);}
+  40%{transform:translateY(-18px) scaleX(1.06);}
+  60%{transform:translateY(-10px) scaleX(.97);}
 }
-.load-ring-2{
-  position:absolute;inset:10px;border-radius:50%;
-  border:2px solid var(--g100);
-  border-bottom-color:var(--g400);
-  animation:spin 1.4s linear infinite reverse;
+.ld-track{
+  width:64px;height:5px;border-radius:99px;
+  background:var(--mint-200);overflow:hidden;
 }
-.load-car-icon{
-  width:64px;height:64px;border-radius:50%;
-  background:var(--surface);box-shadow:var(--sh-md);
-  display:flex;align-items:center;justify-content:center;font-size:28px;
-  animation:pop 1.8s ease-in-out infinite;
+.ld-track-fill{
+  height:100%;background:linear-gradient(90deg,var(--mint-500),var(--mint-400));
+  border-radius:99px;animation:ldFill 1.4s ease-in-out infinite;
 }
-@keyframes spin{to{transform:rotate(360deg);}}
-@keyframes pop{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
-.load-text{font-size:17px;font-weight:700;color:var(--g700);}
-.load-sub{font-size:13px;color:var(--n500);}
-.load-bar{
-  width:140px;height:4px;background:var(--g200);border-radius:99px;overflow:hidden;
-}
-.load-bar-fill{
-  height:100%;background:linear-gradient(90deg,var(--g500),var(--g400));
-  border-radius:99px;animation:fill 1.8s ease-in-out infinite;
-  transform-origin:left;
-}
-@keyframes fill{0%{width:0%}60%{width:100%}100%{width:100%;opacity:0}}
+@keyframes ldFill{0%{width:0;transform:translateX(0)}70%{width:100%}100%{width:100%;transform:translateX(100%);opacity:0}}
+.ld-text{font-size:17px;font-weight:600;color:var(--mint-700);letter-spacing:-.2px;}
+.ld-sub{font-size:13px;color:var(--neutral-500);}
 
-/* ─────────────────────────────────────────
-   SCREEN SYSTEM
-   ───────────────────────────────────────── */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SCREENS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .screen{display:none!important;}
 .screen.active{display:block!important;}
-#screen-pending.active,#screen-suspended.active,#screen-car-in-use.active{
-  display:flex!important;
-}
+#screen-pending.active,#screen-suspended.active,#screen-car-in-use.active{display:flex!important;}
 
-/* ─────────────────────────────────────────
-   TOP NAV BAR
-   ───────────────────────────────────────── */
-.topbar{
-  position:sticky;top:0;z-index:200;
-  background:rgba(255,255,255,0.92);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STICKY HEADER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.site-header{
+  position:sticky;top:0;z-index:300;
+  height:56px;padding:0 14px;
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
-  padding:0 16px;
-  height:58px;
-  display:flex;align-items:center;gap:12px;
+  box-shadow:var(--shadow-xs);
 }
-.topbar-logo{
-  display:flex;align-items:center;gap:9px;flex:1;
-}
-.logo-badge{
-  width:36px;height:36px;border-radius:10px;
-  background:linear-gradient(135deg,var(--g600),var(--g500));
+.hdr-brand{display:flex;align-items:center;gap:8px;flex:1;}
+.hdr-logo{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--mint-700),var(--mint-500));
   display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:16px;
-  box-shadow:0 2px 8px rgba(22,163,74,0.3);
+  color:#fff;font-size:15px;
+  box-shadow:0 2px 6px rgba(20,133,67,.35);
+  flex-shrink:0;
 }
-.logo-text{
-  font-size:15px;font-weight:800;color:var(--g700);
-  letter-spacing:-.2px;
+.hdr-name{font-size:15px;font-weight:700;color:var(--neutral-800);letter-spacing:-.3px;}
+.hdr-tagline{font-size:11px;color:var(--neutral-500);margin-top:-2px;}
+.hdr-av{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--mint-100);border:1.5px solid var(--mint-300);
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:var(--mint-700);
+  flex-shrink:0;cursor:pointer;
 }
-.logo-sub{font-size:11px;font-weight:400;color:var(--text-m);margin-top:-2px;}
+.hdr-av img{width:100%;height:100%;object-fit:cover;}
+.hdr-hist{
+  font-size:12px;font-weight:600;color:var(--neutral-600);
+  background:var(--neutral-100);border:1px solid var(--border);
+  padding:6px 11px;border-radius:var(--rFull);
+  text-decoration:none;display:flex;align-items:center;gap:5px;
+  touch-action:manipulation;white-space:nowrap;
+}
+.hdr-hist:active{background:var(--mint-100);border-color:var(--mint-300);}
 
-.topbar-avatar{
-  width:36px;height:36px;border-radius:50%;
-  background:var(--g100);border:2px solid var(--g300);
-  display:flex;align-items:center;justify-content:center;
-  font-size:15px;font-weight:700;color:var(--g700);
-  overflow:hidden;flex-shrink:0;cursor:pointer;
-}
-.topbar-avatar img{width:100%;height:100%;object-fit:cover;}
-.topbar-hist{
-  display:flex;align-items:center;gap:5px;
-  font-size:12px;font-weight:600;color:var(--n500);
-  background:var(--n100);border:1px solid var(--border);
-  padding:6px 11px;border-radius:var(--r-full);
-  text-decoration:none;white-space:nowrap;
-  touch-action:manipulation;
-}
-.topbar-hist:active{background:var(--g100);}
-
-/* ─────────────────────────────────────────
-   USER WELCOME STRIP
-   ───────────────────────────────────────── */
-.welcome-strip{
-  background:linear-gradient(135deg, var(--g700) 0%, var(--g600) 55%, var(--g500) 100%);
-  padding:20px 18px 52px;
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   USER BANNER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.user-banner{
+  background:linear-gradient(130deg,var(--mint-700) 0%,var(--mint-600) 60%,var(--mint-500) 100%);
+  padding:18px 16px 58px;
   position:relative;overflow:hidden;
 }
-.welcome-strip::before{
+.user-banner::before{
   content:'';position:absolute;
-  top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;
-  background:rgba(255,255,255,0.07);pointer-events:none;
+  width:160px;height:160px;border-radius:50%;
+  background:rgba(255,255,255,.07);
+  top:-40px;right:-30px;pointer-events:none;
 }
-.welcome-strip::after{
+.user-banner::after{
   content:'';position:absolute;
-  bottom:-30px;left:0;right:0;height:62px;
-  background:var(--bg);border-radius:40px 40px 0 0;
+  bottom:-28px;left:0;right:0;height:56px;
+  background:var(--bg);border-radius:32px 32px 0 0;
 }
-.welcome-inner{position:relative;z-index:1;display:flex;align-items:center;gap:14px;}
-.welcome-avi{
-  width:52px;height:52px;border-radius:50%;
-  border:2.5px solid rgba(255,255,255,0.6);
-  background:rgba(255,255,255,0.2);
+.banner-inner{position:relative;z-index:1;display:flex;align-items:center;gap:12px;}
+.banner-avi{
+  width:50px;height:50px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.5);
+  background:rgba(255,255,255,.2);
   display:flex;align-items:center;justify-content:center;
   font-size:20px;font-weight:700;color:#fff;
   flex-shrink:0;overflow:hidden;
 }
-.welcome-avi img{width:100%;height:100%;object-fit:cover;}
-.welcome-name{font-size:19px;font-weight:800;color:#fff;line-height:1.2;}
-.welcome-greet{font-size:12px;color:rgba(255,255,255,.7);margin-bottom:2px;}
-.welcome-chip{
-  display:inline-flex;align-items:center;gap:5px;
-  background:rgba(255,255,255,0.18);
-  border:1px solid rgba(255,255,255,0.3);
-  border-radius:99px;padding:3px 10px;
-  font-size:11px;font-weight:600;color:rgba(255,255,255,.9);
-  margin-top:5px;
+.banner-avi img{width:100%;height:100%;object-fit:cover;}
+.banner-greet{font-size:11.5px;color:rgba(255,255,255,.7);margin-bottom:1px;}
+.banner-name{font-size:18px;font-weight:700;color:#fff;line-height:1.2;letter-spacing:-.2px;}
+.banner-dept{
+  margin-top:5px;display:inline-flex;align-items:center;gap:4px;
+  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:99px;padding:3px 9px;font-size:11px;font-weight:600;color:rgba(255,255,255,.9);
 }
 
-/* ─────────────────────────────────────────
-   MAIN CONTENT
-   ───────────────────────────────────────── */
-.page-content{
-  padding:0 14px 110px;
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   PAGE WRAP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.page-wrap{
   max-width:520px;margin:0 auto;
-  position:relative;
+  padding:0 12px 120px;
 }
 
-/* ─────────────────────────────────────────
-   SECTION HEADING
-   ───────────────────────────────────────── */
-.sec-head{
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SECTION TITLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.sec-title{
   display:flex;align-items:center;gap:8px;
-  padding:20px 2px 10px;
+  padding:18px 2px 8px;
 }
-.sec-head-line{
-  flex:1;height:1px;background:var(--border);
-}
-.sec-head-title{
-  font-size:11px;font-weight:700;color:var(--text-m);
-  text-transform:uppercase;letter-spacing:1px;white-space:nowrap;
-}
+.sec-title-text{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;}
+.sec-title-line{flex:1;height:1px;background:var(--border);}
 
-/* ─────────────────────────────────────────
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    CARDS
-   ───────────────────────────────────────── */
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .card{
   background:var(--surface);
   border:1px solid var(--border);
-  border-radius:var(--r-lg);
-  margin-bottom:12px;
-  box-shadow:var(--sh-sm);
+  border-radius:var(--r5);
+  margin-bottom:10px;
+  box-shadow:var(--shadow-sm);
   overflow:hidden;
 }
-.card-accent{
-  border-left:4px solid var(--g400);
-}
-.card-head{
-  display:flex;align-items:center;gap:10px;
+.card-hd{
   padding:14px 16px 12px;
-  border-bottom:1px solid var(--border);
+  border-bottom:1px solid var(--border-soft);
+  display:flex;align-items:center;gap:10px;
 }
-.card-icon-wrap{
-  width:34px;height:34px;border-radius:10px;
-  background:var(--primary-l);
+.card-ico{
+  width:32px;height:32px;border-radius:9px;
+  background:var(--primary-light);
   display:flex;align-items:center;justify-content:center;
-  color:var(--primary);font-size:15px;flex-shrink:0;
+  color:var(--primary);font-size:14px;flex-shrink:0;
 }
-.card-title{font-size:14px;font-weight:700;color:var(--text);}
-.card-subtitle{font-size:12px;color:var(--text-m);margin-top:1px;}
-.card-body{padding:16px;}
+.card-ttl{font-size:14px;font-weight:700;color:var(--text-primary);}
+.card-sub{font-size:12px;color:var(--text-muted);margin-top:1px;}
+.card-bd{padding:14px 16px;}
 
-/* ─────────────────────────────────────────
-   HISTORY ROWS
-   ───────────────────────────────────────── */
-.hist-list{padding:4px 16px 12px;}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   HISTORY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.hist-wrap{padding:4px 16px 12px;}
 .hist-empty{
-  padding:18px 0;text-align:center;
-  color:var(--text-m);font-size:13px;
+  padding:20px 0;text-align:center;color:var(--text-muted);font-size:13px;
 }
-.hist-item{
-  display:flex;align-items:center;gap:12px;
-  padding:11px 0;
-  border-bottom:1px solid var(--n100);
+.hist-row{
+  display:flex;align-items:center;gap:11px;
+  padding:10px 0;border-bottom:1px solid var(--border-soft);
 }
-.hist-item:last-child{border-bottom:none;}
-.hist-dot{
-  width:9px;height:9px;border-radius:50%;flex-shrink:0;
-}
-.hist-dot.ok{background:var(--g500);}
-.hist-dot.pending{background:var(--warning);}
-.hist-info{flex:1;min-width:0;}
-.hist-car{font-size:14px;font-weight:700;color:var(--text);}
-.hist-meta{font-size:12px;color:var(--text-m);margin-top:1px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.hist-right{text-align:right;flex-shrink:0;}
-.hist-badge{font-size:11px;font-weight:700;}
-.hist-badge.ok{color:var(--g600);}
-.hist-badge.pending{color:var(--warning);}
-.hist-km{font-size:11px;color:var(--text-m);margin-top:2px;}
+.hist-row:last-child{border-bottom:none;}
+.hist-pip{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.hist-pip.green{background:var(--mint-500);}
+.hist-pip.amber{background:var(--amber);}
+.hist-body{flex:1;min-width:0;}
+.hist-car{font-size:13.5px;font-weight:600;color:var(--text-primary);}
+.hist-meta{font-size:11.5px;color:var(--text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hist-tail{text-align:right;flex-shrink:0;}
+.hist-tag{font-size:11px;font-weight:700;}
+.hist-tag.green{color:var(--mint-600);}
+.hist-tag.amber{color:var(--amber);}
+.hist-km{font-size:11px;color:var(--text-muted);margin-top:1px;}
 
-/* ─────────────────────────────────────────
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STEP INDICATOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.steps{
+  display:flex;align-items:center;gap:0;
+  padding:0 16px 14px;
+}
+.step{
+  display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;
+  position:relative;
+}
+.step::after{
+  content:'';position:absolute;
+  top:13px;left:calc(50% + 14px);right:calc(-50% + 14px);
+  height:2px;background:var(--border);
+}
+.step:last-child::after{display:none;}
+.step.done::after{background:var(--mint-400);}
+.step-dot{
+  width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;
+  background:var(--neutral-100);border:2px solid var(--border);
+  color:var(--text-muted);
+  transition:all .2s;
+  position:relative;z-index:1;
+}
+.step.active .step-dot{background:var(--primary);border-color:var(--primary);color:#fff;}
+.step.done .step-dot{background:var(--mint-100);border-color:var(--mint-400);color:var(--mint-600);}
+.step-lbl{font-size:10px;color:var(--text-muted);font-weight:600;text-align:center;white-space:nowrap;}
+.step.active .step-lbl{color:var(--primary);font-weight:700;}
+.step.done .step-lbl{color:var(--mint-600);}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    FORM
-   ───────────────────────────────────────── */
-.form-row{margin-bottom:14px;}
-.f-label{
-  display:block;font-size:12px;font-weight:700;color:var(--text-2);
-  margin-bottom:6px;letter-spacing:.3px;
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.frow{margin-bottom:13px;}
+.flabel{
+  display:block;font-size:12px;font-weight:700;color:var(--text-secondary);
+  margin-bottom:6px;letter-spacing:.2px;
 }
-.f-label .req{color:var(--danger);margin-left:2px;}
-.f-wrap{position:relative;}
-.f-icon{
-  position:absolute;left:13px;top:50%;transform:translateY(-50%);
-  color:var(--g500);font-size:14px;pointer-events:none;z-index:1;
+.flabel .req{color:var(--red);margin-left:2px;}
+.flabel .opt{font-size:10.5px;font-weight:400;color:var(--text-muted);}
+.fwrap{position:relative;}
+.ficon{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  color:var(--mint-500);font-size:14px;pointer-events:none;z-index:1;
 }
-.f-icon.top{top:16px;transform:none;}
+.ficon.top{top:14px;transform:none;}
 input,select,textarea{
-  width:100%;
-  padding:13px 14px 13px 40px;
-  border:1.5px solid var(--border-md);
-  border-radius:var(--r-sm);
-  font-family:'Sarabun',sans-serif;
-  font-size:16px;color:var(--text);
-  background:var(--n50);
-  transition:border-color .15s,box-shadow .15s,background .15s;
+  width:100%;padding:12px 13px 12px 38px;
+  border:1.5px solid var(--neutral-300);border-radius:var(--r3);
+  font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:16px;color:var(--text-primary);
+  background:var(--surface);
+  transition:border .15s,box-shadow .15s,background .15s;
   appearance:none;-webkit-appearance:none;
   -webkit-tap-highlight-color:transparent;
 }
-input::placeholder,textarea::placeholder{color:var(--n400);}
+input::placeholder,textarea::placeholder{color:var(--neutral-400);}
 select{
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath fill='%2316a34a' d='M7 9L2 4h10z'/%3E%3C/svg%3E");
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2318a857' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 13px center;
   padding-right:36px;
 }
+select option{background:#fff;}
 textarea{
-  padding-left:14px;min-height:86px;
-  resize:none;line-height:1.65;
+  padding-left:38px;min-height:82px;
+  resize:none;line-height:1.6;
 }
 input:focus,select:focus,textarea:focus{
   outline:none;
-  border-color:var(--g400);
-  background:var(--surface);
-  box-shadow:0 0 0 3px rgba(34,197,94,0.14);
+  border-color:var(--mint-400);
+  background:var(--mint-50);
+  box-shadow:0 0 0 3px rgba(37,201,110,.12);
 }
-.f-err{
+.ferr{
   display:none;align-items:center;gap:5px;
-  font-size:12px;color:var(--danger);margin-top:5px;
+  font-size:12px;color:var(--red);margin-top:5px;
 }
-.f-err.show{display:flex;}
+.ferr.show{display:flex;}
 
-/* ─────────────────────────────────────────
-   PHOTO UPLOAD
-   ───────────────────────────────────────── */
-.upload-zone{
-  position:relative;
-  border:2px dashed var(--g200);
-  border-radius:var(--r-sm);
-  background:var(--g50);
-  padding:22px 16px;
-  text-align:center;
-  transition:all .2s;
-  cursor:pointer;min-height:88px;
+/* CAR PILL SELECT */
+.car-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:2px;}
+.car-pill{
+  flex:1;min-width:calc(50% - 4px);
+  display:flex;align-items:center;gap:7px;
+  padding:10px 11px;border-radius:var(--r3);
+  border:1.5px solid var(--neutral-200);
+  background:var(--neutral-50);
+  cursor:pointer;transition:all .15s;
+  touch-action:manipulation;
 }
-.upload-zone:active,.upload-zone.has-photo{
-  border-color:var(--g400);
-  background:var(--g100);
+.car-pill:active,.car-pill.selected{
+  background:var(--mint-100);
+  border-color:var(--mint-400);
 }
-.upload-zone input[type=file]{
-  position:absolute;inset:0;opacity:0;
-  cursor:pointer;padding:0;border:none;width:100%;height:100%;
+.car-pill input[type=radio]{display:none;}
+.car-pill-icon{font-size:20px;flex-shrink:0;}
+.car-pill-info{}
+.car-pill-name{font-size:12px;font-weight:700;color:var(--text-primary);}
+.car-pill-plate{font-size:11px;color:var(--text-muted);}
+
+/* UPLOAD */
+.upload-area{
+  border:2px dashed var(--neutral-300);
+  border-radius:var(--r3);background:var(--neutral-50);
+  padding:20px;text-align:center;cursor:pointer;
+  transition:all .2s;position:relative;min-height:80px;
 }
-.upload-icon{font-size:26px;color:var(--g400);margin-bottom:6px;}
-.upload-label{font-size:13px;color:var(--text-m);font-weight:500;}
-.photo-preview-wrap{display:none;margin-top:10px;}
-.photo-preview-wrap.show{display:block;}
-.photo-preview{
-  width:100%;max-height:180px;object-fit:contain;
-  border-radius:var(--r-sm);border:2px solid var(--g200);
-  background:var(--n0);
+.upload-area:active,.upload-area.has-file{
+  border-color:var(--mint-400);background:var(--mint-50);
 }
-.photo-meta{font-size:12px;color:var(--g600);font-weight:600;margin-top:5px;}
-.btn-remove-photo{
-  margin-top:6px;display:flex;align-items:center;justify-content:center;gap:5px;
-  width:100%;padding:8px;border-radius:var(--r-xs);
+.upload-area input[type=file]{
+  position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;
+  padding:0;border:none;
+}
+.upload-ico{font-size:24px;color:var(--neutral-400);margin-bottom:5px;}
+.upload-area.has-file .upload-ico{color:var(--mint-500);}
+.upload-lbl{font-size:13px;color:var(--text-muted);font-weight:500;}
+.preview-wrap{display:none;margin-top:9px;}
+.preview-wrap.show{display:block;}
+.preview-img{width:100%;max-height:160px;object-fit:contain;border-radius:var(--r2);border:1px solid var(--border);}
+.preview-meta{font-size:12px;color:var(--mint-600);font-weight:600;margin-top:4px;}
+.preview-rm{
+  margin-top:6px;width:100%;padding:8px;
   background:transparent;border:1px solid var(--border);
-  color:var(--danger);font-family:'Sarabun',sans-serif;
-  font-size:13px;cursor:pointer;touch-action:manipulation;
+  border-radius:var(--r2);font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:12.5px;color:var(--red);cursor:pointer;touch-action:manipulation;
+  display:flex;align-items:center;justify-content:center;gap:5px;
 }
-.btn-remove-photo:active{background:var(--danger-l);}
+.preview-rm:active{background:var(--red-l);}
 
-/* ─────────────────────────────────────────
-   MAP
-   ───────────────────────────────────────── */
+/* MAP */
 #map{
-  width:100%;height:280px;
-  border-radius:var(--r-sm);overflow:hidden;
-  touch-action:pan-x pan-y;
+  width:100%;height:270px;border-radius:var(--r2);
+  overflow:hidden;touch-action:pan-x pan-y;
   border:1px solid var(--border);
 }
-.map-search{display:flex;gap:8px;margin-bottom:10px;}
-.map-search input{padding-left:14px;}
-.route-pill{
-  display:flex;align-items:center;gap:9px;
-  background:var(--g100);border:1px solid var(--g200);
-  border-radius:var(--r-full);
-  padding:9px 14px;margin-top:10px;
-  font-size:13px;color:var(--g700);font-weight:500;
+.map-search{
+  display:flex;gap:7px;margin-bottom:10px;
 }
-.route-pill i{color:var(--g500);font-size:15px;}
-.dest-box{
-  background:var(--n50);border:1px solid var(--border);
-  border-radius:var(--r-sm);padding:10px 13px;
-  font-size:13px;color:var(--text-m);
-  min-height:42px;white-space:pre-line;line-height:1.8;
-  margin-top:8px;
+.map-search input{padding-left:13px;}
+.route-chip{
+  display:flex;align-items:center;gap:8px;margin-top:9px;
+  background:var(--mint-100);border:1px solid var(--mint-200);
+  border-radius:var(--rFull);padding:8px 13px;
+  font-size:13px;color:var(--mint-700);font-weight:500;
 }
-.map-tools{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px;
+.route-chip i{color:var(--mint-500);}
+.dest-list{
+  background:var(--neutral-50);border:1px solid var(--border);
+  border-radius:var(--r2);padding:9px 12px;
+  font-size:12.5px;color:var(--text-muted);
+  min-height:38px;white-space:pre-line;line-height:1.8;margin-top:7px;
 }
-.map-tool-btn{
-  display:flex;flex-direction:column;align-items:center;
-  gap:4px;padding:10px 6px;
-  border:1px solid var(--border);border-radius:var(--r-sm);
-  background:var(--surface);font-family:'Sarabun',sans-serif;
-  font-size:11px;font-weight:600;color:var(--text-2);
-  cursor:pointer;transition:all .15s;touch-action:manipulation;
-  min-height:52px;
+.map-actions{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;
 }
-.map-tool-btn i{font-size:16px;color:var(--g500);}
-.map-tool-btn:active{background:var(--g100);border-color:var(--g300);}
+.map-btn{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:9px 5px;border-radius:var(--r2);
+  border:1px solid var(--border);background:var(--surface);
+  font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:11px;font-weight:600;color:var(--text-secondary);
+  cursor:pointer;touch-action:manipulation;min-height:50px;
+}
+.map-btn i{font-size:15px;color:var(--mint-500);}
+.map-btn:active{background:var(--mint-100);border-color:var(--mint-300);}
 
-/* ─────────────────────────────────────────
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    BUTTONS
-   ───────────────────────────────────────── */
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .btn{
   display:flex;align-items:center;justify-content:center;gap:8px;
-  padding:14px 20px;border-radius:var(--r-full);
-  font-family:'Sarabun',sans-serif;font-size:15px;font-weight:700;
-  border:none;cursor:pointer;width:100%;
-  transition:all .17s;min-height:50px;
-  text-decoration:none;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
-  user-select:none;
+  padding:14px 18px;border-radius:var(--rFull);
+  font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:15px;font-weight:700;
+  border:none;cursor:pointer;width:100%;text-decoration:none;
+  transition:all .15s;min-height:50px;
+  touch-action:manipulation;user-select:none;
 }
-.btn-primary{
-  background:linear-gradient(135deg, var(--g700), var(--g500));
-  color:#fff;
-  box-shadow:0 4px 16px rgba(22,163,74,0.3);
-}
-.btn-primary:active{transform:scale(.97);box-shadow:0 2px 8px rgba(22,163,74,0.2);}
-.btn-danger{background:linear-gradient(135deg,#dc2626,#f87171);color:#fff;box-shadow:0 4px 16px rgba(239,68,68,0.25);}
-.btn-danger:active{transform:scale(.97);}
-.btn-info{background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;box-shadow:0 4px 16px rgba(59,130,246,0.25);}
-.btn-info:active{transform:scale(.97);}
-.btn-ghost{background:var(--n100);color:var(--text-2);border:1px solid var(--border);}
-.btn-ghost:active{background:var(--g100);}
-.btn-outline{background:transparent;border:1.5px solid var(--border-md);color:var(--text-2);}
-.btn-outline:active{background:var(--n100);}
 .btn:disabled{opacity:.5;pointer-events:none;}
+.btn-primary{
+  background:linear-gradient(135deg,var(--mint-700),var(--mint-500));
+  color:#fff;box-shadow:0 4px 14px rgba(20,133,67,.28);
+}
+.btn-primary:active{transform:scale(.97);box-shadow:0 2px 8px rgba(20,133,67,.2);}
+.btn-danger{background:linear-gradient(135deg,#dc2626,var(--red));color:#fff;box-shadow:0 4px 14px rgba(239,68,68,.22);}
+.btn-danger:active{transform:scale(.97);}
+.btn-blue{background:linear-gradient(135deg,var(--blue-d),var(--blue));color:#fff;box-shadow:0 4px 14px rgba(59,130,246,.22);}
+.btn-blue:active{transform:scale(.97);}
+.btn-ghost{background:var(--neutral-100);color:var(--text-secondary);border:1px solid var(--border);}
+.btn-ghost:active{background:var(--mint-100);}
+.btn-outline{background:transparent;border:1.5px solid var(--neutral-300);color:var(--text-secondary);}
+.btn-outline:active{background:var(--neutral-100);}
 
-/* ─────────────────────────────────────────
-   STICKY SUBMIT BAR
-   ───────────────────────────────────────── */
-.submit-bar{
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FIXED SUBMIT BAR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.action-bar{
   position:fixed;bottom:0;left:0;right:0;z-index:200;
-  background:rgba(255,255,255,0.95);
-  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border-top:1px solid var(--border);
-  padding:10px 16px;
+  padding:10px 14px;
   padding-bottom:max(10px,env(safe-area-inset-bottom,10px));
+  box-shadow:0 -4px 20px rgba(0,50,20,.07);
 }
-.submit-bar .btn{max-width:520px;margin:0 auto;}
+.action-bar .btn{max-width:520px;margin:0 auto;}
 
-/* ─────────────────────────────────────────
-   STATUS SCREENS (pending / suspended)
-   ───────────────────────────────────────── */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STATUS SCREENS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 #screen-pending,#screen-suspended{
-  min-height:100vh;
-  background:linear-gradient(160deg,#ecfdf5,var(--bg) 60%);
-  flex-direction:column;align-items:center;justify-content:center;
-  padding:32px 20px;text-align:center;
+  min-height:100vh;flex-direction:column;
+  align-items:center;justify-content:center;padding:28px 18px;
+  background:linear-gradient(155deg,#edfaf3,var(--bg) 60%);
 }
-.status-blob{
-  width:100px;height:100px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;font-size:48px;
-  margin:0 auto 20px;
-}
-.status-blob.warn{background:var(--warning-l);box-shadow:0 0 0 8px rgba(245,158,11,.1);}
-.status-blob.err{background:var(--danger-l);box-shadow:0 0 0 8px rgba(239,68,68,.08);}
 .status-card{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r-xl);padding:36px 24px;
-  max-width:380px;width:100%;box-shadow:var(--sh-md);
+  border-radius:var(--r6);padding:36px 24px;
+  max-width:380px;width:100%;text-align:center;
+  box-shadow:var(--shadow-lg);
 }
-.status-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:10px;}
-.status-msg{color:var(--text-m);font-size:14px;line-height:1.9;}
-.status-actions{margin-top:22px;display:flex;flex-direction:column;gap:9px;}
+.status-icon{
+  width:96px;height:96px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:48px;
+  margin:0 auto 18px;
+}
+.status-icon.warn{background:var(--amber-l);box-shadow:0 0 0 8px rgba(245,158,11,.08);}
+.status-icon.danger{background:var(--red-l);box-shadow:0 0 0 8px rgba(239,68,68,.06);}
+.status-h{font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:9px;}
+.status-p{color:var(--text-muted);font-size:14px;line-height:1.85;}
+.status-actions{margin-top:22px;display:flex;flex-direction:column;gap:8px;}
 
-/* ─────────────────────────────────────────
-   REGISTER SCREEN
-   ───────────────────────────────────────── */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   REGISTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 #screen-register{
   min-height:100vh;
-  background:linear-gradient(160deg,#ecfdf5,var(--bg) 50%);
-  padding:28px 16px 30px;
+  background:linear-gradient(155deg,#edfaf3,var(--bg) 60%);
+  padding:28px 14px 30px;
 }
-.reg-wrap{max-width:460px;margin:0 auto;}
-.reg-header{text-align:center;margin-bottom:22px;}
-.reg-avatar-wrap{
-  width:88px;height:88px;border-radius:50%;
-  border:3px solid var(--g300);
-  background:var(--g100);
+.reg-inner{max-width:460px;margin:0 auto;}
+.reg-top{text-align:center;margin-bottom:20px;}
+.reg-av{
+  width:84px;height:84px;border-radius:50%;
+  background:var(--mint-100);border:2.5px solid var(--mint-300);
   display:flex;align-items:center;justify-content:center;
-  font-size:36px;font-weight:700;color:var(--g600);
-  margin:0 auto 14px;overflow:hidden;
-  box-shadow:0 0 0 6px rgba(34,197,94,0.1);
+  font-size:34px;font-weight:700;color:var(--mint-600);
+  margin:0 auto 12px;overflow:hidden;
+  box-shadow:0 0 0 6px rgba(37,201,110,.09);
 }
-.reg-avatar-wrap img{width:100%;height:100%;object-fit:cover;}
-.reg-header h2{font-size:22px;font-weight:800;color:var(--text);}
-.reg-header p{color:var(--text-m);font-size:14px;margin-top:4px;}
+.reg-av img{width:100%;height:100%;object-fit:cover;}
+.reg-top h2{font-size:21px;font-weight:700;color:var(--text-primary);}
+.reg-top p{font-size:13.5px;color:var(--text-muted);margin-top:4px;}
 .reg-card{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r-xl);padding:24px 18px;
-  box-shadow:var(--sh-md);
+  border-radius:var(--r5);padding:22px 16px;box-shadow:var(--shadow-md);
 }
 
-/* ─────────────────────────────────────────
-   CAR IN USE SCREEN
-   ───────────────────────────────────────── */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CAR IN USE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 #screen-car-in-use{
-  min-height:100vh;
-  background:linear-gradient(160deg,#ecfdf5,var(--bg) 60%);
-  flex-direction:column;align-items:center;justify-content:flex-start;
-  padding:24px 16px 110px;overflow-y:auto;
+  min-height:100vh;flex-direction:column;
+  align-items:center;justify-content:flex-start;
+  padding:20px 14px 110px;overflow-y:auto;
+  background:linear-gradient(155deg,#edfaf3,var(--bg) 70%);
 }
-.in-use-card{
+.iu-card{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r-xl);padding:28px 20px;
-  max-width:440px;width:100%;box-shadow:var(--sh-lg);
-  text-align:center;
+  border-radius:var(--r6);padding:24px 18px;
+  max-width:440px;width:100%;text-align:center;
+  box-shadow:var(--shadow-xl);
 }
+.iu-car{
+  font-size:56px;margin-bottom:10px;display:inline-block;
+  animation:iuFloat 3s ease-in-out infinite;
+}
+@keyframes iuFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.iu-h{font-size:21px;font-weight:700;color:var(--text-primary);margin-bottom:3px;}
+.iu-sub{font-size:13px;color:var(--text-muted);margin-bottom:18px;}
 
-.pulse-icon{
-  width:88px;height:88px;border-radius:50%;
-  background:linear-gradient(135deg,var(--g100),var(--g200));
-  border:2px solid var(--g300);
-  display:flex;align-items:center;justify-content:center;
-  font-size:40px;margin:0 auto 12px;
-  animation:pulseGlow 2.5s ease-in-out infinite;
+/* info row */
+.iu-info{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;
 }
-@keyframes pulseGlow{
-  0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.3);}
-  50%{box-shadow:0 0 0 14px rgba(34,197,94,0);}
+.iu-tile{
+  background:var(--sage-100);border:1px solid var(--sage-200);
+  border-radius:var(--r3);padding:10px 12px;text-align:left;
 }
-.in-use-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px;}
-.in-use-sub{font-size:13px;color:var(--text-m);margin-bottom:18px;}
+.iu-tile-l{font-size:10px;font-weight:700;color:var(--sage-600);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.iu-tile-v{font-size:13.5px;font-weight:700;color:var(--text-primary);}
 
-.info-tiles{
-  display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px;
+/* timer */
+.timer-panel{
+  background:linear-gradient(135deg,var(--mint-800),var(--mint-600));
+  border-radius:var(--r4);padding:16px;margin-bottom:14px;
+  box-shadow:0 4px 18px rgba(20,133,67,.25);
 }
-.info-tile{
-  background:var(--g50);border:1px solid var(--g200);
-  border-radius:var(--r-sm);padding:11px 13px;text-align:left;
-}
-.tile-lbl{font-size:10px;font-weight:700;color:var(--g600);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;}
-.tile-val{font-size:14px;font-weight:700;color:var(--text);}
-
-.timer-box{
-  background:linear-gradient(135deg,var(--g700),var(--g600));
-  border-radius:var(--r-md);padding:18px;margin-bottom:16px;
-  box-shadow:0 4px 20px rgba(22,163,74,0.25);
-}
-.timer-lbl{font-size:11px;font-weight:600;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+.timer-l{font-size:11px;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;}
 #timerDisplay{
-  font-size:clamp(38px,10vw,54px);font-weight:800;color:#fff;
-  letter-spacing:4px;font-variant-numeric:tabular-nums;line-height:1;
-  text-shadow:0 2px 20px rgba(0,0,0,0.2);
+  font-size:clamp(38px,10vw,52px);font-weight:700;color:#fff;
+  letter-spacing:3px;font-variant-numeric:tabular-nums;line-height:1.05;
+  text-shadow:0 1px 12px rgba(0,0,0,.2);
 }
 
-.loc-status{
-  background:var(--n50);border:1px solid var(--border);
-  border-radius:var(--r-sm);padding:11px 13px;
-  font-size:13px;color:var(--text-m);text-align:left;margin:12px 0 8px;
+/* location */
+.loc-bar{
+  background:var(--neutral-50);border:1px solid var(--border);
+  border-radius:var(--r2);padding:10px 12px;
+  font-size:13px;color:var(--text-muted);text-align:left;margin:10px 0 6px;
 }
-.loc-status.loading{background:var(--warning-l);border-color:rgba(245,158,11,.3);color:var(--warning);}
-.loc-status.ok{background:var(--g100);border-color:var(--g300);color:var(--g700);}
-.loc-status.err{background:var(--danger-l);border-color:rgba(239,68,68,.3);color:var(--danger);}
-.acc-badge{
-  display:inline-block;border-radius:99px;padding:2px 9px;
-  font-size:11px;font-weight:700;margin-top:4px;
-}
-.acc-good{background:var(--g100);color:var(--g700);}
-.acc-ok{background:var(--warning-l);color:#92400e;}
-.acc-bad{background:var(--danger-l);color:var(--danger);}
-#locationDetail{
-  font-size:12px;color:var(--text-m);text-align:left;
-  padding:0 2px;margin-bottom:8px;
-}
-.in-use-actions{display:flex;flex-direction:column;gap:9px;margin-top:4px;}
+.loc-bar.loading{background:var(--amber-l);border-color:rgba(245,158,11,.3);color:#92400e;}
+.loc-bar.ok{background:var(--mint-100);border-color:var(--mint-300);color:var(--mint-700);}
+.loc-bar.err{background:var(--red-l);border-color:rgba(239,68,68,.3);color:var(--red);}
+.acc-tag{display:inline-block;border-radius:99px;padding:2px 8px;font-size:11px;font-weight:700;margin-top:4px;}
+.acc-tag.hi{background:var(--mint-100);color:var(--mint-700);}
+.acc-tag.mid{background:var(--amber-l);color:#92400e;}
+.acc-tag.lo{background:var(--red-l);color:var(--red);}
+#locationDetail{font-size:12px;color:var(--text-muted);text-align:left;padding:0 1px;margin-bottom:6px;}
+.iu-actions{display:flex;flex-direction:column;gap:8px;margin-top:2px;}
 
-/* ─────────────────────────────────────────
-   CONFIRM SHEET (bottom sheet)
-   ───────────────────────────────────────── */
-.sheet-backdrop{
-  display:none;position:fixed;inset:0;
-  background:rgba(10,40,20,0.4);z-index:9000;
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BOTTOM SHEET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.overlay{
+  display:none;position:fixed;inset:0;z-index:9000;
+  background:rgba(10,40,18,.45);
   backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
   align-items:flex-end;justify-content:center;
 }
-.sheet-backdrop.show{display:flex;}
-.bottom-sheet{
-  background:var(--surface);
-  border-radius:var(--r-xl) var(--r-xl) 0 0;
+.overlay.show{display:flex;}
+.sheet{
+  background:var(--surface);border-radius:var(--r6) var(--r6) 0 0;
   border:1px solid var(--border);border-bottom:none;
-  padding:20px 18px;
-  padding-bottom:max(20px,calc(env(safe-area-inset-bottom,0px) + 14px));
+  padding:18px 16px;
+  padding-bottom:max(18px,calc(env(safe-area-inset-bottom,0px)+12px));
   width:100%;max-width:520px;
-  box-shadow:var(--sh-lg);
-  animation:sheetUp .28s cubic-bezier(.16,1,.3,1);
-  max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  box-shadow:var(--shadow-xl);
+  animation:shUp .26s cubic-bezier(.16,1,.3,1);
+  max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
 }
-@keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
-.sheet-handle{
-  width:38px;height:4px;border-radius:2px;
-  background:var(--border-md);margin:0 auto 18px;
+@keyframes shUp{from{transform:translateY(100%)}to{transform:none}}
+.sheet-grip{
+  width:36px;height:4px;border-radius:2px;
+  background:var(--neutral-200);margin:0 auto 16px;
 }
-.sheet-title{font-size:17px;font-weight:800;color:var(--text);text-align:center;margin-bottom:16px;}
-.confirm-list{
-  background:var(--n50);border:1px solid var(--border);
-  border-radius:var(--r-md);padding:2px 14px;margin-bottom:16px;
+.sheet-title{font-size:16px;font-weight:700;color:var(--text-primary);text-align:center;margin-bottom:14px;}
+.conf-rows{
+  background:var(--neutral-50);border:1px solid var(--border);
+  border-radius:var(--r3);padding:2px 14px;margin-bottom:14px;
 }
-.c-row{
-  display:flex;align-items:flex-start;gap:8px;
-  padding:11px 0;border-bottom:1px solid var(--n100);
-  font-size:14px;
+.conf-row{
+  display:flex;align-items:flex-start;gap:8px;padding:10px 0;
+  border-bottom:1px solid var(--border-soft);font-size:13.5px;
 }
-.c-row:last-child{border-bottom:none;}
-.c-lbl{color:var(--text-m);flex-shrink:0;width:82px;padding-top:1px;}
-.c-val{font-weight:700;color:var(--text);flex:1;word-break:break-word;}
-.sheet-btns{display:flex;gap:9px;}
+.conf-row:last-child{border-bottom:none;}
+.conf-l{color:var(--text-muted);flex-shrink:0;width:76px;padding-top:1px;}
+.conf-v{font-weight:600;color:var(--text-primary);flex:1;word-break:break-word;}
+.sheet-btns{display:flex;gap:8px;}
 .sheet-btns .btn{flex:1;}
 
-/* ─────────────────────────────────────────
-   SUCCESS MODAL
-   ───────────────────────────────────────── */
-.modal-backdrop{
-  display:none;position:fixed;inset:0;
-  background:rgba(10,40,20,0.5);z-index:9500;
-  align-items:center;justify-content:center;padding:24px;
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MODAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:9500;
+  background:rgba(10,40,18,.5);
   backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:22px;
 }
-.modal-backdrop.show{display:flex;}
-.modal-box{
+.modal-overlay.show{display:flex;}
+.modal{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r-xl);padding:34px 24px;
-  max-width:340px;width:100%;text-align:center;
-  box-shadow:var(--sh-lg);
-  animation:popIn .28s cubic-bezier(.16,1,.3,1);
+  border-radius:var(--r5);padding:30px 22px;
+  max-width:320px;width:100%;text-align:center;
+  box-shadow:var(--shadow-xl);
+  animation:mPop .25s cubic-bezier(.16,1,.3,1);
 }
-@keyframes popIn{from{transform:scale(.88);opacity:0}to{transform:none;opacity:1}}
-.modal-icon{font-size:58px;margin-bottom:14px;}
-.modal-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px;}
-.modal-msg{color:var(--text-m);font-size:14px;line-height:1.8;margin-bottom:22px;}
+@keyframes mPop{from{transform:scale(.88);opacity:0}to{transform:none;opacity:1}}
+.modal-ico{font-size:54px;margin-bottom:12px;}
+.modal-h{font-size:19px;font-weight:700;color:var(--text-primary);margin-bottom:7px;}
+.modal-p{color:var(--text-muted);font-size:13.5px;line-height:1.8;margin-bottom:20px;}
 
-/* ─────────────────────────────────────────
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    TOAST
-   ───────────────────────────────────────── */
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 #toast{
-  position:fixed;top:18px;left:50%;
-  transform:translateX(-50%) translateY(-120px);
+  position:fixed;top:16px;left:50%;
+  transform:translateX(-50%) translateY(-110px);
   z-index:99999;
-  font-family:'Sarabun',sans-serif;
-  font-size:14px;font-weight:600;
-  padding:11px 20px;border-radius:var(--r-full);
-  white-space:nowrap;max-width:90vw;
-  box-shadow:var(--sh-lg);
-  transition:transform .3s cubic-bezier(.16,1,.3,1);
-  display:flex;align-items:center;gap:8px;
-  background:var(--n700);color:#fff;
+  font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:13.5px;font-weight:600;
+  padding:10px 18px;border-radius:var(--rFull);
+  white-space:nowrap;max-width:88vw;
+  box-shadow:var(--shadow-lg);
+  transition:transform .28s cubic-bezier(.16,1,.3,1);
+  display:flex;align-items:center;gap:7px;
+  background:var(--neutral-700);color:#fff;
 }
 #toast.show{transform:translateX(-50%) translateY(0);}
-#toast.success{background:linear-gradient(135deg,var(--g700),var(--g500));}
-#toast.error{background:linear-gradient(135deg,#dc2626,#f87171);}
-#toast.warning{background:linear-gradient(135deg,#d97706,var(--warning));}
-#toast.info{background:linear-gradient(135deg,#2563eb,var(--info));}
+#toast.success{background:linear-gradient(135deg,var(--mint-700),var(--mint-500));}
+#toast.error{background:linear-gradient(135deg,#dc2626,var(--red));}
+#toast.warning{background:linear-gradient(135deg,#d97706,var(--amber));}
+#toast.info{background:linear-gradient(135deg,var(--blue-d),var(--blue));}
 
-/* ─────────────────────────────────────────
-   ANIMATION STAGGER
-   ───────────────────────────────────────── */
-@keyframes fadeSlideUp{
-  from{opacity:0;transform:translateY(14px);}
-  to{opacity:1;transform:none;}
-}
-.stagger>*{animation:fadeSlideUp .35s cubic-bezier(.16,1,.3,1) both;}
-.stagger>*:nth-child(1){animation-delay:.04s;}
-.stagger>*:nth-child(2){animation-delay:.09s;}
-.stagger>*:nth-child(3){animation-delay:.14s;}
-.stagger>*:nth-child(4){animation-delay:.19s;}
-.stagger>*:nth-child(5){animation-delay:.24s;}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ANIMATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.anim>*{animation:fadeUp .3s cubic-bezier(.16,1,.3,1) both;}
+.anim>*:nth-child(1){animation-delay:.04s;}
+.anim>*:nth-child(2){animation-delay:.09s;}
+.anim>*:nth-child(3){animation-delay:.14s;}
+.anim>*:nth-child(4){animation-delay:.19s;}
+.anim>*:nth-child(5){animation-delay:.24s;}
 
-/* ─────────────────────────────────────────
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    RESPONSIVE
-   ───────────────────────────────────────── */
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 @media(max-width:374px){
-  .page-content{padding:0 10px 110px;}
-  .card-body{padding:13px;}
+  .page-wrap{padding:0 10px 114px;}
+  .card-bd{padding:12px;}
   .btn{font-size:14px;min-height:46px;}
   #timerDisplay{font-size:36px!important;}
-  .info-tiles{grid-template-columns:1fr;}
-  .welcome-strip{padding:16px 14px 48px;}
+  .iu-info{grid-template-columns:1fr;}
+  .car-pill{min-width:100%;}
 }
 @media(min-width:480px){
-  #map{height:320px;}
-  .topbar{height:62px;}
+  #map{height:310px;}
+  .site-header{height:60px;}
 }
 </style>
 </head>
 <body>
 
-<!-- ══════════════ LOADING ══════════════ -->
+<!-- ════════════ LOADING ════════════ -->
 <div id="appLoading">
-  <div class="load-logo-wrap">
-    <div class="load-ring"></div>
-    <div class="load-ring-2"></div>
-    <div class="load-car-icon">🚗</div>
-  </div>
-  <div class="load-text">ระบบบันทึกการใช้รถ</div>
-  <div class="load-sub">กำลังเชื่อมต่อ LINE LIFF…</div>
-  <div class="load-bar"><div class="load-bar-fill"></div></div>
+  <div class="ld-car">🚗</div>
+  <div class="ld-text">CarTrack</div>
+  <div class="ld-sub">กำลังเชื่อมต่อ LINE LIFF…</div>
+  <div class="ld-track"><div class="ld-track-fill"></div></div>
 </div>
 
-<!-- ══════════════ MAIN SCREEN ══════════════ -->
+<!-- ════════════ MAIN ════════════ -->
 <div id="screen-main" class="screen">
 
-  <!-- Top Nav -->
-  <div class="topbar" id="mainTopbar">
-    <div class="topbar-logo">
-      <div class="logo-badge"><i class="fas fa-car-side"></i></div>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="hdr-brand">
+      <div class="hdr-logo"><i class="fas fa-car-side"></i></div>
       <div>
-        <div class="logo-text">ระบบบันทึกการใช้รถ</div>
-        <div class="logo-sub">Powered by N/_\ck</div>
+        <div class="hdr-name">CarTrack</div>
+        <div class="hdr-tagline">ระบบบันทึกการใช้รถ</div>
       </div>
     </div>
-    <a href="/history" class="topbar-hist"><i class="fas fa-clock-rotate-left"></i> ประวัติ</a>
-    <div class="topbar-avatar" id="topbarAvatar"><i class="fas fa-user" style="font-size:14px;color:var(--g600)"></i></div>
-  </div>
+    <a href="/history" class="hdr-hist"><i class="fas fa-clock-rotate-left"></i>ประวัติ</a>
+    <div class="hdr-av" id="topbarAvatar"><i class="fas fa-user" style="font-size:13px;color:var(--mint-600)"></i></div>
+  </header>
 
-  <!-- Welcome Strip -->
-  <div class="welcome-strip" id="welcomeStrip">
-    <div class="welcome-inner">
-      <div class="welcome-avi" id="userAvatar">👤</div>
+  <!-- User Banner -->
+  <div class="user-banner">
+    <div class="banner-inner">
+      <div class="banner-avi" id="userAvatar">👤</div>
       <div>
-        <div class="welcome-greet" id="userGreeting">สวัสดี คุณ</div>
-        <div class="welcome-name" id="userName">—</div>
-        <div class="welcome-chip" id="userDept"><i class="fas fa-building" style="font-size:9px"></i> —</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="page-content stagger">
-
-    <!-- ── History ── -->
-    <div class="sec-head">
-      <div class="sec-head-line"></div>
-      <div class="sec-head-title">ประวัติการใช้รถล่าสุด</div>
-      <div class="sec-head-line"></div>
-    </div>
-    <div class="card card-accent">
-      <div class="card-head">
-        <div class="card-icon-wrap"><i class="fas fa-history"></i></div>
-        <div>
-          <div class="card-title">บันทึกล่าสุดของคุณ</div>
-          <div class="card-subtitle">5 รายการล่าสุด</div>
+        <div class="banner-greet" id="userGreeting">สวัสดี คุณ</div>
+        <div class="banner-name" id="userName">—</div>
+        <div class="banner-dept" id="userDept">
+          <i class="fas fa-building" style="font-size:9px"></i> —
         </div>
       </div>
-      <div class="hist-list" id="userHistorySection">
-        <div class="hist-empty"><i class="fas fa-spinner fa-spin" style="margin-right:6px;color:var(--g500)"></i>กำลังโหลด...</div>
-      </div>
+    </div>
+  </div>
+
+  <div class="page-wrap anim">
+
+    <!-- ── ประวัติ ── -->
+    <div class="sec-title">
+      <div class="sec-title-text">ประวัติล่าสุด</div>
+      <div class="sec-title-line"></div>
     </div>
 
-    <!-- ── Form Header ── -->
-    <div class="sec-head">
-      <div class="sec-head-line"></div>
-      <div class="sec-head-title">บันทึกการใช้รถ</div>
-      <div class="sec-head-line"></div>
-    </div>
-
-    <!-- ── Vehicle Info Card ── -->
-    <div class="card card-accent">
-      <div class="card-head">
-        <div class="card-icon-wrap"><i class="fas fa-clipboard-list"></i></div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ico"><i class="fas fa-clock-rotate-left"></i></div>
         <div>
-          <div class="card-title">ข้อมูลรถ & เหตุผล</div>
-          <div class="card-subtitle">กรอกข้อมูลให้ครบก่อนบันทึก</div>
+          <div class="card-ttl">บันทึกการใช้รถของคุณ</div>
+          <div class="card-sub">5 รายการล่าสุด</div>
         </div>
       </div>
-      <div class="card-body">
-        <form id="mainForm" novalidate>
+      <div class="hist-wrap" id="userHistorySection">
+        <div class="hist-empty">
+          <i class="fas fa-spinner fa-spin" style="color:var(--mint-400);margin-right:6px"></i>กำลังโหลด...
+        </div>
+      </div>
+    </div>
 
-          <!-- ทะเบียนรถ -->
-          <div class="form-row">
-            <label class="f-label">ทะเบียนรถ<span class="req">*</span></label>
-            <div class="f-wrap">
-              <i class="fas fa-car-side f-icon"></i>
-              <select id="car" required>
-                <option value="" disabled selected>— เลือกทะเบียนรถ —</option>
-                <option value="Nissan : ผอ 5757">🚙 Nissan — ผอ 5757</option>
-                <option value="Mazda : ยค 3777">🚗 Mazda — ยค 3777</option>
-                <option value="MG : งบ 255">🚘 MG — งบ 255</option>
-                <option value="Click : จงจ 222">🛵 Honda Click — จงจ 222</option>
-                <option value="Fino : งธท 222">🛵 Fino — งธท 222</option>
-              </select>
+    <!-- ── ฟอร์ม ── -->
+    <div class="sec-title">
+      <div class="sec-title-text">บันทึกการใช้รถใหม่</div>
+      <div class="sec-title-line"></div>
+    </div>
+
+    <!-- Steps -->
+    <div class="card">
+      <div class="steps" id="stepBar" style="padding-top:14px">
+        <div class="step active" id="step1">
+          <div class="step-dot">1</div>
+          <div class="step-lbl">ข้อมูลรถ</div>
+        </div>
+        <div class="step" id="step2">
+          <div class="step-dot">2</div>
+          <div class="step-lbl">ภารกิจ</div>
+        </div>
+        <div class="step" id="step3">
+          <div class="step-dot">3</div>
+          <div class="step-lbl">เส้นทาง</div>
+        </div>
+        <div class="step" id="step4">
+          <div class="step-dot">4</div>
+          <div class="step-lbl">ส่ง</div>
+        </div>
+      </div>
+    </div>
+
+    <form id="mainForm" novalidate>
+
+      <!-- ── Card 1: ข้อมูลรถ ── -->
+      <div class="card" id="formCard1">
+        <div class="card-hd">
+          <div class="card-ico"><i class="fas fa-car-side"></i></div>
+          <div>
+            <div class="card-ttl">เลือกรถที่จะใช้</div>
+            <div class="card-sub">แตะเพื่อเลือกทะเบียน</div>
+          </div>
+        </div>
+        <div class="card-bd">
+          <div class="frow">
+            <div class="car-pills" id="carPills">
+              <label class="car-pill">
+                <input type="radio" name="carPill" value="Nissan : ผอ 5757" onchange="onCarPick(this)">
+                <div class="car-pill-icon">🚙</div>
+                <div class="car-pill-info">
+                  <div class="car-pill-name">Nissan</div>
+                  <div class="car-pill-plate">ผอ 5757</div>
+                </div>
+              </label>
+              <label class="car-pill">
+                <input type="radio" name="carPill" value="Mazda : ยค 3777" onchange="onCarPick(this)">
+                <div class="car-pill-icon">🚗</div>
+                <div class="car-pill-info">
+                  <div class="car-pill-name">Mazda</div>
+                  <div class="car-pill-plate">ยค 3777</div>
+                </div>
+              </label>
+              <label class="car-pill">
+                <input type="radio" name="carPill" value="MG : งบ 255" onchange="onCarPick(this)">
+                <div class="car-pill-icon">🚘</div>
+                <div class="car-pill-info">
+                  <div class="car-pill-name">MG</div>
+                  <div class="car-pill-plate">งบ 255</div>
+                </div>
+              </label>
+              <label class="car-pill">
+                <input type="radio" name="carPill" value="Click : จงจ 222" onchange="onCarPick(this)">
+                <div class="car-pill-icon">🛵</div>
+                <div class="car-pill-info">
+                  <div class="car-pill-name">Honda Click</div>
+                  <div class="car-pill-plate">จงจ 222</div>
+                </div>
+              </label>
+              <label class="car-pill">
+                <input type="radio" name="carPill" value="Fino : งธท 222" onchange="onCarPick(this)">
+                <div class="car-pill-icon">🛵</div>
+                <div class="car-pill-info">
+                  <div class="car-pill-name">Fino</div>
+                  <div class="car-pill-plate">งธท 222</div>
+                </div>
+              </label>
             </div>
-            <div class="f-err" id="car-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
+            <!-- hidden select for validation -->
+            <select id="car" style="display:none" required>
+              <option value="" disabled selected></option>
+              <option value="Nissan : ผอ 5757">Nissan : ผอ 5757</option>
+              <option value="Mazda : ยค 3777">Mazda : ยค 3777</option>
+              <option value="MG : งบ 255">MG : งบ 255</option>
+              <option value="Click : จงจ 222">Click : จงจ 222</option>
+              <option value="Fino : งธท 222">Fino : งธท 222</option>
+            </select>
+            <div class="ferr" id="car-error" style="margin-top:8px"><i class="fas fa-circle-exclamation"></i><span></span></div>
           </div>
 
-          <!-- เลขไมล์ -->
-          <div class="form-row">
-            <label class="f-label">เลขไมล์รถ<span class="req">*</span></label>
-            <div class="f-wrap">
-              <i class="fas fa-gauge-high f-icon"></i>
-              <input type="number" id="mileage" placeholder="เช่น 12500" inputmode="numeric" min="0" required>
+          <div class="frow">
+            <label class="flabel">เลขไมล์รถ <span class="req">*</span></label>
+            <div class="fwrap">
+              <i class="fas fa-gauge-high ficon"></i>
+              <input type="number" id="mileage" placeholder="กรอกเลขไมล์ เช่น 12500" inputmode="numeric" min="0" required>
             </div>
-            <div class="f-err" id="mileage-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
+            <div class="ferr" id="mileage-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
           </div>
 
-          <!-- สาเหตุ -->
-          <div class="form-row">
-            <label class="f-label">ภารกิจ / สาเหตุการใช้รถ<span class="req">*</span></label>
-            <div class="f-wrap">
-              <i class="fas fa-pen-to-square f-icon top"></i>
-              <textarea id="reason" placeholder="ระบุภารกิจหรือสาเหตุที่ใช้รถ..." required style="padding-left:40px"></textarea>
-            </div>
-            <div class="f-err" id="reason-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
-          </div>
-
-          <!-- รูปไมล์ -->
-          <div class="form-row">
-            <label class="f-label">รูปถ่ายเลขไมล์ <span style="color:var(--text-m);font-weight:400;font-size:11px">(ไม่บังคับ)</span></label>
-            <div class="upload-zone" id="photoArea">
+          <div class="frow" style="margin-bottom:0">
+            <label class="flabel">รูปถ่ายเลขไมล์ <span class="opt">(ไม่บังคับ)</span></label>
+            <div class="upload-area" id="photoArea">
               <input type="file" id="mileagePhoto" accept="image/*" capture="environment">
-              <div class="upload-icon"><i class="fas fa-camera"></i></div>
-              <div class="upload-label">แตะเพื่อถ่ายรูปหน้าปัดไมล์</div>
+              <div class="upload-ico"><i class="fas fa-camera"></i></div>
+              <div class="upload-lbl">แตะเพื่อถ่ายรูปหน้าปัดไมล์</div>
             </div>
-            <div class="photo-preview-wrap" id="photoPreviewWrap">
-              <img class="photo-preview" id="photoPreview" alt="">
-              <div class="photo-meta" id="photoInfo"></div>
-              <button type="button" class="btn-remove-photo" onclick="clearPhoto()">
+            <div class="preview-wrap" id="photoPreviewWrap">
+              <img class="preview-img" id="photoPreview" alt="">
+              <div class="preview-meta" id="photoInfo"></div>
+              <button type="button" class="preview-rm" onclick="clearPhoto()">
                 <i class="fas fa-trash-alt"></i> ลบรูปนี้
               </button>
             </div>
           </div>
-
-        </form>
-      </div>
-    </div>
-
-    <!-- ── Map Card ── -->
-    <div class="card card-accent">
-      <div class="card-head">
-        <div class="card-icon-wrap"><i class="fas fa-map-location-dot"></i></div>
-        <div>
-          <div class="card-title">เส้นทาง & ปลายทาง</div>
-          <div class="card-subtitle">แตะบนแผนที่เพื่อเลือก (สูงสุด 3 จุด)</div>
         </div>
       </div>
-      <div class="card-body" style="padding-top:10px">
-        <div class="map-search">
-          <div class="f-wrap" style="flex:1">
-            <i class="fas fa-magnifying-glass f-icon"></i>
-            <input type="text" id="searchInput" placeholder="ค้นหาสถานที่..." style="padding-left:40px">
+
+      <!-- ── Card 2: ภารกิจ ── -->
+      <div class="card" id="formCard2">
+        <div class="card-hd">
+          <div class="card-ico"><i class="fas fa-pen-to-square"></i></div>
+          <div>
+            <div class="card-ttl">ภารกิจ / สาเหตุ</div>
+            <div class="card-sub">ระบุว่าจะใช้รถทำอะไร</div>
           </div>
         </div>
-        <div id="map"></div>
-        <div id="selectedDestinations" class="dest-box">📍 แตะบนแผนที่เพื่อปักหมุดปลายทาง</div>
-        <div id="routeInfo" class="route-pill">
-          <i class="fas fa-route"></i>
-          <span>เลือกปลายทางเพื่อคำนวณระยะทาง</span>
-        </div>
-        <div class="f-err" id="destinations-error" style="margin-top:8px"><i class="fas fa-circle-exclamation"></i><span></span></div>
-        <div class="map-tools">
-          <button class="map-tool-btn" onclick="clearAllMarkers()"><i class="fas fa-trash-can"></i>ล้างหมุด</button>
-          <button class="map-tool-btn" onclick="centerMap()"><i class="fas fa-crosshairs"></i>จุดเริ่ม</button>
-          <button class="map-tool-btn" onclick="toggleMapType()"><i class="fas fa-satellite-dish"></i>สลับมุมมอง</button>
+        <div class="card-bd">
+          <div class="frow" style="margin-bottom:0">
+            <div class="fwrap">
+              <i class="fas fa-clipboard-list ficon top"></i>
+              <textarea id="reason" placeholder="เช่น ไปส่งของที่ลูกค้า / ประชุมนอกสถานที่..." required></textarea>
+            </div>
+            <div class="ferr" id="reason-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
+          </div>
         </div>
       </div>
-    </div>
 
-  </div><!-- /page-content -->
+      <!-- ── Card 3: แผนที่ ── -->
+      <div class="card" id="formCard3">
+        <div class="card-hd">
+          <div class="card-ico"><i class="fas fa-map-location-dot"></i></div>
+          <div>
+            <div class="card-ttl">เส้นทาง & ปลายทาง</div>
+            <div class="card-sub">แตะแผนที่เพื่อปักหมุด (สูงสุด 3 จุด)</div>
+          </div>
+        </div>
+        <div class="card-bd" style="padding-top:10px">
+          <div class="map-search">
+            <div class="fwrap" style="flex:1">
+              <i class="fas fa-magnifying-glass ficon"></i>
+              <input type="text" id="searchInput" placeholder="ค้นหาสถานที่..." style="padding-left:38px">
+            </div>
+          </div>
+          <div id="map"></div>
+          <div class="dest-list" id="selectedDestinations">📍 แตะบนแผนที่เพื่อปักหมุดปลายทาง</div>
+          <div class="route-chip" id="routeInfo">
+            <i class="fas fa-route"></i>
+            <span>เลือกปลายทางเพื่อคำนวณระยะทาง</span>
+          </div>
+          <div class="ferr" id="destinations-error" style="margin-top:7px"><i class="fas fa-circle-exclamation"></i><span></span></div>
+          <div class="map-actions">
+            <button type="button" class="map-btn" onclick="clearAllMarkers()"><i class="fas fa-trash-can"></i>ล้างหมุด</button>
+            <button type="button" class="map-btn" onclick="centerMap()"><i class="fas fa-crosshairs"></i>จุดเริ่มต้น</button>
+            <button type="button" class="map-btn" onclick="toggleMapType()"><i class="fas fa-satellite-dish"></i>สลับมุมมอง</button>
+          </div>
+        </div>
+      </div>
 
-  <!-- Submit Bar -->
-  <div class="submit-bar">
+    </form>
+  </div><!-- /page-wrap -->
+
+  <!-- Action Bar -->
+  <div class="action-bar">
     <button type="submit" form="mainForm" class="btn btn-primary" id="submitBtn">
       <i class="fas fa-share-nodes"></i>
       บันทึก & แชร์ไปกลุ่ม LINE
     </button>
   </div>
+
 </div><!-- /screen-main -->
 
-<!-- ══════════════ PENDING ══════════════ -->
+<!-- ════════════ PENDING ════════════ -->
 <div id="screen-pending" class="screen">
   <div class="status-card">
-    <div class="status-blob warn">⏳</div>
-    <div class="status-title" id="pendingTitle">รอการอนุมัติ</div>
-    <p class="status-msg" id="pendingMsg">คำขอของคุณได้รับการส่งเรียบร้อย<br>กรุณารอแอดมินยืนยัน</p>
+    <div class="status-icon warn">⏳</div>
+    <div class="status-h" id="pendingTitle">รอการอนุมัติ</div>
+    <p class="status-p" id="pendingMsg">คำขอของคุณส่งเรียบร้อยแล้ว<br>กรุณารอแอดมินยืนยัน</p>
     <div class="status-actions">
-      <a href="https://line.me/ti/p/~" class="btn btn-ghost"><i class="fab fa-line" style="color:#06c755"></i> ติดต่อแอดมิน</a>
+      <a href="https://line.me/ti/p/~" class="btn btn-ghost" style="max-width:280px;margin:0 auto">
+        <i class="fab fa-line" style="color:#06c755"></i> ติดต่อแอดมิน
+      </a>
     </div>
   </div>
 </div>
 
-<!-- ══════════════ SUSPENDED ══════════════ -->
+<!-- ════════════ SUSPENDED ════════════ -->
 <div id="screen-suspended" class="screen">
   <div class="status-card">
-    <div class="status-blob err">⛔</div>
-    <div class="status-title">บัญชีถูกระงับ</div>
-    <p class="status-msg" id="suspendedMsg">บัญชีของคุณถูกระงับการใช้งาน<br>กรุณาติดต่อผู้ดูแลระบบ</p>
+    <div class="status-icon danger">⛔</div>
+    <div class="status-h">บัญชีถูกระงับ</div>
+    <p class="status-p" id="suspendedMsg">บัญชีของคุณถูกระงับการใช้งาน<br>กรุณาติดต่อผู้ดูแลระบบ</p>
     <div class="status-actions">
-      <a href="https://line.me/ti/p/~" class="btn btn-danger"><i class="fab fa-line"></i> ติดต่อแอดมิน</a>
+      <a href="https://line.me/ti/p/~" class="btn btn-danger" style="max-width:280px;margin:0 auto">
+        <i class="fab fa-line"></i> ติดต่อแอดมิน
+      </a>
     </div>
   </div>
 </div>
 
-<!-- ══════════════ REGISTER ══════════════ -->
+<!-- ════════════ REGISTER ════════════ -->
 <div id="screen-register" class="screen">
-  <div class="reg-wrap">
-    <div class="reg-header">
-      <div id="regAvatar" class="reg-avatar-wrap">👤</div>
-      <h2>ขอสิทธิ์ใช้งาน</h2>
-      <p>กรอกข้อมูลเพื่อส่งคำขอถึงแอดมิน</p>
+  <div class="reg-inner">
+    <div class="reg-top">
+      <div class="reg-av" id="regAvatar">👤</div>
+      <h2>ขอสิทธิ์ใช้งานระบบ</h2>
+      <p>กรอกข้อมูลเพื่อส่งคำขอถึงผู้ดูแล</p>
     </div>
     <div class="reg-card">
       <form id="regForm" novalidate>
-        <div class="form-row">
-          <label class="f-label">ชื่อ-นามสกุล<span class="req">*</span></label>
-          <div class="f-wrap"><i class="fas fa-user f-icon"></i><input type="text" id="regName" placeholder="ชื่อจริง นามสกุลจริง" required></div>
-          <div class="f-err" id="regName-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
+        <div class="frow">
+          <label class="flabel">ชื่อ-นามสกุล <span class="req">*</span></label>
+          <div class="fwrap">
+            <i class="fas fa-user ficon"></i>
+            <input type="text" id="regName" placeholder="ชื่อจริง นามสกุลจริง" required>
+          </div>
+          <div class="ferr" id="regName-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
         </div>
-        <div class="form-row">
-          <label class="f-label">เบอร์โทรศัพท์<span class="req">*</span></label>
-          <div class="f-wrap"><i class="fas fa-phone f-icon"></i><input type="tel" id="regPhone" placeholder="0XX-XXX-XXXX" maxlength="10" inputmode="tel" required></div>
-          <div class="f-err" id="regPhone-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
+        <div class="frow">
+          <label class="flabel">เบอร์โทรศัพท์ <span class="req">*</span></label>
+          <div class="fwrap">
+            <i class="fas fa-phone ficon"></i>
+            <input type="tel" id="regPhone" placeholder="0XX-XXX-XXXX" maxlength="10" inputmode="tel" required>
+          </div>
+          <div class="ferr" id="regPhone-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
         </div>
-        <div class="form-row">
-          <label class="f-label">แผนก<span class="req">*</span></label>
-          <div class="f-wrap"><i class="fas fa-building f-icon"></i>
+        <div class="frow">
+          <label class="flabel">แผนก <span class="req">*</span></label>
+          <div class="fwrap">
+            <i class="fas fa-building ficon"></i>
             <select id="regDept" required>
               <option value="" disabled selected>— เลือกแผนก —</option>
-              <option>AE</option>
-              <option>Graphics</option>
+              <option>AE</option><option>Graphics</option>
               <option>Graphics &amp; Print</option>
               <option>Prod &amp; Print</option>
               <option>นักศึกษาฝึกงาน</option>
               <option value="อื่นๆ">อื่นๆ (ระบุ)</option>
             </select>
           </div>
-          <div class="f-err" id="regDept-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
+          <div class="ferr" id="regDept-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
         </div>
-        <div class="form-row" id="otherDeptGroup" style="display:none">
-          <label class="f-label">ระบุแผนก</label>
-          <div class="f-wrap"><i class="fas fa-pen f-icon"></i><input type="text" id="regOtherDept" placeholder="ชื่อแผนก"></div>
+        <div class="frow" id="otherDeptGroup" style="display:none">
+          <label class="flabel">ระบุแผนก</label>
+          <div class="fwrap">
+            <i class="fas fa-pen ficon"></i>
+            <input type="text" id="regOtherDept" placeholder="ชื่อแผนก">
+          </div>
         </div>
         <button type="submit" class="btn btn-primary" id="regSubmitBtn" style="margin-top:6px">
           <i class="fas fa-paper-plane"></i> ส่งคำขอสมัคร
@@ -981,50 +1014,62 @@ input:focus,select:focus,textarea:focus{
   </div>
 </div>
 
-<!-- ══════════════ CAR IN USE ══════════════ -->
+<!-- ════════════ CAR IN USE ════════════ -->
 <div id="screen-car-in-use" class="screen">
-  <div class="in-use-card">
-    <div class="pulse-icon">🚗</div>
-    <div class="in-use-title">กำลังใช้รถอยู่</div>
-    <div class="in-use-sub">คืนรถเมื่อเสร็จภารกิจด้วยนะครับ 🙏</div>
+  <div class="iu-card">
+    <div class="iu-car">🚗</div>
+    <div class="iu-h">กำลังใช้รถอยู่</div>
+    <div class="iu-sub">คืนรถเมื่อเสร็จภารกิจด้วยนะครับ 🙏</div>
 
-    <div class="info-tiles">
-      <div class="info-tile"><div class="tile-lbl">ทะเบียนรถ</div><div class="tile-val" id="infoCarPlate">—</div></div>
-      <div class="info-tile"><div class="tile-lbl">ชื่อผู้ใช้</div><div class="tile-val" id="infoUserName" style="font-size:13px">—</div></div>
-      <div class="info-tile"><div class="tile-lbl">เลขไมล์</div><div class="tile-val" id="infoMileage">—</div></div>
-      <div class="info-tile"><div class="tile-lbl">เริ่มใช้เมื่อ</div><div class="tile-val" id="infoStartTime" style="font-size:11px;line-height:1.4">—</div></div>
+    <div class="iu-info">
+      <div class="iu-tile">
+        <div class="iu-tile-l">ทะเบียนรถ</div>
+        <div class="iu-tile-v" id="infoCarPlate">—</div>
+      </div>
+      <div class="iu-tile">
+        <div class="iu-tile-l">ผู้ใช้</div>
+        <div class="iu-tile-v" id="infoUserName" style="font-size:12px">—</div>
+      </div>
+      <div class="iu-tile">
+        <div class="iu-tile-l">เลขไมล์</div>
+        <div class="iu-tile-v" id="infoMileage">—</div>
+      </div>
+      <div class="iu-tile">
+        <div class="iu-tile-l">เริ่มใช้เมื่อ</div>
+        <div class="iu-tile-v" id="infoStartTime" style="font-size:10.5px;line-height:1.4">—</div>
+      </div>
     </div>
 
-    <div class="timer-box">
-      <div class="timer-lbl">⏱ ระยะเวลาที่ใช้งาน</div>
+    <div class="timer-panel">
+      <div class="timer-l">⏱ เวลาที่ใช้งาน</div>
       <div id="timerDisplay">00:00:00</div>
     </div>
 
-    <div class="loc-status" id="locationStatus">
-      <i class="fas fa-location-dot"></i> ยังไม่ได้ดึงตำแหน่ง (บังคับ)
+    <div class="loc-bar" id="locationStatus">
+      <i class="fas fa-location-dot"></i> ยังไม่ได้ดึงตำแหน่ง (ไม่บังคับ)
     </div>
     <div id="locationDetail" style="display:none"></div>
 
-    <div class="in-use-actions">
-      <button class="btn btn-info" id="getLocationBtn" onclick="getReturnLocation()">
+    <div class="iu-actions">
+      <button class="btn btn-blue" id="getLocationBtn" onclick="getReturnLocation()">
         <i class="fas fa-location-crosshairs"></i> ดึงตำแหน่งปัจจุบัน
       </button>
       <button class="btn btn-danger" id="returnCarBtn" onclick="handleReturnCar()">
-        <i class="fas fa-rotate-left"></i> คืนรถ & แจ้งกลุ่ม
+        <i class="fas fa-rotate-left"></i> คืนรถ & แจ้งกลุ่ม LINE
       </button>
       <button class="btn btn-ghost" onclick="handleCancelUsage()" style="font-size:13px;min-height:42px">
-        <i class="fas fa-xmark"></i> ยกเลิก (กรณีเปลี่ยนรถ/ไม่ได้ใช้งานจริง)
+        <i class="fas fa-xmark"></i> ยกเลิก (ไม่ได้ใช้จริง)
       </button>
     </div>
   </div>
 </div>
 
-<!-- ══════════════ CONFIRM SHEET ══════════════ -->
-<div class="sheet-backdrop" id="confirmSubmitModal">
-  <div class="bottom-sheet">
-    <div class="sheet-handle"></div>
+<!-- ════════════ CONFIRM SHEET ════════════ -->
+<div class="overlay" id="confirmSubmitModal">
+  <div class="sheet">
+    <div class="sheet-grip"></div>
     <div class="sheet-title">📋 ตรวจสอบข้อมูลก่อนส่ง</div>
-    <div class="confirm-list" id="confirmSummaryContent"></div>
+    <div class="conf-rows" id="confirmSummaryContent"></div>
     <div class="sheet-btns">
       <button class="btn btn-outline" onclick="closeConfirmSubmit()"><i class="fas fa-xmark"></i> ยกเลิก</button>
       <button class="btn btn-primary" onclick="doSubmit()"><i class="fas fa-share-nodes"></i> ยืนยัน</button>
@@ -1032,12 +1077,12 @@ input:focus,select:focus,textarea:focus{
   </div>
 </div>
 
-<!-- ══════════════ SUCCESS MODAL ══════════════ -->
-<div class="modal-backdrop" id="successModal">
-  <div class="modal-box">
-    <div class="modal-icon" id="modalIcon">✅</div>
-    <div class="modal-title" id="modalTitle">สำเร็จ!</div>
-    <div class="modal-msg" id="modalMessage">—</div>
+<!-- ════════════ SUCCESS MODAL ════════════ -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal">
+    <div class="modal-ico" id="modalIcon">✅</div>
+    <div class="modal-h" id="modalTitle">สำเร็จ!</div>
+    <div class="modal-p" id="modalMessage">—</div>
     <button class="btn btn-primary" onclick="closeModal()"><i class="fas fa-check"></i> ตกลง</button>
   </div>
 </div>
@@ -1045,11 +1090,9 @@ input:focus,select:focus,textarea:focus{
 <!-- Toast -->
 <div id="toast"></div>
 
-<!-- ══════════════════════════════════════════
-     SCRIPTS — Logic unchanged + security fixes
-     ══════════════════════════════════════════ -->
 <script src="https://static.line-scdn.net/liff/edge/versions/2.22.3/sdk.js"></script>
 <script>
+/* ─── CONFIG ─── */
 const CONFIG={
   liffId:'2007130450-YVNvyNbL',
   googleMapsKey:'AIzaSyAw5sDr5qXKIpun2dp4jpu8NerbXy6Hfew',
@@ -1057,69 +1100,95 @@ const CONFIG={
   autoDestination:{userId:'Uc8695dc6e2569a960fe8912809a2e2ff',startTime:{h:16,m:40},endTime:{h:17,m:20},location:{lat:14.975057297021436,lng:102.11365790021132}}
 };
 
+/* ─── STATE ─── */
 let currentUser=null,map=null,markers=[],directionsRenderer,directionsService,mapInitialized=false,mapType='roadmap';
 let autocomplete=null,cachedPhotoBase64=null,cachedPhotoFile=null,returnLocation=null,timerInterval=null;
 const CAR_USAGE_KEY='car_usage_v2';
 
+/* ─── UTILS ─── */
 function loadUsage(){try{const s=localStorage.getItem(CAR_USAGE_KEY);if(!s)return null;const u=JSON.parse(s);if(u.startedAt&&(Date.now()-new Date(u.startedAt))>86400000){localStorage.removeItem(CAR_USAGE_KEY);return null;}return u.isUsing?u:null;}catch{return null;}}
 function saveUsage(d){localStorage.setItem(CAR_USAGE_KEY,JSON.stringify(d));}
 function clearUsage(){localStorage.removeItem(CAR_USAGE_KEY);}
+function escapeHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
+/* ─── SCREENS ─── */
 function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');});
-  const el=document.getElementById(id);
-  if(el)el.classList.add('active');
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id);if(el)el.classList.add('active');
 }
 
-let toastTimer;
+/* ─── TOAST ─── */
+let _tt;
 function showToast(msg,type='info'){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.className=`${type} show`;
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),3500);
+  const t=document.getElementById('toast');t.textContent=msg;t.className=`${type} show`;
+  clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),3500);
 }
 
-function showErr(id,msg){const el=document.getElementById(id+'-error');if(el){el.querySelector('span').textContent=msg;el.classList.add('show');}}
-function clearErr(id){const el=document.getElementById(id+'-error');if(el)el.classList.remove('show');}
+/* ─── ERRORS ─── */
+function showErr(id,msg){const e=document.getElementById(id+'-error');if(e){e.querySelector('span').textContent=msg;e.classList.add('show');}}
+function clearErr(id){const e=document.getElementById(id+'-error');if(e)e.classList.remove('show');}
 
-/* PHOTO */
+/* ─── STEP INDICATOR ─── */
+function updateSteps(){
+  const hasCar=document.getElementById('car').value;
+  const hasMile=document.getElementById('mileage').value;
+  const hasReason=document.getElementById('reason').value.trim();
+  const hasMap=markers.length>0;
+  const s=(n,done,active)=>{
+    const el=document.getElementById('step'+n);
+    el.classList.toggle('done',done);el.classList.toggle('active',active&&!done);
+    const prev=document.getElementById('step'+(n-1));
+    if(prev)prev.classList.toggle('done',done||active);
+  };
+  s(1,hasCar&&hasMile,true);
+  s(2,hasReason,hasCar&&hasMile);
+  s(3,hasMap,hasReason);
+  s(4,false,hasMap);
+}
+
+/* ─── CAR PILLS ─── */
+function onCarPick(radio){
+  document.getElementById('car').value=radio.value;
+  document.querySelectorAll('.car-pill').forEach(p=>p.classList.toggle('selected',p.querySelector('input')===radio));
+  clearErr('car');updateSteps();
+}
+
+/* ─── PHOTO ─── */
 document.getElementById('mileagePhoto').addEventListener('change',e=>{
-  const file=e.target.files[0];
-  cachedPhotoBase64=null;cachedPhotoFile=null;
-  const preview=document.getElementById('photoPreview'),wrap=document.getElementById('photoPreviewWrap'),info=document.getElementById('photoInfo'),area=document.getElementById('photoArea');
-  if(!file){wrap.classList.remove('show');area.classList.remove('has-photo');return;}
-  const ok=['image/jpeg','image/png','image/gif','image/webp'];
-  if(!ok.includes(file.type)){showToast('รองรับ JPG,PNG,GIF,WEBP เท่านั้น','warning');e.target.value='';return;}
-  if(file.size>10*1024*1024){showToast('ไฟล์ต้องไม่เกิน 10MB','warning');e.target.value='';return;}
-  cachedPhotoFile=file;
-  const reader=new FileReader();
-  reader.onloadend=()=>{cachedPhotoBase64=reader.result;preview.src=reader.result;wrap.classList.add('show');area.classList.add('has-photo');info.textContent=`✅ ${file.name} (${(file.size/1024/1024).toFixed(2)} MB)`;};
-  reader.readAsDataURL(file);
+  const f=e.target.files[0];cachedPhotoBase64=null;cachedPhotoFile=null;
+  const prev=document.getElementById('photoPreview'),wrap=document.getElementById('photoPreviewWrap'),info=document.getElementById('photoInfo'),area=document.getElementById('photoArea');
+  if(!f){wrap.classList.remove('show');area.classList.remove('has-file');return;}
+  if(!['image/jpeg','image/png','image/gif','image/webp'].includes(f.type)){showToast('รองรับ JPG, PNG, WEBP เท่านั้น','warning');e.target.value='';return;}
+  if(f.size>10*1024*1024){showToast('ไฟล์ต้องไม่เกิน 10MB','warning');e.target.value='';return;}
+  cachedPhotoFile=f;
+  const r=new FileReader();
+  r.onloadend=()=>{cachedPhotoBase64=r.result;prev.src=r.result;wrap.classList.add('show');area.classList.add('has-file');info.textContent=`✅ ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)`;};
+  r.readAsDataURL(f);
 });
-function clearPhoto(){document.getElementById('mileagePhoto').value='';cachedPhotoBase64=null;cachedPhotoFile=null;document.getElementById('photoPreviewWrap').classList.remove('show');document.getElementById('photoArea').classList.remove('has-photo');document.getElementById('photoInfo').textContent='';}
+function clearPhoto(){document.getElementById('mileagePhoto').value='';cachedPhotoBase64=null;cachedPhotoFile=null;document.getElementById('photoPreviewWrap').classList.remove('show');document.getElementById('photoArea').classList.remove('has-file');document.getElementById('photoInfo').textContent='';}
 
-/* MAP */
+/* ─── MAP ─── */
 function initMap(){
   if(mapInitialized)return;
   try{
     map=new google.maps.Map(document.getElementById('map'),{center:CONFIG.originLatLng,zoom:12,mapTypeId:'roadmap',mapTypeControl:false,fullscreenControl:false,streetViewControl:false,zoomControl:true});
-    directionsRenderer=new google.maps.DirectionsRenderer({map,suppressMarkers:true,polylineOptions:{strokeColor:'#16a34a',strokeWeight:4}});
+    directionsRenderer=new google.maps.DirectionsRenderer({map,suppressMarkers:true,polylineOptions:{strokeColor:'#18a857',strokeWeight:4}});
     directionsService=new google.maps.DirectionsService();
-    new google.maps.Marker({position:CONFIG.originLatLng,map,title:'บริษัท',icon:{url:'https://maps.google.com/mapfiles/ms/icons/green-dot.png',scaledSize:new google.maps.Size(40,40)}});
+    new google.maps.Marker({position:CONFIG.originLatLng,map,title:'บริษัท (จุดเริ่มต้น)',icon:{url:'https://maps.google.com/mapfiles/ms/icons/green-dot.png',scaledSize:new google.maps.Size(40,40)}});
     autocomplete=new google.maps.places.Autocomplete(document.getElementById('searchInput'),{types:['establishment','geocode'],componentRestrictions:{country:'th'}});
     autocomplete.bindTo('bounds',map);
     autocomplete.addListener('place_changed',()=>{const p=autocomplete.getPlace();if(!p.geometry?.location)return;if(markers.length>=3){showToast('เลือกได้สูงสุด 3 จุด','warning');return;}addMarker(p.geometry.location);map.panTo(p.geometry.location);document.getElementById('searchInput').value='';});
     map.addListener('click',e=>{if(markers.length>=3){showToast('เลือกได้สูงสุด 3 จุด','warning');return;}addMarker(e.latLng);});
     mapInitialized=true;
     setTimeout(()=>{if(currentUser&&!loadUsage())checkAutoDestination();},1500);
-  }catch{document.getElementById('map').innerHTML='<div style="padding:40px;text-align:center;color:var(--text-m)"><i class="fas fa-map" style="font-size:32px;margin-bottom:8px;display:block"></i>ไม่สามารถโหลดแผนที่ได้</div>';}
+  }catch{document.getElementById('map').innerHTML='<div style="padding:40px;text-align:center;color:var(--text-muted)"><i class="fas fa-map" style="font-size:32px;display:block;margin-bottom:8px"></i>ไม่สามารถโหลดแผนที่ได้</div>';}
 }
 function addMarker(pos){
-  const m=new google.maps.Marker({position:pos,map,icon:{url:'https://maps.google.com/mapfiles/ms/icons/red-dot.png',scaledSize:new google.maps.Size(32,32)},animation:google.maps.Animation.DROP,title:`จุดที่ ${markers.length+1}`});
-  m.addListener('click',()=>{m.setMap(null);markers=markers.filter(x=>x!==m);updateDestDisplay();calcRoute();});
-  markers.push(m);updateDestDisplay();calcRoute();clearErr('destinations');
+  const m=new google.maps.Marker({position:pos,map,icon:{url:'https://maps.google.com/mapfiles/ms/icons/red-dot.png',scaledSize:new google.maps.Size(32,32)},animation:google.maps.Animation.DROP});
+  m.addListener('click',()=>{m.setMap(null);markers=markers.filter(x=>x!==m);updateDest();calcRoute();updateSteps();});
+  markers.push(m);updateDest();calcRoute();clearErr('destinations');updateSteps();
 }
-function updateDestDisplay(){
+function updateDest(){
   const el=document.getElementById('selectedDestinations');
   el.textContent=markers.length===0?'📍 แตะบนแผนที่เพื่อปักหมุดปลายทาง':markers.map((m,i)=>`📍 จุดที่ ${i+1}: ${m.getPosition().lat().toFixed(5)}, ${m.getPosition().lng().toFixed(5)}`).join('\n');
 }
@@ -1127,281 +1196,256 @@ function calcRoute(){
   const el=document.getElementById('routeInfo');
   if(markers.length===0){directionsRenderer?.set('directions',null);el.innerHTML='<i class="fas fa-route"></i><span>เลือกปลายทางเพื่อคำนวณระยะทาง</span>';return;}
   const wp=markers.slice(0,-1).map(m=>({location:m.getPosition(),stopover:true}));
-  directionsService.route({origin:CONFIG.originLatLng,destination:markers[markers.length-1].getPosition(),waypoints:wp,travelMode:google.maps.TravelMode.DRIVING},(res,status)=>{
-    if(status==='OK'){
-      directionsRenderer.setDirections(res);let dist=0,time=0;
-      res.routes[0].legs.forEach(l=>{dist+=l.distance.value;time+=l.duration.value;});
-      const km=(dist/1000).toFixed(2),min=Math.round(time/60);
-      el.innerHTML=`<i class="fas fa-route"></i><span>🛣️ ระยะทางรวม <strong>${km} กม.</strong> &nbsp;·&nbsp; ⏱ <strong>${min} นาที</strong></span>`;
+  directionsService.route({origin:CONFIG.originLatLng,destination:markers[markers.length-1].getPosition(),waypoints:wp,travelMode:google.maps.TravelMode.DRIVING},(res,st)=>{
+    if(st==='OK'){
+      directionsRenderer.setDirections(res);let d=0,t=0;
+      res.routes[0].legs.forEach(l=>{d+=l.distance.value;t+=l.duration.value;});
+      el.innerHTML=`<i class="fas fa-route"></i><span>🛣️ <strong>${(d/1000).toFixed(2)} กม.</strong> &nbsp;·&nbsp; ⏱ <strong>${Math.round(t/60)} นาที</strong></span>`;
     }
   });
 }
-function clearAllMarkers(){markers.forEach(m=>m.setMap(null));markers=[];updateDestDisplay();calcRoute();showToast('ล้างหมุดทั้งหมดแล้ว','info');}
+function clearAllMarkers(){markers.forEach(m=>m.setMap(null));markers=[];updateDest();calcRoute();updateSteps();showToast('ล้างหมุดแล้ว','info');}
 function centerMap(){if(map){map.panTo(CONFIG.originLatLng);map.setZoom(12);}}
 function toggleMapType(){if(!map)return;mapType=mapType==='roadmap'?'satellite':'roadmap';map.setMapTypeId(mapType);}
 function checkAutoDestination(){
   if(!currentUser||currentUser.userId!==CONFIG.autoDestination.userId)return;
-  const now=new Date(),total=now.getHours()*60+now.getMinutes(),s=CONFIG.autoDestination.startTime.h*60+CONFIG.autoDestination.startTime.m,e=CONFIG.autoDestination.endTime.h*60+CONFIG.autoDestination.endTime.m;
-  if(total>=s&&total<=e&&markers.length===0){const loc=CONFIG.autoDestination.location;addMarker(new google.maps.LatLng(loc.lat,loc.lng));map.panTo(loc);showToast('📍 เพิ่มปลายทางอัตโนมัติ','info');}
+  const now=new Date(),tot=now.getHours()*60+now.getMinutes(),s=CONFIG.autoDestination.startTime.h*60+CONFIG.autoDestination.startTime.m,e=CONFIG.autoDestination.endTime.h*60+CONFIG.autoDestination.endTime.m;
+  if(tot>=s&&tot<=e&&markers.length===0){const l=CONFIG.autoDestination.location;addMarker(new google.maps.LatLng(l.lat,l.lng));map.panTo(l);showToast('📍 เพิ่มปลายทางอัตโนมัติ','info');}
 }
 
-/* FLEX MESSAGES */
-function buildFlexMessage(name,phone,car,mileage,reason,markerList,routeInfoText,hasPhoto){
-  const dm=String(routeInfoText).match(/([\d.]+)\s*กม/),tm=String(routeInfoText).match(/(\d+)\s*นาที/);
-  const km=dm?dm[1]:'-',min=tm?tm[1]:'-';
-  const now=new Date(),dateStr=now.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}),timeStr=now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
-  const destTexts=markerList.length>0?markerList.map((m,i)=>({type:'text',size:'sm',wrap:true,color:'#6b7280',text:`• จุดที่ ${i+1}: ${m.getPosition().lat().toFixed(5)}, ${m.getPosition().lng().toFixed(5)}`})):[{type:'text',size:'sm',color:'#9ca3af',text:'• ไม่ได้ระบุปลายทาง'}];
-  return{type:'flex',altText:`🚗 ${name} ขอใช้รถ ${car} เลขไมล์ ${mileage}`,contents:{type:'bubble',size:'mega',header:{type:'box',layout:'vertical',backgroundColor:'#16a34a',paddingAll:'16px',contents:[{type:'text',text:'บันทึกการใช้รถ',weight:'bold',size:'xl',color:'#FFFFFF',align:'center'},{type:'text',text:`${dateStr}  ${timeStr} น.`,size:'xs',color:'#d1fae5',align:'center',margin:'sm'}]},body:{type:'box',layout:'vertical',spacing:'sm',contents:[{type:'text',text:`ชื่อ : ${name}`,size:'md',wrap:true},{type:'text',text:`เบอร์โทร : ${phone}`,size:'md',wrap:true,color:'#374151'},{type:'text',text:`ทะเบียนรถ : ${car}`,size:'md',wrap:true,weight:'bold'},{type:'text',text:`ไมล์รถ : ${mileage}`,size:'md',wrap:true},{type:'text',text:`สาเหตุ : ${reason}`,size:'sm',wrap:true,color:'#6b7280',margin:'md'},{type:'separator',margin:'md'},{type:'text',text:'ปลายทาง',weight:'bold',size:'sm',margin:'md'},...destTexts,{type:'separator',margin:'md'},{type:'box',layout:'horizontal',spacing:'lg',margin:'md',contents:[{type:'box',layout:'vertical',alignItems:'center',contents:[{type:'text',text:km==='-'?'-':`${km} กม.`,size:'lg',weight:'bold',color:'#16a34a'},{type:'text',text:'ระยะทาง',size:'xs',color:'#9ca3af'}]},{type:'box',layout:'vertical',alignItems:'center',contents:[{type:'text',text:min==='-'?'-':`${min} นาที`,size:'lg',weight:'bold',color:'#16a34a'},{type:'text',text:'เวลาประมาณ',size:'xs',color:'#9ca3af'}]}]},{type:'text',text:hasPhoto?'แนบรูปเลขไมล์แล้ว ✓':'ไม่มีรูปเลขไมล์',size:'sm',align:'center',margin:'sm',color:hasPhoto?'#16a34a':'#ef4444'}]},footer:{type:'box',layout:'vertical',contents:[{type:'button',action:{type:'uri',label:'ดูประวัติการใช้งานรถ',uri:`${window.location.origin}/history`},style:'primary',color:'#16a34a',height:'sm'}]}}};
+/* ─── FLEX MSG ─── */
+function buildFlexMessage(name,phone,car,mileage,reason,markerList,routeText,hasPhoto){
+  const dm=String(routeText).match(/([\d.]+)\s*กม/),tm=String(routeText).match(/(\d+)\s*นาที/);
+  const now=new Date(),ds=now.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}),ts=now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  const dests=markerList.length>0?markerList.map((m,i)=>({type:'text',size:'sm',wrap:true,color:'#6b7280',text:`• จุดที่ ${i+1}: ${m.getPosition().lat().toFixed(5)}, ${m.getPosition().lng().toFixed(5)}`})):[{type:'text',size:'sm',color:'#9ca3af',text:'• ไม่ได้ระบุปลายทาง'}];
+  return{type:'flex',altText:`🚗 ${name} ขอใช้รถ ${car} เลขไมล์ ${mileage}`,contents:{type:'bubble',size:'mega',header:{type:'box',layout:'vertical',backgroundColor:'#16a34a',paddingAll:'16px',contents:[{type:'text',text:'บันทึกการใช้รถ',weight:'bold',size:'xl',color:'#FFFFFF',align:'center'},{type:'text',text:`${ds}  ${ts} น.`,size:'xs',color:'#d1fae5',align:'center',margin:'sm'}]},body:{type:'box',layout:'vertical',spacing:'sm',contents:[{type:'text',text:`ชื่อ : ${name}`,size:'md',wrap:true},{type:'text',text:`เบอร์โทร : ${phone}`,size:'md',wrap:true,color:'#374151'},{type:'text',text:`ทะเบียนรถ : ${car}`,size:'md',wrap:true,weight:'bold'},{type:'text',text:`ไมล์รถ : ${mileage}`,size:'md',wrap:true},{type:'text',text:`สาเหตุ : ${reason}`,size:'sm',wrap:true,color:'#6b7280',margin:'md'},{type:'separator',margin:'md'},{type:'text',text:'ปลายทาง',weight:'bold',size:'sm',margin:'md'},...dests,{type:'separator',margin:'md'},{type:'box',layout:'horizontal',spacing:'lg',margin:'md',contents:[{type:'box',layout:'vertical',alignItems:'center',contents:[{type:'text',text:dm?`${dm[1]} กม.`:'-',size:'lg',weight:'bold',color:'#16a34a'},{type:'text',text:'ระยะทาง',size:'xs',color:'#9ca3af'}]},{type:'box',layout:'vertical',alignItems:'center',contents:[{type:'text',text:tm?`${tm[1]} นาที`:'-',size:'lg',weight:'bold',color:'#16a34a'},{type:'text',text:'เวลาประมาณ',size:'xs',color:'#9ca3af'}]}]},{type:'text',text:hasPhoto?'แนบรูปเลขไมล์แล้ว ✓':'ไม่มีรูปเลขไมล์',size:'sm',align:'center',margin:'sm',color:hasPhoto?'#16a34a':'#ef4444'}]},footer:{type:'box',layout:'vertical',contents:[{type:'button',action:{type:'uri',label:'ดูประวัติการใช้งานรถ',uri:`${window.location.origin}/history`},style:'primary',color:'#16a34a',height:'sm'}]}}};
 }
 function buildReturnFlexMessage(carPlate,userName,returnTime,durationText,returnLoc){
-  const mapsLink=`https://www.google.com/maps?q=${returnLoc.lat},${returnLoc.lng}`,baseUrl=window.location.origin;
-  const dateStr=returnTime.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}),timeStr=returnTime.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
-  return{type:'flex',altText:`🔑 คืนรถแล้ว: ${carPlate} โดย ${userName}`,contents:{type:'bubble',header:{type:'box',layout:'vertical',backgroundColor:'#dc2626',paddingAll:'16px',contents:[{type:'text',text:'แจ้งคืนรถแล้ว',weight:'bold',size:'xl',color:'#FFFFFF',align:'center'},{type:'text',text:`${dateStr}  ${timeStr} น.`,size:'xs',color:'#fecaca',align:'center',margin:'sm'}]},body:{type:'box',layout:'vertical',spacing:'sm',contents:[{type:'text',text:`ทะเบียนรถ : ${carPlate}`,size:'xl',weight:'bold',wrap:true},{type:'text',text:`ชื่อ : ${userName}`,size:'md',wrap:true,margin:'sm'},{type:'separator',margin:'md'},{type:'box',layout:'vertical',margin:'md',backgroundColor:'#fff1f2',cornerRadius:'10px',paddingAll:'12px',contents:[{type:'text',text:'ระยะเวลาใช้งาน',size:'xs',color:'#9ca3af'},{type:'text',text:durationText,size:'xl',weight:'bold',color:'#dc2626',margin:'sm'}]},{type:'separator',margin:'md'},{type:'text',text:`พิกัดคืนรถ : ${returnLoc.lat.toFixed(5)}, ${returnLoc.lng.toFixed(5)}`,size:'xs',wrap:true,color:'#9ca3af',margin:'md'}]},footer:{type:'box',layout:'vertical',spacing:'sm',contents:[{type:'button',action:{type:'uri',label:'ดูตำแหน่งคืนรถ',uri:mapsLink},style:'link',color:'#2563eb',height:'sm'},{type:'button',action:{type:'uri',label:'ดูประวัติการใช้รถ',uri:`${baseUrl}/history`},style:'primary',color:'#16a34a',height:'sm'}]}}};
+  const ml=`https://www.google.com/maps?q=${returnLoc.lat},${returnLoc.lng}`;
+  const ds=returnTime.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}),ts=returnTime.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  return{type:'flex',altText:`🔑 คืนรถแล้ว: ${carPlate} โดย ${userName}`,contents:{type:'bubble',header:{type:'box',layout:'vertical',backgroundColor:'#dc2626',paddingAll:'16px',contents:[{type:'text',text:'แจ้งคืนรถแล้ว',weight:'bold',size:'xl',color:'#FFFFFF',align:'center'},{type:'text',text:`${ds}  ${ts} น.`,size:'xs',color:'#fecaca',align:'center',margin:'sm'}]},body:{type:'box',layout:'vertical',spacing:'sm',contents:[{type:'text',text:`ทะเบียนรถ : ${carPlate}`,size:'xl',weight:'bold',wrap:true},{type:'text',text:`ชื่อ : ${userName}`,size:'md',wrap:true,margin:'sm'},{type:'separator',margin:'md'},{type:'box',layout:'vertical',margin:'md',backgroundColor:'#fff1f2',cornerRadius:'10px',paddingAll:'12px',contents:[{type:'text',text:'ระยะเวลาใช้งาน',size:'xs',color:'#9ca3af'},{type:'text',text:durationText,size:'xl',weight:'bold',color:'#dc2626',margin:'sm'}]},{type:'text',text:`พิกัดคืนรถ : ${returnLoc.lat.toFixed(5)}, ${returnLoc.lng.toFixed(5)}`,size:'xs',wrap:true,color:'#9ca3af',margin:'md'}]},footer:{type:'box',layout:'vertical',spacing:'sm',contents:[{type:'button',action:{type:'uri',label:'ดูตำแหน่งคืนรถ',uri:ml},style:'link',color:'#2563eb',height:'sm'},{type:'button',action:{type:'uri',label:'ดูประวัติการใช้รถ',uri:`${window.location.origin}/history`},style:'primary',color:'#16a34a',height:'sm'}]}}};
 }
 
-/* VALIDATION */
+/* ─── VALIDATION ─── */
 function validateForm(){
   let ok=true;
-  const car=document.getElementById('car').value,mileage=document.getElementById('mileage').value,reason=document.getElementById('reason').value.trim();
+  const car=document.getElementById('car').value,mile=document.getElementById('mileage').value,reason=document.getElementById('reason').value.trim();
   if(!car){showErr('car','กรุณาเลือกทะเบียนรถ');ok=false;}else clearErr('car');
-  if(!mileage||isNaN(mileage)||Number(mileage)<0){showErr('mileage','กรุณากรอกเลขไมล์ให้ถูกต้อง');ok=false;}else clearErr('mileage');
+  if(!mile||isNaN(mile)||Number(mile)<0){showErr('mileage','กรุณากรอกเลขไมล์ให้ถูกต้อง');ok=false;}else clearErr('mileage');
   if(!reason){showErr('reason','กรุณากรอกสาเหตุการใช้รถ');ok=false;}else clearErr('reason');
   if(markers.length===0){showErr('destinations','กรุณาเลือกปลายทางอย่างน้อย 1 จุด');ok=false;}else clearErr('destinations');
   return ok;
 }
 
-/* SUBMIT */
-let _pendingSubmit=null;
+/* ─── SUBMIT ─── */
+let _ps=null;
 document.getElementById('mainForm').addEventListener('submit',async function(e){
   e.preventDefault();
-  const usage=loadUsage();if(usage){showCarInUseScreen(usage);return;}
+  if(loadUsage()){showCarInUseScreen(loadUsage());return;}
   if(!currentUser){showToast('กรุณาเข้าสู่ระบบก่อน','warning');return;}
   if(!validateForm())return;
-  const car=document.getElementById('car').value,mileage=document.getElementById('mileage').value,reason=document.getElementById('reason').value.trim();
-  const routeText=document.getElementById('routeInfo')?document.getElementById('routeInfo').innerText:'';
-  const name=currentUser.name||currentUser.displayName||'ไม่ระบุชื่อ',phone=currentUser.phone||'-';
-  _pendingSubmit={car,mileage,reason,routeText,name,phone};
-  const dm=routeText.match(/ระยะทางรวม\s*([\d.]+)/),tm=routeText.match(/(\d+)\s*นาที/);
+  const car=document.getElementById('car').value,mile=document.getElementById('mileage').value,reason=document.getElementById('reason').value.trim();
+  const rt=document.getElementById('routeInfo').innerText||'';
+  const name=currentUser.name||currentUser.displayName||'ไม่ระบุ',phone=currentUser.phone||'-';
+  _ps={car,mile,reason,rt,name,phone};
+  const dm=rt.match(/[\d.]+\s*กม/),tm=rt.match(/\d+\s*นาที/);
   document.getElementById('confirmSummaryContent').innerHTML=`
-    <div class="c-row"><span class="c-lbl">👤 ชื่อ</span><span class="c-val">${name}</span></div>
-    <div class="c-row"><span class="c-lbl">🚗 ทะเบียน</span><span class="c-val">${car}</span></div>
-    <div class="c-row"><span class="c-lbl">📍 เลขไมล์</span><span class="c-val">${mileage}</span></div>
-    <div class="c-row"><span class="c-lbl">📝 ภารกิจ</span><span class="c-val">${reason}</span></div>
-    <div class="c-row"><span class="c-lbl">🛣️ ระยะทาง</span><span class="c-val">${dm?dm[1]+' กม.':'ไม่ระบุ'}</span></div>
-    <div class="c-row"><span class="c-lbl">📸 รูปไมล์</span><span class="c-val">${cachedPhotoFile?'✅ มีรูปแนบ':'—'}</span></div>`;
+    <div class="conf-row"><span class="conf-l">👤 ชื่อ</span><span class="conf-v">${escapeHtml(name)}</span></div>
+    <div class="conf-row"><span class="conf-l">🚗 ทะเบียน</span><span class="conf-v">${escapeHtml(car)}</span></div>
+    <div class="conf-row"><span class="conf-l">📍 เลขไมล์</span><span class="conf-v">${escapeHtml(mile)}</span></div>
+    <div class="conf-row"><span class="conf-l">📝 ภารกิจ</span><span class="conf-v">${escapeHtml(reason)}</span></div>
+    <div class="conf-row"><span class="conf-l">🛣️ ระยะทาง</span><span class="conf-v">${dm?dm[0]:'ไม่ระบุ'}</span></div>
+    <div class="conf-row"><span class="conf-l">📸 รูปไมล์</span><span class="conf-v">${cachedPhotoFile?'✅ มีรูปแนบ':'—'}</span></div>`;
   document.getElementById('confirmSubmitModal').classList.add('show');
 });
 function closeConfirmSubmit(){document.getElementById('confirmSubmitModal').classList.remove('show');}
 
 async function doSubmit(){
   closeConfirmSubmit();
-  if(!_pendingSubmit)return;
-  const{car,mileage,reason,routeText,name,phone}=_pendingSubmit;_pendingSubmit=null;
-  const message=buildFlexMessage(name,phone,car,mileage,reason,markers,routeText,!!cachedPhotoBase64);
-  const submitBtn=document.getElementById('submitBtn');let shareSuccess=false;
+  if(!_ps)return;
+  const{car,mile,reason,rt,name,phone}=_ps;_ps=null;
+  const message=buildFlexMessage(name,phone,car,mile,reason,markers,rt,!!cachedPhotoBase64);
+  const btn=document.getElementById('submitBtn');let ok=false;
   if(typeof liff!=='undefined'&&liff.isLoggedIn()){
-    try{await liff.shareTargetPicker([message]);shareSuccess=true;}
-    catch(err){const msg=String(err).toLowerCase();if(msg.includes('cancel')||msg.includes('closed'))showToast('ยกเลิกการแชร์','warning');else showToast('ไม่สามารถเปิดการแชร์ได้','error');return;}
-  }else{showToast('📤 [Preview] ข้ามการแชร์','info');shareSuccess=true;}
-  if(!shareSuccess)return;
-  submitBtn.disabled=true;submitBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
+    try{await liff.shareTargetPicker([message]);ok=true;}
+    catch(err){const m=String(err).toLowerCase();if(m.includes('cancel')||m.includes('closed'))showToast('ยกเลิกการแชร์','warning');else showToast('ไม่สามารถแชร์ได้','error');return;}
+  }else{showToast('[Preview] ข้ามการแชร์','info');ok=true;}
+  if(!ok)return;
+  btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
   try{
-    const dm=routeText.match(/ระยะทางรวม\s*([\d.]+)/),tm=routeText.match(/(\d+)\s*นาที/);
-    let photoKey=null;
+    const dm=rt.match(/([\d.]+)\s*กม/),tm=rt.match(/(\d+)\s*นาที/);let pk=null;
     if(cachedPhotoFile){
-      submitBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลดรูป...';
-      try{const fd=new FormData();fd.append('photo',cachedPhotoFile);const ur=await fetch('/upload-photo',{method:'POST',body:fd}),ud=await ur.json();if(ud.success)photoKey=ud.key;else showToast('⚠️ อัปโหลดรูปไม่สำเร็จ','warning');}catch{showToast('⚠️ อัปโหลดรูปไม่สำเร็จ','warning');}
-      submitBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
+      btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลดรูป...';
+      try{const fd=new FormData();fd.append('photo',cachedPhotoFile);const ur=await fetch('/upload-photo',{method:'POST',body:fd}).then(r=>r.json());if(ur.success)pk=ur.key;else showToast('อัปโหลดรูปไม่สำเร็จ','warning');}catch{showToast('อัปโหลดรูปไม่สำเร็จ','warning');}
+      btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
     }
-    await fetch('/save-record',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:currentUser.userId,name,phone,car,mileage,reason,routeText,totalDistance:dm?parseFloat(dm[1]):0,totalTime:tm?parseInt(tm[1]):0,hasPhoto:!!(photoKey||cachedPhotoBase64),photoKey,destinations:markers.map((m,i)=>({point:i+1,lat:m.getPosition().lat(),lng:m.getPosition().lng()})),timestamp:new Date().toISOString()})});
-    const usageData={isUsing:true,carPlate:car,carModel:car.split(':')[0].trim(),startedAt:new Date().toISOString(),userName:name,userId:currentUser.userId,mileage};
-    saveUsage(usageData);showCarInUseScreen(usageData);showToast(`✅ บันทึกสำเร็จ! ใช้รถ ${car}`,'success');
-  }catch{showToast('เกิดข้อผิดพลาดในการบันทึก','error');}
-  finally{submitBtn.disabled=false;submitBtn.innerHTML='<i class="fas fa-share-nodes"></i> บันทึก & แชร์ไปกลุ่ม LINE';}
+    await fetch('/save-record',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:currentUser.userId,name,phone,car,mileage:mile,reason,routeText:rt,totalDistance:dm?parseFloat(dm[1]):0,totalTime:tm?parseInt(tm[1]):0,hasPhoto:!!(pk||cachedPhotoBase64),photoKey:pk,destinations:markers.map((m,i)=>({point:i+1,lat:m.getPosition().lat(),lng:m.getPosition().lng()})),timestamp:new Date().toISOString()})});
+    const ud={isUsing:true,carPlate:car,carModel:car.split(':')[0].trim(),startedAt:new Date().toISOString(),userName:name,userId:currentUser.userId,mileage:mile};
+    saveUsage(ud);showCarInUseScreen(ud);showToast(`✅ บันทึกสำเร็จ! ใช้รถ ${car}`,'success');
+  }catch{showToast('เกิดข้อผิดพลาด กรุณาลองใหม่','error');}
+  finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-share-nodes"></i> บันทึก & แชร์ไปกลุ่ม LINE';}
 }
 
-/* CAR IN USE */
-function showCarInUseScreen(usage){
-  if(!usage)usage=loadUsage();if(!usage)return;
-  document.getElementById('infoCarPlate').textContent=usage.carPlate||'-';
-  document.getElementById('infoUserName').textContent=usage.userName||'-';
-  document.getElementById('infoMileage').textContent=usage.mileage?`${usage.mileage} กม.`:'-';
-  document.getElementById('infoStartTime').textContent=usage.startedAt?new Date(usage.startedAt).toLocaleString('th-TH'):'-';
+/* ─── CAR IN USE ─── */
+function showCarInUseScreen(u){
+  if(!u)u=loadUsage();if(!u)return;
+  document.getElementById('infoCarPlate').textContent=u.carPlate||'-';
+  document.getElementById('infoUserName').textContent=u.userName||'-';
+  document.getElementById('infoMileage').textContent=u.mileage?`${u.mileage} กม.`:'-';
+  document.getElementById('infoStartTime').textContent=u.startedAt?new Date(u.startedAt).toLocaleString('th-TH'):'-';
   returnLocation=null;
-  document.getElementById('returnCarBtn').innerHTML='<i class="fas fa-rotate-left"></i> คืนรถ & แจ้งกลุ่ม';
-  document.getElementById('locationStatus').className='loc-status';
+  document.getElementById('returnCarBtn').innerHTML='<i class="fas fa-rotate-left"></i> คืนรถ & แจ้งกลุ่ม LINE';
+  document.getElementById('locationStatus').className='loc-bar';
   document.getElementById('locationStatus').innerHTML='<i class="fas fa-location-dot"></i> ยังไม่ได้ดึงตำแหน่ง (ไม่บังคับ)';
   document.getElementById('locationDetail').style.display='none';
-  showScreen('screen-car-in-use');startTimer(usage.startedAt);
+  showScreen('screen-car-in-use');startTimer(u.startedAt);
 }
-function startTimer(startedAt){
-  clearInterval(timerInterval);const start=new Date(startedAt);
-  function update(){const d=Date.now()-start;const h=Math.floor(d/3600000),m=Math.floor((d%3600000)/60000),s=Math.floor((d%60000)/1000);document.getElementById('timerDisplay').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
-  update();timerInterval=setInterval(update,1000);
+function startTimer(s){
+  clearInterval(timerInterval);const st=new Date(s);
+  const u=()=>{const d=Date.now()-st,h=Math.floor(d/3600000),m=Math.floor((d%3600000)/60000),sc=Math.floor((d%60000)/1000);document.getElementById('timerDisplay').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sc).padStart(2,'0')}`;};
+  u();timerInterval=setInterval(u,1000);
 }
-
 async function getReturnLocation(){
-  const btn=document.getElementById('getLocationBtn'),status=document.getElementById('locationStatus'),detail=document.getElementById('locationDetail');
+  const btn=document.getElementById('getLocationBtn'),st=document.getElementById('locationStatus'),det=document.getElementById('locationDetail');
   btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังดึงตำแหน่ง...';
-  status.className='loc-status loading';status.innerHTML='⏳ กำลังรับสัญญาณ GPS...';detail.style.display='none';
-  if(!navigator.geolocation){status.className='loc-status err';status.innerHTML='❌ เบราว์เซอร์นี้ไม่รองรับ GPS';btn.disabled=false;btn.innerHTML='<i class="fas fa-redo"></i> ลองอีกครั้ง';return;}
-  const readings=[];const COLLECT_MS=8000,MAX_WAIT_MS=20000;
-  await new Promise(resolve=>{
-    const watchId=navigator.geolocation.watchPosition(pos=>{
-      readings.push({lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy});
-      const acc=pos.coords.accuracy,ac=acc<=20?'acc-good':acc<=60?'acc-ok':'acc-bad',al=acc<=20?'🎯 แม่นมาก':acc<=60?'👍 พอใช้ได้':'⚠️ สัญญาณอ่อน';
-      status.innerHTML=`⏳ กำลังปรับความแม่นยำ... (${readings.length} readings)<br><span class="acc-badge ${ac}">±${acc.toFixed(0)} ม. — ${al}</span>`;
-      if(acc<=15){navigator.geolocation.clearWatch(watchId);resolve();}
-    },()=>{navigator.geolocation.clearWatch(watchId);resolve();},{enableHighAccuracy:true,timeout:MAX_WAIT_MS,maximumAge:0});
-    setTimeout(()=>{navigator.geolocation.clearWatch(watchId);resolve();},COLLECT_MS);
+  st.className='loc-bar loading';st.innerHTML='⏳ กำลังรับสัญญาณ GPS...';det.style.display='none';
+  if(!navigator.geolocation){st.className='loc-bar err';st.innerHTML='❌ เบราว์เซอร์ไม่รองรับ GPS';btn.disabled=false;btn.innerHTML='<i class="fas fa-redo"></i> ลองใหม่';return;}
+  const rds=[];
+  await new Promise(res=>{
+    const w=navigator.geolocation.watchPosition(p=>{
+      rds.push({lat:p.coords.latitude,lng:p.coords.longitude,accuracy:p.coords.accuracy});
+      const a=p.coords.accuracy,cl=a<=20?'acc-tag hi':a<=60?'acc-tag mid':'acc-tag lo',lb=a<=20?'🎯 แม่นมาก':a<=60?'👍 พอใช้':'⚠️ อ่อน';
+      st.innerHTML=`⏳ ปรับความแม่นยำ... (${rds.length} pts)<br><span class="${cl}">±${a.toFixed(0)} ม. — ${lb}</span>`;
+      if(a<=15){navigator.geolocation.clearWatch(w);res();}
+    },()=>{navigator.geolocation.clearWatch(w);res();},{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+    setTimeout(()=>{navigator.geolocation.clearWatch(w);res();},8000);
   });
-  if(readings.length===0){status.className='loc-status err';status.innerHTML='❌ ดึงตำแหน่งไม่ได้ กรุณาอนุญาต GPS';btn.disabled=false;btn.innerHTML='<i class="fas fa-redo"></i> ลองอีกครั้ง';return;}
-  const best=readings.reduce((a,b)=>a.accuracy<b.accuracy?a:b);returnLocation=best;
-  const acc=best.accuracy,ac=acc<=20?'acc-good':acc<=60?'acc-ok':'acc-bad',al=acc<=20?'🎯 แม่นมาก':acc<=60?'👍 พอใช้ได้':'⚠️ สัญญาณอ่อน';
-  status.className='loc-status ok';status.innerHTML=`✅ ได้ตำแหน่งแล้ว (จาก ${readings.length} readings)<br><span class="acc-badge ${ac}">±${acc.toFixed(0)} ม. — ${al}</span>`;
-  const mapsUrl=`https://www.google.com/maps?q=${best.lat},${best.lng}`;
-  detail.style.display='block';detail.innerHTML=`📍 ${best.lat.toFixed(6)}, ${best.lng.toFixed(6)} &nbsp;<a href="${mapsUrl}" target="_blank" style="color:var(--info)"><i class="fas fa-external-link-alt"></i> เปิดแผนที่</a>`;
-  btn.innerHTML='<i class="fas fa-check-circle"></i> ดึงตำแหน่งสำเร็จ';btn.style.background='linear-gradient(135deg,#16a34a,#22c55e)';
+  if(!rds.length){st.className='loc-bar err';st.innerHTML='❌ ดึงตำแหน่งไม่ได้ กรุณาอนุญาต GPS';btn.disabled=false;btn.innerHTML='<i class="fas fa-redo"></i> ลองใหม่';return;}
+  const best=rds.reduce((a,b)=>a.accuracy<b.accuracy?a:b);returnLocation=best;
+  const a=best.accuracy,cl=a<=20?'acc-tag hi':a<=60?'acc-tag mid':'acc-tag lo',lb=a<=20?'🎯 แม่นมาก':a<=60?'👍 พอใช้':'⚠️ อ่อน';
+  st.className='loc-bar ok';st.innerHTML=`✅ ได้ตำแหน่งแล้ว (${rds.length} pts)<br><span class="${cl}">±${a.toFixed(0)} ม. — ${lb}</span>`;
+  det.style.display='block';det.innerHTML=`📍 ${best.lat.toFixed(6)}, ${best.lng.toFixed(6)} &nbsp;<a href="https://www.google.com/maps?q=${best.lat},${best.lng}" target="_blank" style="color:var(--blue)"><i class="fas fa-external-link-alt"></i> แผนที่</a>`;
+  btn.innerHTML='<i class="fas fa-check-circle"></i> ดึงตำแหน่งสำเร็จ';btn.style.background='linear-gradient(135deg,#148543,#25c96e)';
 }
-
 async function handleReturnCar(){
-  const usage=loadUsage();if(!usage){showToast('ไม่พบข้อมูลการใช้รถ','error');return;}
-  const returnTime=new Date(),startTime=new Date(usage.startedAt),durationMs=Math.max(0,returnTime-startTime),totalSec=Math.floor(durationMs/1000),totalMin=Math.floor(totalSec/60),durationH=Math.floor(totalMin/60),durationMin=totalMin%60,durationSec=totalSec%60;
-  let durationText;
-  if(durationH>0)durationText=`${durationH} ชั่วโมง ${durationMin} นาที`;
-  else if(totalMin>0)durationText=`${totalMin} นาที ${durationSec} วินาที`;
-  else durationText=`${durationSec} วินาที`;
-  const safeLoc=returnLocation||{lat:0,lng:0};
-  const message=buildReturnFlexMessage(usage.carPlate,usage.userName,returnTime,durationText,safeLoc);
-  const returnBtn=document.getElementById('returnCarBtn');let shareSuccess=false;
-  if(typeof liff!=='undefined'&&liff.isLoggedIn()){try{await liff.shareTargetPicker([message]);shareSuccess=true;}catch(err){const msg=String(err).toLowerCase();if(!msg.includes('cancel'))showToast('ไม่สามารถเปิดการแชร์ได้','error');else showToast('ยกเลิกการแชร์','warning');return;}}else shareSuccess=true;
-  if(!shareSuccess)return;
-  returnBtn.disabled=true;returnBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';clearInterval(timerInterval);
-  try{await fetch('/update-return-status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({carPlate:usage.carPlate,returnedAt:returnTime.toISOString(),durationText,returnLocation})});}catch(_){}
-  clearUsage();showToast(`✅ คืนรถ ${usage.carPlate} สำเร็จ!`,'success');
-  showModal('✅','คืนรถสำเร็จ!',`คืนรถ ${usage.carPlate} เรียบร้อยแล้ว\nระยะเวลาใช้งาน: ${durationText}`);
+  const u=loadUsage();if(!u){showToast('ไม่พบข้อมูลการใช้รถ','error');return;}
+  const rt=new Date(),st=new Date(u.startedAt),ms=Math.max(0,rt-st),ts=Math.floor(ms/1000),tm=Math.floor(ts/60),h=Math.floor(tm/60),mn=tm%60,sc=ts%60;
+  let dur=h>0?`${h} ชั่วโมง ${mn} นาที`:tm>0?`${tm} นาที ${sc} วินาที`:`${sc} วินาที`;
+  const msg=buildReturnFlexMessage(u.carPlate,u.userName,rt,dur,returnLocation||{lat:0,lng:0});
+  const btn=document.getElementById('returnCarBtn');let ok=false;
+  if(typeof liff!=='undefined'&&liff.isLoggedIn()){try{await liff.shareTargetPicker([msg]);ok=true;}catch(err){const m=String(err).toLowerCase();if(!m.includes('cancel'))showToast('แชร์ไม่ได้','error');else showToast('ยกเลิกการแชร์','warning');return;}}else ok=true;
+  if(!ok)return;
+  btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> บันทึก...';clearInterval(timerInterval);
+  try{await fetch('/update-return-status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({carPlate:u.carPlate,returnedAt:rt.toISOString(),durationText:dur,returnLocation})});}catch(_){}
+  clearUsage();showToast(`✅ คืนรถ ${u.carPlate} สำเร็จ!`,'success');
+  showModal('✅','คืนรถสำเร็จ!',`คืนรถ ${u.carPlate} เรียบร้อยแล้ว\nระยะเวลา: ${dur}`);
   setTimeout(()=>{if(typeof liff!=='undefined'&&liff.isInClient())liff.closeWindow();else location.reload();},2500);
 }
-function handleCancelUsage(){if(!window.confirm('ยืนยันยกเลิกการใช้รถ?'))return;clearUsage();clearInterval(timerInterval);showToast('ยกเลิกการใช้รถแล้ว','info');location.reload();}
+function handleCancelUsage(){if(!confirm('ยืนยันยกเลิกการใช้รถ?'))return;clearUsage();clearInterval(timerInterval);showToast('ยกเลิกการใช้รถแล้ว','info');location.reload();}
 
-/* MODAL */
-function showModal(icon,title,message){
-  document.getElementById('modalIcon').textContent=icon;document.getElementById('modalTitle').textContent=title;
-  document.getElementById('modalMessage').innerHTML=message.replace(/\n/g,'<br>');
-  document.getElementById('successModal').classList.add('show');
+/* ─── MODAL ─── */
+function showModal(ico,h,msg){
+  document.getElementById('modalIcon').textContent=ico;document.getElementById('modalTitle').textContent=h;
+  document.getElementById('modalMessage').innerHTML=msg.replace(/\n/g,'<br>');document.getElementById('successModal').classList.add('show');
 }
 function closeModal(){document.getElementById('successModal').classList.remove('show');}
 
-/* USER UI */
-function escapeHtml(str){if(!str)return'';return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-
-function setUserCard(name,pictureUrl,dept){
-  const h=new Date().getHours(),g=h<12?'อรุณสวัสดิ์':h<18?'สวัสดีตอนบ่าย':'สวัสดีตอนเย็น';
+/* ─── USER UI ─── */
+function setUserCard(name,pic,dept){
+  const hr=new Date().getHours(),g=hr<12?'อรุณสวัสดิ์':hr<18?'สวัสดีตอนบ่าย':'สวัสดีตอนเย็น';
   document.getElementById('userGreeting').textContent=`${g} คุณ`;
   document.getElementById('userName').textContent=name;
-  document.getElementById('userDept').textContent=dept||'';
-  // Welcome strip avatar
-  const av=document.getElementById('userAvatar');
-  const tbAv=document.getElementById('topbarAvatar');
-  if(pictureUrl){
-    const img=document.createElement('img');img.src=pictureUrl;img.alt=name;
-    img.addEventListener('error',()=>{av.textContent=name.charAt(0);});
-    av.innerHTML='';av.appendChild(img);
-    // topbar
-    const img2=document.createElement('img');img2.src=pictureUrl;img2.alt=name;img2.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';
-    tbAv.innerHTML='';tbAv.appendChild(img2);
-  }else{
-    av.textContent=name.charAt(0);
-    tbAv.textContent=name.charAt(0);tbAv.style.cssText='display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--g700)';
-  }
+  document.getElementById('userDept').innerHTML=`<i class="fas fa-building" style="font-size:9px"></i> ${escapeHtml(dept||'')}`;
+  const av=document.getElementById('userAvatar'),tb=document.getElementById('topbarAvatar');
+  if(pic){
+    const i=document.createElement('img');i.src=pic;i.alt=name;i.addEventListener('error',()=>av.textContent=name.charAt(0));av.innerHTML='';av.appendChild(i);
+    const i2=document.createElement('img');i2.src=pic;i2.alt=name;i2.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';tb.innerHTML='';tb.appendChild(i2);
+  }else{av.textContent=name.charAt(0);tb.textContent=name.charAt(0);tb.style.fontWeight='700';}
 }
 
-async function loadUserHistory(userId){
+async function loadUserHistory(uid){
   const el=document.getElementById('userHistorySection');if(!el)return;
   try{
-    const res=await fetch(`/get-records?userId=${encodeURIComponent(userId)}&limit=5`);
-    const data=await res.json();const recs=data.records||[];
-    if(recs.length===0){el.innerHTML='<div class="hist-empty"><i class="fas fa-inbox" style="font-size:22px;color:var(--g300);display:block;margin-bottom:6px"></i>ยังไม่มีประวัติการใช้รถ</div>';return;}
+    const data=await fetch(`/get-records?userId=${encodeURIComponent(uid)}&limit=5`).then(r=>r.json());
+    const recs=data.records||[];
+    if(!recs.length){el.innerHTML='<div class="hist-empty"><i class="fas fa-inbox" style="font-size:20px;color:var(--mint-300);display:block;margin-bottom:6px"></i>ยังไม่มีประวัติการใช้รถ</div>';return;}
     el.innerHTML=recs.map(r=>{
-      const isOk=r.returnStatus==='returned';
-      const carS=escapeHtml(r.car||'—'),rsS=escapeHtml(r.reason?r.reason.slice(0,32)+(r.reason.length>32?'…':''):'—');
+      const ok=r.returnStatus==='returned';
+      const cs=escapeHtml(r.car||'—'),rs=escapeHtml(r.reason?r.reason.slice(0,30)+(r.reason.length>30?'…':''):'—');
       const d=r.timestamp?new Date(r.timestamp).toLocaleDateString('th-TH',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
-      return`<div class="hist-item">
-        <div class="hist-dot ${isOk?'ok':'pending'}"></div>
-        <div class="hist-info"><div class="hist-car">🚗 ${carS}</div><div class="hist-meta">${rsS} · ${d}</div></div>
-        <div class="hist-right"><div class="hist-badge ${isOk?'ok':'pending'}">${isOk?'✅ คืนแล้ว':'🔑 ใช้อยู่'}</div><div class="hist-km">${r.totalDistance?r.totalDistance.toFixed(1)+' กม.':''}</div></div>
+      return`<div class="hist-row">
+        <div class="hist-pip ${ok?'green':'amber'}"></div>
+        <div class="hist-body"><div class="hist-car">🚗 ${cs}</div><div class="hist-meta">${rs} · ${d}</div></div>
+        <div class="hist-tail"><div class="hist-tag ${ok?'green':'amber'}">${ok?'✅ คืนแล้ว':'🔑 ใช้อยู่'}</div><div class="hist-km">${r.totalDistance?r.totalDistance.toFixed(1)+' กม.':''}</div></div>
       </div>`;
     }).join('');
   }catch{el.innerHTML='<div class="hist-empty">โหลดประวัติไม่ได้</div>';}
 }
 
-/* REGISTER */
-function showRegisterScreen(user){
+/* ─── REGISTER ─── */
+function showRegisterScreen(u){
   const av=document.getElementById('regAvatar');
-  if(user.pictureUrl){const img=document.createElement('img');img.id='regAvatar';img.src=user.pictureUrl;img.alt=user.displayName||'';img.style.cssText='width:88px;height:88px;border-radius:50%;object-fit:cover;border:3px solid var(--g300);margin:0 auto 14px;display:block;box-shadow:0 0 0 6px rgba(34,197,94,0.1)';av.replaceWith(img);}
-  else{av.textContent=user.displayName?.charAt(0)||'👤';}
-  document.getElementById('regName').value=user.displayName||'';
+  if(u.pictureUrl){const i=document.createElement('img');i.id='regAvatar';i.src=u.pictureUrl;i.alt=u.displayName||'';i.style.cssText='width:84px;height:84px;border-radius:50%;object-fit:cover;border:2.5px solid var(--mint-300);margin:0 auto 12px;display:block;box-shadow:0 0 0 6px rgba(37,201,110,.09)';av.replaceWith(i);}
+  else av.textContent=u.displayName?.charAt(0)||'👤';
+  document.getElementById('regName').value=u.displayName||'';
   showScreen('screen-register');
 }
 document.getElementById('regDept').addEventListener('change',function(){document.getElementById('otherDeptGroup').style.display=this.value==='อื่นๆ'?'block':'none';});
 document.getElementById('regForm').addEventListener('submit',async function(e){
   e.preventDefault();const btn=document.getElementById('regSubmitBtn');
-  const name=document.getElementById('regName').value.trim(),phone=document.getElementById('regPhone').value.trim(),dept=document.getElementById('regDept').value,otherDept=document.getElementById('regOtherDept').value.trim();
-  let valid=true;
-  if(!name){showErr('regName','กรุณากรอกชื่อ-นามสกุล');valid=false;}
-  if(!phone||!/^[0-9]{9,10}$/.test(phone)){showErr('regPhone','กรุณากรอกเบอร์โทร 9-10 หลัก');valid=false;}
-  if(!dept){showErr('regDept','กรุณาเลือกแผนก');valid=false;}
-  if(dept==='อื่นๆ'&&!otherDept){showErr('regOtherDept','กรุณาระบุแผนก');valid=false;}
-  if(!valid)return;
+  const name=document.getElementById('regName').value.trim(),phone=document.getElementById('regPhone').value.trim(),dept=document.getElementById('regDept').value,od=document.getElementById('regOtherDept').value.trim();
+  let v=true;
+  if(!name){showErr('regName','กรุณากรอกชื่อ-นามสกุล');v=false;}
+  if(!phone||!/^[0-9]{9,10}$/.test(phone)){showErr('regPhone','กรุณากรอกเบอร์โทร 9-10 หลัก');v=false;}
+  if(!dept){showErr('regDept','กรุณาเลือกแผนก');v=false;}
+  if(dept==='อื่นๆ'&&!od){showErr('regOtherDept','กรุณาระบุแผนก');v=false;}
+  if(!v)return;
   btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...';
   try{
-    const res=await fetch('/user-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'submit',userId:currentUser.userId,displayName:currentUser.displayName,pictureUrl:currentUser.pictureUrl,formData:{fullName:name,phone,department:dept==='อื่นๆ'?otherDept:dept}})});
-    const data=await res.json();
-    if(data.duplicate){showToast('คุณส่งคำขอไปแล้ว กรุณารอการอนุมัติ','warning');showPendingScreen(currentUser.displayName,true);return;}
-    if(data.success){showModal('📨','ส่งคำขอสำเร็จ!',`ขอบคุณคุณ ${name}\nคำขอถูกส่งถึงแอดมินแล้ว`);setTimeout(()=>{closeModal();showPendingScreen(name,false);},3000);}
-  }catch(_){showToast('เกิดข้อผิดพลาด กรุณาลองใหม่','error');}
+    const res=await fetch('/user-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'submit',userId:currentUser.userId,displayName:currentUser.displayName,pictureUrl:currentUser.pictureUrl,formData:{fullName:name,phone,department:dept==='อื่นๆ'?od:dept}})}).then(r=>r.json());
+    if(res.duplicate){showToast('คุณส่งคำขอไปแล้ว','warning');showPendingScreen(currentUser.displayName,true);return;}
+    if(res.success){showModal('📨','ส่งคำขอสำเร็จ!',`ขอบคุณคุณ ${name}\nรอแอดมินยืนยันภายใน 24 ชั่วโมง`);setTimeout(()=>{closeModal();showPendingScreen(name,false);},3000);}
+  }catch{showToast('เกิดข้อผิดพลาด','error');}
   finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> ส่งคำขอสมัคร';}
 });
-function showPendingScreen(name,hasPending){
-  document.getElementById('pendingTitle').textContent=hasPending?'⏳ รอการอนุมัติ':'📨 ส่งคำขอแล้ว';
-  document.getElementById('pendingMsg').innerHTML=hasPending?`สวัสดีคุณ ${name}<br>กำลังรออนุมัติจากแอดมิน<br>กรุณาตรวจสอบอีกครั้งภายหลัง`:`ขอบคุณคุณ ${name}<br>คำขอได้รับแล้ว รอแอดมินยืนยัน`;
+function showPendingScreen(name,had){
+  document.getElementById('pendingTitle').textContent=had?'⏳ รอการอนุมัติ':'📨 ส่งคำขอแล้ว';
+  document.getElementById('pendingMsg').innerHTML=had?`สวัสดีคุณ ${name}<br>กำลังรออนุมัติจากแอดมิน`:`ขอบคุณคุณ ${name}<br>คำขอได้รับแล้ว รอแอดมินยืนยัน`;
   showScreen('screen-pending');
 }
 
-/* INIT */
+/* ─── INIT ─── */
 async function initApp(){
   try{
-    const mapsScript=document.createElement('script');
-    mapsScript.src=`https://maps.googleapis.com/maps/api/js?key=${CONFIG.googleMapsKey}&libraries=places&loading=async&callback=initMap`;
-    mapsScript.async=true;document.head.appendChild(mapsScript);
+    const ms=document.createElement('script');ms.src=`https://maps.googleapis.com/maps/api/js?key=${CONFIG.googleMapsKey}&libraries=places&loading=async&callback=initMap`;ms.async=true;document.head.appendChild(ms);
     const usage=loadUsage();
     await liff.init({liffId:CONFIG.liffId});
     if(!liff.isLoggedIn()){liff.login({redirectUri:location.href});return;}
     const profile=await liff.getProfile();
-    const userMap=await fetch(`/get-user?userId=${encodeURIComponent(profile.userId)}`).then(r=>r.json()).catch(()=>({}));
-    const dbUser=userMap[profile.userId];
-    currentUser={userId:profile.userId,displayName:profile.displayName,pictureUrl:profile.pictureUrl,name:dbUser?.name||profile.displayName,phone:dbUser?.phone||'',department:dbUser?.department||'รออนุมัติ',role:dbUser?.role||'pending',status:dbUser?.status||'pending'};
-    if(dbUser&&profile.pictureUrl!==dbUser.pictureUrl)fetch('/update-user',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:profile.userId,pictureUrl:profile.pictureUrl})}).catch(()=>{});
+    const um=await fetch(`/get-user?userId=${encodeURIComponent(profile.userId)}`).then(r=>r.json()).catch(()=>({}));
+    const db=um[profile.userId];
+    currentUser={userId:profile.userId,displayName:profile.displayName,pictureUrl:profile.pictureUrl,name:db?.name||profile.displayName,phone:db?.phone||'',department:db?.department||'รออนุมัติ',role:db?.role||'pending',status:db?.status||'pending'};
+    if(db&&profile.pictureUrl!==db.pictureUrl)fetch('/update-user',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:profile.userId,pictureUrl:profile.pictureUrl})}).catch(()=>{});
     fetch('/log-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:profile.userId})}).catch(()=>{});
     document.getElementById('appLoading').style.display='none';
     if(usage){showCarInUseScreen(usage);return;}
     const role=currentUser.role,status=currentUser.status;
     if(role==='inactive'||status==='inactive'||role==='rejected'){
       const sm=document.getElementById('suspendedMsg');sm.textContent='';
-      const s1=document.createElement('span');s1.textContent=`คุณ ${profile.displayName}`;sm.appendChild(s1);sm.appendChild(document.createElement('br'));sm.appendChild(document.createTextNode('บัญชีถูกระงับการใช้งาน'));sm.appendChild(document.createElement('br'));sm.appendChild(document.createTextNode('กรุณาติดต่อผู้ดูแลระบบ'));
+      const s1=document.createElement('span');s1.textContent=`คุณ ${profile.displayName}`;sm.appendChild(s1);sm.appendChild(document.createElement('br'));sm.appendChild(document.createTextNode('บัญชีถูกระงับ'));sm.appendChild(document.createElement('br'));sm.appendChild(document.createTextNode('กรุณาติดต่อผู้ดูแลระบบ'));
       showScreen('screen-suspended');
     }else if(role==='pending'){
-      const checkRes=await fetch('/user-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'check',userId:profile.userId})}).then(r=>r.json()).catch(()=>({exists:false}));
-      if(checkRes.exists)showPendingScreen(profile.displayName,true);else showRegisterScreen(currentUser);
+      const cr=await fetch('/user-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'check',userId:profile.userId})}).then(r=>r.json()).catch(()=>({exists:false}));
+      if(cr.exists)showPendingScreen(profile.displayName,true);else showRegisterScreen(currentUser);
     }else{
       setUserCard(currentUser.name,profile.pictureUrl,currentUser.department);
       showScreen('screen-main');loadUserHistory(profile.userId);
+      // live step update on input
+      ['mileage','reason'].forEach(id=>document.getElementById(id).addEventListener('input',updateSteps));
     }
   }catch(err){
-    console.error('Init error:',err);
-    document.getElementById('appLoading').style.display='none';
-    showToast('เกิดข้อผิดพลาดในการเริ่มต้น','error');
-    showScreen('screen-main');
+    console.error(err);document.getElementById('appLoading').style.display='none';
+    showToast('เกิดข้อผิดพลาดในการเริ่มต้น','error');showScreen('screen-main');
   }
 }
 window.addEventListener('load',initApp);
