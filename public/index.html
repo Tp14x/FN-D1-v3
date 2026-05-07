@@ -249,10 +249,11 @@ body::after{
   background:var(--glass-reflection);pointer-events:none;
 }
 .weather-icon{font-size:36px;flex-shrink:0;}
+.weather-info{flex:1;min-width:0;}
 .weather-temp{font-size:24px;font-weight:700;color:var(--text);}
 .weather-desc{font-size:12px;color:var(--text-m);}
-.weather-detail{display:flex;gap:14px;margin-left:auto;font-size:11px;color:var(--text-m);}
-.weather-detail span{display:flex;align-items:center;gap:4px;}
+.weather-detail{display:flex;gap:14px;margin-left:auto;font-size:11px;color:var(--text-m);flex-shrink:0;}
+.weather-detail span{display:flex;align-items:center;gap:4px;white-space:nowrap;}
 
 /* ========== QUICK STATS ========== */
 .stats-strip{
@@ -271,11 +272,11 @@ body::after{
   background:var(--glass-reflection);pointer-events:none;
 }
 .stat-card:active{transform:scale(0.95);box-shadow:var(--sh2);}
-.stat-icon{font-size:20px;margin-bottom:3px;}
+.stat-icon{font-size:20px;margin-bottom:3px;position:relative;z-index:1;}
 .stat-val{font-size:18px;font-weight:800;color:var(--primary);line-height:1;font-family:'Plus Jakarta Sans',sans-serif;position:relative;z-index:1;}
 .stat-lbl{font-size:10px;color:var(--text-m);margin-top:2px;font-weight:600;position:relative;z-index:1;}
 
-/* ========== SKELETON LOADING APPLE STYLE ========== */
+/* ========== SKELETON LOADING ========== */
 .skel{
   background:linear-gradient(90deg,var(--n200) 25%,var(--n100) 50%,var(--n200) 75%);
   background-size:200% 100%;animation:shimmer 1.6s ease-in-out infinite;border-radius:4px;
@@ -448,7 +449,7 @@ input:focus,select:focus,textarea:focus{
 }
 .dock-btn.small:active{background:var(--primary-l);}
 
-/* ========== BUTTONS — MAGNETIC + MICRO‑INTERACTION ========== */
+/* ========== BUTTONS ========== */
 .btn{
   display:flex;align-items:center;justify-content:center;gap:8px;
   padding:14px 18px;border-radius:var(--rF);
@@ -477,7 +478,7 @@ input:focus,select:focus,textarea:focus{
 .btn-ghost:active{background:var(--primary-l);}
 .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text-2);}
 
-/* RIPPLE */
+/* ========== RIPPLE ========== */
 .ripple{
   position:absolute;border-radius:50%;
   background:rgba(255,255,255,.35);pointer-events:none;
@@ -586,6 +587,40 @@ input:focus,select:focus,textarea:focus{
 /* ========== CONFETTI ========== */
 #confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:9600;}
 
+/* ========== HISTORY ROWS ========== */
+.hist-wrap{padding:4px 15px 12px;}
+.hist-skel-row{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--border-2);}
+.hist-skel-row:last-child{border-bottom:none;}
+.hist-empty{padding:20px 0;text-align:center;color:var(--text-m);font-size:13px;}
+.hist-row{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--border-2);animation:fadeUp .3s both;}
+.hist-row:last-child{border-bottom:none;}
+
+/* ========== STEPS ========== */
+.steps{display:flex;align-items:center;padding:18px 15px 18px;}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;}
+.step + .step::before{
+  content:'';position:absolute;top:13px;right:50%;left:-50%;height:2px;
+  background:var(--border);transition:background .3s;
+  z-index:0;
+}
+.step.done + .step::before,.step.active + .step::before{background:var(--p3);}
+.step-dot{
+  width:26px;height:26px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:800;z-index:1;
+  background:var(--n100);border:2px solid var(--border);color:var(--text-m);
+  transition:all .25s;
+}
+.step.active .step-dot{
+  background:var(--primary);border-color:var(--primary);color:#fff;
+  box-shadow:0 0 0 3px rgba(34,197,94,.18);
+}
+.step.done .step-dot{background:var(--primary-l);border-color:var(--p3);color:var(--p1);}
+[data-theme="dark"] .step.done .step-dot{background:rgba(34,197,94,.15);color:var(--p3);}
+[data-theme="amoled"] .step.done .step-dot{background:rgba(34,197,94,.12);color:var(--p3);}
+.step-lbl{font-size:10px;color:var(--text-m);font-weight:600;text-align:center;}
+.step.active .step-lbl{color:var(--primary);font-weight:700;}
+.step.done .step-lbl{color:var(--p2);}
+
 /* ========== ANIMATIONS ========== */
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .anim>*{animation:fadeUp .35s cubic-bezier(0.19,1,0.22,1) both;}
@@ -665,14 +700,14 @@ input:focus,select:focus,textarea:focus{
     </div>
   </div>
 
-  <!-- WEATHER WIDGET -->
+  <!-- WEATHER WIDGET (FIXED: แยก container ชัดเจน ป้องกันข้อความทับ) -->
   <div class="weather-card" id="weatherWidget">
     <div class="weather-icon" id="weatherIcon">☀️</div>
-    <div>
+    <div class="weather-info">
       <div class="weather-temp" id="weatherTemp">--°C</div>
-      <div class="weather-desc" id="weatherDesc">กำลังโหลดสภาพอากาศ...</div>
+      <div class="weather-desc" id="weatherDesc">กำลังโหลด...</div>
     </div>
-    <div class="weather-detail">
+    <div class="weather-detail" id="weatherDetail">
       <span id="weatherHumidity"><i class="fas fa-droplet"></i> --%</span>
       <span id="weatherWind"><i class="fas fa-wind"></i> --</span>
     </div>
@@ -708,22 +743,10 @@ input:focus,select:focus,textarea:focus{
         <div class="card-ico"><i class="fas fa-clock-rotate-left"></i></div>
         <div><div class="card-ttl">บันทึกของคุณ</div><div class="card-sub">5 รายการล่าสุด</div></div>
       </div>
-      <div class="hist-wrap" id="userHistorySection" style="padding:4px 15px 12px">
-        <div class="hist-skel-row" style="display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--border-2)">
-          <div class="skel" style="width:9px;height:9px;border-radius:50%;flex-shrink:0"></div>
-          <div class="skel" style="height:13px;border-radius:4px;flex:1"></div>
-          <div class="skel" style="width:52px;height:20px;border-radius:6px;flex-shrink:0"></div>
-        </div>
-        <div class="hist-skel-row" style="display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--border-2)">
-          <div class="skel" style="width:9px;height:9px;border-radius:50%;flex-shrink:0"></div>
-          <div class="skel" style="height:13px;border-radius:4px;flex:1"></div>
-          <div class="skel" style="width:52px;height:20px;border-radius:6px;flex-shrink:0"></div>
-        </div>
-        <div class="hist-skel-row" style="display:flex;align-items:center;gap:11px;padding:10px 0">
-          <div class="skel" style="width:9px;height:9px;border-radius:50%;flex-shrink:0"></div>
-          <div class="skel" style="height:13px;border-radius:4px;flex:1;max-width:70%"></div>
-          <div class="skel" style="width:52px;height:20px;border-radius:6px;flex-shrink:0"></div>
-        </div>
+      <div class="hist-wrap" id="userHistorySection">
+        <div class="hist-skel-row"><div class="skel" style="width:9px;height:9px;border-radius:50%;flex-shrink:0"></div><div class="skel" style="height:13px;border-radius:4px;flex:1"></div><div class="skel" style="width:52px;height:20px;border-radius:6px;flex-shrink:0"></div></div>
+        <div class="hist-skel-row"><div class="skel" style="width:9px;height:9px;border-radius:50%;flex-shrink:0"></div><div class="skel" style="height:13px;border-radius:4px;flex:1"></div><div class="skel" style="width:52px;height:20px;border-radius:6px;flex-shrink:0"></div></div>
+        <div class="hist-skel-row"><div class="skel" style="width:9px;height:9px;border-radius:50%;flex-shrink:0"></div><div class="skel" style="height:13px;border-radius:4px;flex:1;max-width:70%"></div><div class="skel" style="width:52px;height:20px;border-radius:6px;flex-shrink:0"></div></div>
       </div>
     </div>
 
@@ -733,28 +756,13 @@ input:focus,select:focus,textarea:focus{
       <div class="sec-lbl-line"></div>
     </div>
 
-    <!-- STEPS -->
+    <!-- STEPS (FIXED: ใช้ CSS class แทน inline style) -->
     <div class="card" style="margin-bottom:10px">
-      <div class="steps" id="stepBar" style="display:flex;align-items:center;padding:18px 15px 18px">
-        <div class="step active" id="step1" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative">
-          <div class="step-dot" style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;z-index:1;background:var(--primary);border:2px solid var(--primary);color:#fff;box-shadow:0 0 0 3px rgba(34,197,94,.18);transition:all .25s">1</div>
-          <div class="step-lbl" style="font-size:10px;font-weight:700;color:var(--primary)">ข้อมูลรถ</div>
-        </div>
-        <div class="step" id="step2" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative">
-          <div style="position:absolute;top:13px;right:50%;left:-50%;height:2px;background:var(--border);transition:background .3s"></div>
-          <div class="step-dot" style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;z-index:1;background:var(--n100);border:2px solid var(--border);color:var(--text-m);transition:all .25s">2</div>
-          <div class="step-lbl" style="font-size:10px;font-weight:600;color:var(--text-m)">ภารกิจ</div>
-        </div>
-        <div class="step" id="step3" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative">
-          <div style="position:absolute;top:13px;right:50%;left:-50%;height:2px;background:var(--border);transition:background .3s"></div>
-          <div class="step-dot" style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;z-index:1;background:var(--n100);border:2px solid var(--border);color:var(--text-m);transition:all .25s">3</div>
-          <div class="step-lbl" style="font-size:10px;font-weight:600;color:var(--text-m)">เส้นทาง</div>
-        </div>
-        <div class="step" id="step4" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative">
-          <div style="position:absolute;top:13px;right:50%;left:-50%;height:2px;background:var(--border);transition:background .3s"></div>
-          <div class="step-dot" style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;z-index:1;background:var(--n100);border:2px solid var(--border);color:var(--text-m);transition:all .25s">4</div>
-          <div class="step-lbl" style="font-size:10px;font-weight:600;color:var(--text-m)">ส่ง</div>
-        </div>
+      <div class="steps" id="stepBar">
+        <div class="step active" id="step1"><div class="step-dot">1</div><div class="step-lbl">ข้อมูลรถ</div></div>
+        <div class="step" id="step2"><div class="step-dot">2</div><div class="step-lbl">ภารกิจ</div></div>
+        <div class="step" id="step3"><div class="step-dot">3</div><div class="step-lbl">เส้นทาง</div></div>
+        <div class="step" id="step4"><div class="step-dot">4</div><div class="step-lbl">ส่ง</div></div>
       </div>
     </div>
 
@@ -769,38 +777,11 @@ input:focus,select:focus,textarea:focus{
         <div class="card-bd">
           <div class="frow">
             <div class="car-pills" id="carPills">
-              <!-- รถยนต์ -->
-              <label class="car-pill">
-                <input type="radio" name="cp" value="Nissan : ผอ 5757" onchange="onCarPick(this)">
-                <span class="car-pill-em">🚙</span>
-                <div class="car-pill-info"><div class="car-pill-nm">Nissan</div><div class="car-pill-pl">ผอ 5757</div></div>
-                <span class="car-status-tag available" id="status-Nissan"><span class="live-dot green"></span>ว่าง</span>
-              </label>
-              <label class="car-pill">
-                <input type="radio" name="cp" value="Mazda : ยค 3777" onchange="onCarPick(this)">
-                <span class="car-pill-em">🚗</span>
-                <div class="car-pill-info"><div class="car-pill-nm">Mazda</div><div class="car-pill-pl">ยค 3777</div></div>
-                <span class="car-status-tag in-use" id="status-Mazda"><span class="live-dot red"></span>ใช้อยู่</span>
-              </label>
-              <label class="car-pill">
-                <input type="radio" name="cp" value="MG : งบ 255" onchange="onCarPick(this)">
-                <span class="car-pill-em">🚘</span>
-                <div class="car-pill-info"><div class="car-pill-nm">MG</div><div class="car-pill-pl">งบ 255</div></div>
-                <span class="car-status-tag available" id="status-MG"><span class="live-dot green"></span>ว่าง</span>
-              </label>
-              <!-- มอเตอร์ไซค์ -->
-              <label class="car-pill">
-                <input type="radio" name="cp" value="Click : จงจ 222" onchange="onCarPick(this)">
-                <span class="car-pill-em">🛵</span>
-                <div class="car-pill-info"><div class="car-pill-nm">Click</div><div class="car-pill-pl">จงจ 222</div></div>
-                <span class="car-status-tag available" id="status-Click"><span class="live-dot green"></span>ว่าง</span>
-              </label>
-              <label class="car-pill">
-                <input type="radio" name="cp" value="Fino : งธท 222" onchange="onCarPick(this)">
-                <span class="car-pill-em">🛵</span>
-                <div class="car-pill-info"><div class="car-pill-nm">Fino</div><div class="car-pill-pl">งธท 222</div></div>
-                <span class="car-status-tag available" id="status-Fino"><span class="live-dot green"></span>ว่าง</span>
-              </label>
+              <label class="car-pill"><input type="radio" name="cp" value="Nissan : ผอ 5757" onchange="onCarPick(this)"><span class="car-pill-em">🚙</span><div class="car-pill-info"><div class="car-pill-nm">Nissan</div><div class="car-pill-pl">ผอ 5757</div></div><span class="car-status-tag available" id="status-Nissan"><span class="live-dot green"></span>ว่าง</span></label>
+              <label class="car-pill"><input type="radio" name="cp" value="Mazda : ยค 3777" onchange="onCarPick(this)"><span class="car-pill-em">🚗</span><div class="car-pill-info"><div class="car-pill-nm">Mazda</div><div class="car-pill-pl">ยค 3777</div></div><span class="car-status-tag in-use" id="status-Mazda"><span class="live-dot red"></span>ใช้อยู่</span></label>
+              <label class="car-pill"><input type="radio" name="cp" value="MG : งบ 255" onchange="onCarPick(this)"><span class="car-pill-em">🚘</span><div class="car-pill-info"><div class="car-pill-nm">MG</div><div class="car-pill-pl">งบ 255</div></div><span class="car-status-tag available" id="status-MG"><span class="live-dot green"></span>ว่าง</span></label>
+              <label class="car-pill"><input type="radio" name="cp" value="Click : จงจ 222" onchange="onCarPick(this)"><span class="car-pill-em">🛵</span><div class="car-pill-info"><div class="car-pill-nm">Click</div><div class="car-pill-pl">จงจ 222</div></div><span class="car-status-tag available" id="status-Click"><span class="live-dot green"></span>ว่าง</span></label>
+              <label class="car-pill"><input type="radio" name="cp" value="Fino : งธท 222" onchange="onCarPick(this)"><span class="car-pill-em">🛵</span><div class="car-pill-info"><div class="car-pill-nm">Fino</div><div class="car-pill-pl">งธท 222</div></div><span class="car-status-tag available" id="status-Fino"><span class="live-dot green"></span>ว่าง</span></label>
             </div>
             <select id="car" style="display:none" required>
               <option value="" disabled selected></option>
@@ -812,13 +793,11 @@ input:focus,select:focus,textarea:focus{
             </select>
             <div class="ferr" id="car-error" style="margin-top:8px"><i class="fas fa-circle-exclamation"></i><span></span></div>
           </div>
-
           <div class="frow">
             <label class="flabel">เลขไมล์รถ <span class="req">*</span></label>
             <div class="fwrap"><i class="fas fa-gauge-high fic"></i><input type="number" id="mileage" placeholder="เช่น 12500" inputmode="numeric" min="0" required></div>
             <div class="ferr" id="mileage-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
           </div>
-
           <div class="frow" style="margin-bottom:0">
             <label class="flabel">รูปถ่ายเลขไมล์ <span class="opt">(ไม่บังคับ)</span></label>
             <div class="upload-zone" id="photoArea" style="border:2px dashed var(--border);border-radius:var(--r3);background:var(--bg2);padding:20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;min-height:78px">
@@ -843,10 +822,7 @@ input:focus,select:focus,textarea:focus{
         </div>
         <div class="card-bd">
           <div class="frow" style="margin-bottom:0">
-            <div class="fwrap">
-              <i class="fas fa-clipboard-list fic top"></i>
-              <textarea id="reason" placeholder="เช่น ส่งของที่ลูกค้า / ประชุมนอกสถานที่..." required></textarea>
-            </div>
+            <div class="fwrap"><i class="fas fa-clipboard-list fic top"></i><textarea id="reason" placeholder="เช่น ส่งของที่ลูกค้า / ประชุมนอกสถานที่..." required></textarea></div>
             <div class="ferr" id="reason-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
           </div>
         </div>
@@ -859,9 +835,7 @@ input:focus,select:focus,textarea:focus{
           <div><div class="card-ttl">เส้นทาง & ปลายทาง</div><div class="card-sub">แตะแผนที่เพื่อปักหมุด (สูงสุด 3 จุด)</div></div>
         </div>
         <div class="card-bd" style="padding-top:10px">
-          <div class="map-srch">
-            <div class="fwrap" style="flex:1"><i class="fas fa-magnifying-glass fic"></i><input type="text" id="searchInput" placeholder="ค้นหาสถานที่..." style="padding-left:38px"></div>
-          </div>
+          <div class="map-srch"><div class="fwrap" style="flex:1"><i class="fas fa-magnifying-glass fic"></i><input type="text" id="searchInput" placeholder="ค้นหาสถานที่..." style="padding-left:38px"></div></div>
           <div id="map"></div>
           <div class="dest-list" id="selectedDestinations">📍 แตะบนแผนที่เพื่อปักหมุดปลายทาง</div>
           <div class="route-chip" id="routeInfo"><i class="fas fa-route"></i><span>เลือกปลายทางเพื่อคำนวณระยะทาง</span></div>
@@ -892,9 +866,7 @@ input:focus,select:focus,textarea:focus{
     <div class="st-icon warn">⏳</div>
     <div class="st-h" id="pendingTitle">รอการอนุมัติ</div>
     <p class="st-p" id="pendingMsg">คำขอของคุณส่งเรียบร้อยแล้ว<br>กรุณารอแอดมินยืนยัน</p>
-    <div class="st-acts" style="margin-top:18px">
-      <a href="https://line.me/ti/p/~" class="btn btn-ghost" style="max-width:280px;margin:0 auto"><i class="fab fa-line" style="color:#06c755"></i> ติดต่อแอดมิน</a>
-    </div>
+    <div class="st-acts" style="margin-top:18px"><a href="https://line.me/ti/p/~" class="btn btn-ghost" style="max-width:280px;margin:0 auto"><i class="fab fa-line" style="color:#06c755"></i> ติดต่อแอดมิน</a></div>
   </div>
 </div>
 
@@ -904,9 +876,7 @@ input:focus,select:focus,textarea:focus{
     <div class="st-icon err">⛔</div>
     <div class="st-h">บัญชีถูกระงับ</div>
     <p class="st-p" id="suspendedMsg">บัญชีของคุณถูกระงับ<br>กรุณาติดต่อผู้ดูแลระบบ</p>
-    <div class="st-acts" style="margin-top:18px">
-      <a href="https://line.me/ti/p/~" class="btn btn-danger" style="max-width:280px;margin:0 auto"><i class="fab fa-line"></i> ติดต่อแอดมิน</a>
-    </div>
+    <div class="st-acts" style="margin-top:18px"><a href="https://line.me/ti/p/~" class="btn btn-danger" style="max-width:280px;margin:0 auto"><i class="fab fa-line"></i> ติดต่อแอดมิน</a></div>
   </div>
 </div>
 
@@ -1073,7 +1043,7 @@ function showDynamicIsland(msg, type = 'info', icon = 'info-circle') {
   _islandTimer = setTimeout(() => el.classList.remove('show'), 3200);
 }
 
-/* ========== TOAST (fallback) ========== */
+/* ========== TOAST ========== */
 let _toastTimer;
 function showToast(msg, type = 'info') {
   const t = document.getElementById('toast');
@@ -1214,36 +1184,8 @@ function updateSteps() {
   const setStep = (n, done, active) => {
     const stepEl = document.getElementById('step' + n);
     if (!stepEl) return;
-    const dot = stepEl.querySelector('.step-dot');
-    const lbl = stepEl.querySelector('.step-lbl');
-    const line = stepEl.querySelector('div[style]');
     stepEl.classList.toggle('done', !!done);
     stepEl.classList.toggle('active', !!active && !done);
-    if (done) {
-      dot.style.background = 'var(--primary-l)';
-      dot.style.borderColor = 'var(--p3)';
-      dot.style.color = 'var(--p1)';
-      dot.style.boxShadow = 'none';
-      dot.textContent = '✓';
-      lbl.style.color = 'var(--p2)';
-      lbl.style.fontWeight = '700';
-    } else if (active) {
-      dot.style.background = 'var(--primary)';
-      dot.style.borderColor = 'var(--primary)';
-      dot.style.color = '#fff';
-      dot.style.boxShadow = '0 0 0 3px rgba(34,197,94,.18)';
-      dot.textContent = n;
-      lbl.style.color = 'var(--primary)';
-      lbl.style.fontWeight = '700';
-    } else {
-      dot.style.background = 'var(--n100)';
-      dot.style.borderColor = 'var(--border)';
-      dot.style.color = 'var(--text-m)';
-      dot.style.boxShadow = 'none';
-      dot.textContent = n;
-      lbl.style.color = 'var(--text-m)';
-      lbl.style.fontWeight = '600';
-    }
   };
 
   setStep(1, hasCar && hasMile, true);
@@ -1448,11 +1390,21 @@ function checkAutoDestination() {
   }
 }
 
-/* ========== WEATHER ========== */
+/* ========== WEATHER (FIXED: ป้องกันข้อมูลซ้อนทับ User Banner) ========== */
 async function loadWeather() {
+  const weatherIcon = document.getElementById('weatherIcon');
+  const weatherTemp = document.getElementById('weatherTemp');
+  const weatherDesc = document.getElementById('weatherDesc');
+  const weatherHumidity = document.getElementById('weatherHumidity');
+  const weatherWind = document.getElementById('weatherWind');
+  const weatherWidget = document.getElementById('weatherWidget');
+
+  // fallback ถ้าไม่เจอ element
+  if (!weatherWidget) return;
+
   try {
     if (!navigator.geolocation) {
-      document.getElementById('weatherDesc').textContent = 'ไม่รองรับ GPS';
+      if (weatherDesc) weatherDesc.textContent = 'ไม่รองรับ GPS';
       return;
     }
     const pos = await new Promise((res, rej) =>
@@ -1462,14 +1414,23 @@ async function loadWeather() {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=relativehumidity_2m&timezone=Asia/Bangkok`;
     const data = await fetch(url).then(r => r.json());
     const w = data.current_weather;
-    document.getElementById('weatherTemp').textContent = `${w.temperature}°C`;
-    document.getElementById('weatherDesc').textContent = w.weathercode <= 3 ? 'ท้องฟ้าแจ่มใส' : w.weathercode <= 48 ? 'เมฆมาก' : 'ฝนตก';
-    document.getElementById('weatherIcon').textContent = w.weathercode <= 3 ? '☀️' : w.weathercode <= 48 ? '⛅' : '🌧️';
-    document.getElementById('weatherWind').innerHTML = `<i class="fas fa-wind"></i> ${w.windspeed} กม./ชม.`;
+
+    if (weatherTemp) weatherTemp.textContent = `${w.temperature}°C`;
+    if (weatherDesc) {
+      weatherDesc.textContent = w.weathercode <= 3 ? 'ท้องฟ้าแจ่มใส' : w.weathercode <= 48 ? 'เมฆมาก' : 'ฝนตก';
+    }
+    if (weatherIcon) {
+      weatherIcon.textContent = w.weathercode <= 3 ? '☀️' : w.weathercode <= 48 ? '⛅' : '🌧️';
+    }
+    if (weatherWind) {
+      weatherWind.innerHTML = `<i class="fas fa-wind"></i> ${w.windspeed} กม./ชม.`;
+    }
     const hum = data.hourly?.relativehumidity_2m?.[0] || '--';
-    document.getElementById('weatherHumidity').innerHTML = `<i class="fas fa-droplet"></i> ${hum}%`;
+    if (weatherHumidity) {
+      weatherHumidity.innerHTML = `<i class="fas fa-droplet"></i> ${hum}%`;
+    }
   } catch {
-    document.getElementById('weatherDesc').textContent = 'โหลดสภาพอากาศไม่สำเร็จ';
+    if (weatherDesc) weatherDesc.textContent = 'โหลดไม่สำเร็จ';
   }
 }
 
@@ -1681,7 +1642,6 @@ document.getElementById('mainForm')?.addEventListener('submit', async function(e
   _pendingSubmit = { car, mile, reason, rt, name, phone };
 
   const dm = rt.match(/[\d.]+\s*กม/);
-  const tm = rt.match(/\d+\s*นาที/);
   document.getElementById('confirmSummaryContent').innerHTML = `
     <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-bottom:1px solid var(--border-2);font-size:13.5px"><span style="color:var(--text-m);flex-shrink:0;width:76px">👤 ชื่อ</span><span style="font-weight:700;color:var(--text);flex:1">${escapeHtml(name)}</span></div>
     <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-bottom:1px solid var(--border-2);font-size:13.5px"><span style="color:var(--text-m);flex-shrink:0;width:76px">🚗 ทะเบียน</span><span style="font-weight:700;color:var(--text);flex:1">${escapeHtml(car)}</span></div>
@@ -1845,9 +1805,11 @@ async function getReturnLocation() {
       p => {
         rds.push({ lat: p.coords.latitude, lng: p.coords.longitude, accuracy: p.coords.accuracy });
         const a = p.coords.accuracy;
-        const cl = a <= 20 ? 'acc-tag hi' : a <= 60 ? 'acc-tag mid' : 'acc-tag lo';
+        const cl = a <= 20 ? 'hi' : a <= 60 ? 'mid' : 'lo';
         const lb = a <= 20 ? '🎯 แม่นมาก' : a <= 60 ? '👍 พอใช้' : '⚠️ อ่อน';
-        st.innerHTML = `⏳ ปรับความแม่นยำ... (${rds.length} pts)<br><span class="${cl}" style="display:inline-block;border-radius:99px;padding:2px 8px;font-size:11px;font-weight:700;margin-top:4px;background:${a<=20?'rgba(34,197,94,.12)':a<=60?'var(--amber-l)':'var(--red-l)'};color:${a<=20?'var(--p2)':a<=60?'#92400e':'var(--red)'}">±${a.toFixed(0)} ม. — ${lb}</span>`;
+        const bg = a <= 20 ? 'rgba(34,197,94,.12)' : a <= 60 ? 'var(--amber-l)' : 'var(--red-l)';
+        const color = a <= 20 ? 'var(--p2)' : a <= 60 ? '#92400e' : 'var(--red)';
+        st.innerHTML = `⏳ ปรับความแม่นยำ... (${rds.length} pts)<br><span style="display:inline-block;border-radius:99px;padding:2px 8px;font-size:11px;font-weight:700;margin-top:4px;background:${bg};color:${color}">±${a.toFixed(0)} ม. — ${lb}</span>`;
         if (a <= 15) { navigator.geolocation.clearWatch(w); res(); }
       },
       () => { navigator.geolocation.clearWatch(w); res(); },
@@ -1867,10 +1829,11 @@ async function getReturnLocation() {
   const best = rds.reduce((a, b) => a.accuracy < b.accuracy ? a : b);
   returnLocation = best;
   const a = best.accuracy;
-  const cl = a <= 20 ? 'acc-tag hi' : a <= 60 ? 'acc-tag mid' : 'acc-tag lo';
+  const bg = a <= 20 ? 'rgba(34,197,94,.12)' : a <= 60 ? 'var(--amber-l)' : 'var(--red-l)';
+  const color = a <= 20 ? 'var(--p2)' : a <= 60 ? '#92400e' : 'var(--red)';
   const lb = a <= 20 ? '🎯 แม่นมาก' : a <= 60 ? '👍 พอใช้' : '⚠️ อ่อน';
   st.className = 'loc-bar ok';
-  st.innerHTML = `✅ ได้ตำแหน่งแล้ว (${rds.length} pts)<br><span class="${cl}" style="display:inline-block;border-radius:99px;padding:2px 8px;font-size:11px;font-weight:700;margin-top:4px;background:${a<=20?'rgba(34,197,94,.12)':a<=60?'var(--amber-l)':'var(--red-l)'};color:${a<=20?'var(--p2)':a<=60?'#92400e':'var(--red)'}">±${a.toFixed(0)} ม. — ${lb}</span>`;
+  st.innerHTML = `✅ ได้ตำแหน่งแล้ว (${rds.length} pts)<br><span style="display:inline-block;border-radius:99px;padding:2px 8px;font-size:11px;font-weight:700;margin-top:4px;background:${bg};color:${color}">±${a.toFixed(0)} ม. — ${lb}</span>`;
   if (det) {
     det.style.display = 'block';
     det.innerHTML = `📍 ${best.lat.toFixed(6)}, ${best.lng.toFixed(6)} &nbsp;<a href="https://www.google.com/maps?q=${best.lat},${best.lng}" target="_blank" style="color:var(--blue)"><i class="fas fa-external-link-alt"></i> แผนที่</a>`;
@@ -1959,7 +1922,7 @@ async function loadUserHistory(uid) {
     const data = await fetch(`/get-records?userId=${encodeURIComponent(uid)}&limit=5`).then(r => r.json());
     const recs = data.records || [];
     if (!recs.length) {
-      el.innerHTML = '<div style="padding:20px 0;text-align:center;color:var(--text-m);font-size:13px"><i class="fas fa-inbox" style="font-size:20px;color:var(--p4);display:block;margin-bottom:6px"></i>ยังไม่มีประวัติการใช้รถ</div>';
+      el.innerHTML = '<div class="hist-empty"><i class="fas fa-inbox" style="font-size:20px;color:var(--p4);display:block;margin-bottom:6px"></i>ยังไม่มีประวัติการใช้รถ</div>';
       return;
     }
     el.innerHTML = recs.map(r => {
@@ -1967,14 +1930,15 @@ async function loadUserHistory(uid) {
       const cs = escapeHtml(r.car || '—');
       const rs = escapeHtml(r.reason ? r.reason.slice(0, 35) + (r.reason.length > 35 ? '…' : '') : '—');
       const d = r.timestamp ? new Date(r.timestamp).toLocaleDateString('th-TH', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
-      return `<div style="display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--border-2);animation:fadeUp .3s both">
+      const kmText = r.totalDistance ? r.totalDistance.toFixed(1) + ' กม.' : '';
+      return `<div class="hist-row">
         <div style="width:9px;height:9px;border-radius:50%;flex-shrink:0;background:${ok?'var(--p3)':'var(--amber)'}"></div>
         <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700;color:var(--text)">🚗 ${cs}</div><div style="font-size:11.5px;color:var(--text-m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px">${rs} · ${d}</div></div>
-        <div style="text-align:right;flex-shrink:0"><div style="font-size:11px;font-weight:700;color:${ok?'var(--p2)':'var(--amber)'}">${ok?'✅ คืนแล้ว':'🔑 ใช้อยู่'}</div><div style="font-size:11px;color:var(--text-m);margin-top:1px">${r.totalDistance?r.totalDistance.toFixed(1)+' กม.':''}</div></div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:11px;font-weight:700;color:${ok?'var(--p2)':'var(--amber)'}">${ok?'✅ คืนแล้ว':'🔑 ใช้อยู่'}</div><div style="font-size:11px;color:var(--text-m);margin-top:1px">${kmText}</div></div>
       </div>`;
     }).join('');
   } catch {
-    el.innerHTML = '<div style="padding:20px 0;text-align:center;color:var(--text-m);font-size:13px">โหลดประวัติไม่ได้</div>';
+    el.innerHTML = '<div class="hist-empty">โหลดประวัติไม่ได้</div>';
   }
 }
 
@@ -2141,19 +2105,15 @@ function showPendingScreen(name, had) {
 /* ========== INIT ========== */
 async function initApp() {
   try {
-    // Load Google Maps
     const ms = document.createElement('script');
     ms.src = `https://maps.googleapis.com/maps/api/js?key=${CONFIG.googleMapsKey}&libraries=places&loading=async&callback=initMap`;
     ms.async = true;
     document.head.appendChild(ms);
 
-    // Load weather
     loadWeather();
 
-    // Check car usage
     const usage = loadUsage();
 
-    // Init LIFF
     await liff.init({ liffId: CONFIG.liffId });
 
     if (!liff.isLoggedIn()) {
@@ -2176,7 +2136,6 @@ async function initApp() {
       status: db?.status || 'pending'
     };
 
-    // Sync profile picture
     if (db && profile.pictureUrl !== db.pictureUrl) {
       fetch('/update-user', {
         method: 'POST',
@@ -2185,18 +2144,15 @@ async function initApp() {
       }).catch(() => {});
     }
 
-    // Log login
     fetch('/log-login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: profile.userId })
     }).catch(() => {});
 
-    // Hide loading
     const ld = document.getElementById('appLoading');
     if (ld) { ld.classList.add('fade'); setTimeout(() => { ld.style.display = 'none'; }, 500); }
 
-    // Show appropriate screen
     if (usage) {
       showCarInUseScreen(usage);
       return;
@@ -2235,7 +2191,6 @@ async function initApp() {
       updateLiveCarStatus();
     }
 
-    // Periodic live status update
     setInterval(updateLiveCarStatus, 15000);
 
   } catch (err) {
