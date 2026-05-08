@@ -1,930 +1,833 @@
 <!DOCTYPE html>
-<html lang="th" data-theme="light">
+<html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>CarTrack — ระบบบันทึกการใช้รถ</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>ระบบบันทึกการใช้รถ</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-/* ═══════════════════ TOKENS ═══════════════════ */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TOKENS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 :root{
-  --p1:#065f35;--p2:#16a34a;--p3:#22c55e;--p4:#4ade80;--p5:#bbf7d0;--p6:#dcfce7;--p7:#f0fdf4;
-  --n0:#fff;--n50:#f8fafc;--n100:#f1f5f2;--n200:#e2eae4;--n300:#c5d4c9;--n400:#94a89a;--n500:#647a6b;--n600:#445950;--n700:#2c3e32;--n800:#1a2a1f;--n900:#0d1810;
-  --bg:#eef8f1;--bg2:#f5fbf6;
-  --surface:rgba(255,255,255,0.82);--surface-2:rgba(255,255,255,0.96);
-  --glass:rgba(255,255,255,0.55);--glass-bd:rgba(255,255,255,0.72);
-  --border:rgba(0,80,30,0.11);--border-2:rgba(0,80,30,0.07);
-  --text:#1a2a1f;--text-2:#445950;--text-m:#647a6b;
-  --primary:#16a34a;--primary-h:#15803d;--primary-l:#dcfce7;
-  --red:#ef4444;--red-l:#fef2f2;--amber:#f59e0b;--amber-l:#fffbeb;
-  --blue:#3b82f6;--blue-d:#1d4ed8;--blue-l:#eff6ff;
-  --r1:6px;--r2:10px;--r3:14px;--r4:18px;--r5:24px;--r6:32px;--rF:999px;
-  --sh1:0 1px 3px rgba(0,50,20,.06);--sh2:0 2px 8px rgba(0,50,20,.08);
-  --sh3:0 4px 20px rgba(0,50,20,.10);--sh4:0 8px 40px rgba(0,50,20,.13);--sh5:0 16px 56px rgba(0,50,20,.16);
-  --glow:0 0 0 3px rgba(34,197,94,.18);
-}
-[data-theme="dark"]{
-  --bg:#0d1810;--bg2:#111f15;
-  --surface:rgba(20,38,25,0.85);--surface-2:rgba(22,40,27,0.97);
-  --glass:rgba(20,38,25,0.60);--glass-bd:rgba(40,70,48,0.82);
-  --border:rgba(255,255,255,0.09);--border-2:rgba(255,255,255,0.05);
-  --text:#e8f5ec;--text-2:#a8c5b0;--text-m:#6b8c73;
-  --primary:#22c55e;--primary-h:#16a34a;--primary-l:rgba(34,197,94,0.15);
-  --sh1:0 1px 3px rgba(0,0,0,.30);--sh2:0 2px 8px rgba(0,0,0,.35);
-  --sh3:0 4px 20px rgba(0,0,0,.40);--sh4:0 8px 40px rgba(0,0,0,.50);--sh5:0 16px 56px rgba(0,0,0,.60);
-}
-/* AMOLED — pure black */
-[data-theme="amoled"]{
-  --bg:#000000;--bg2:#080808;
-  --surface:rgba(10,10,10,0.96);--surface-2:rgba(12,12,12,0.99);
-  --glass:rgba(6,6,6,0.85);--glass-bd:rgba(18,18,18,0.95);
-  --border:rgba(255,255,255,0.07);--border-2:rgba(255,255,255,0.04);
-  --text:#f2f2f2;--text-2:#9ab8a2;--text-m:#4a6050;
-  --primary:#22c55e;--primary-h:#16a34a;--primary-l:rgba(34,197,94,0.12);
-  --n100:rgba(255,255,255,0.04);--n200:rgba(255,255,255,0.07);
-  --sh1:0 1px 4px rgba(0,0,0,.6);--sh2:0 2px 12px rgba(0,0,0,.7);
-  --sh3:0 4px 24px rgba(0,0,0,.8);--sh4:0 8px 40px rgba(0,0,0,.85);--sh5:0 16px 60px rgba(0,0,0,.9);
+  --mint-50:#f0fdf6; --mint-100:#dcfcec; --mint-200:#b8f5d4;
+  --mint-300:#82edb3; --mint-400:#4ddd8e; --mint-500:#25c96e;
+  --mint-600:#18a857; --mint-700:#148543; --mint-800:#116637;
+
+  --sage-50:#f5faf6; --sage-100:#eaf4ed; --sage-200:#d4e9d9;
+  --sage-400:#88b894; --sage-600:#4d7a59;
+
+  --neutral-0:#ffffff; --neutral-50:#f9fbfa;
+  --neutral-100:#f2f6f3; --neutral-200:#e5ede7;
+  --neutral-300:#cddacf; --neutral-400:#a3b9a6;
+  --neutral-500:#6e8872; --neutral-600:#4a6050;
+  --neutral-700:#2d3d30; --neutral-800:#1a2b1d;
+
+  --red:#ef4444; --red-l:#fef2f2;
+  --amber:#f59e0b; --amber-l:#fffbeb;
+  --blue:#3b82f6; --blue-l:#eff6ff;
+  --blue-d:#1d4ed8;
+
+  --bg:var(--mint-50);
+  --surface:var(--neutral-0);
+  --surface-raised:var(--neutral-0);
+  --border:var(--neutral-200);
+  --border-soft:var(--neutral-100);
+  --text-primary:var(--neutral-800);
+  --text-secondary:var(--neutral-600);
+  --text-muted:var(--neutral-500);
+  --primary:var(--mint-600);
+  --primary-hover:var(--mint-700);
+  --primary-light:var(--mint-100);
+
+  --r1:6px; --r2:10px; --r3:14px; --r4:18px; --r5:24px; --r6:32px; --rFull:999px;
+  --shadow-xs:0 1px 2px rgba(0,50,20,.06);
+  --shadow-sm:0 2px 6px rgba(0,50,20,.08);
+  --shadow-md:0 4px 16px rgba(0,50,20,.10);
+  --shadow-lg:0 8px 32px rgba(0,50,20,.13);
+  --shadow-xl:0 16px 48px rgba(0,50,20,.16);
 }
 
-/* ═══════════════════ RESET ═══════════════════ */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   RESET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 *{box-sizing:border-box;margin:0;padding:0;}
-html{-webkit-text-size-adjust:100%;}
+html{-webkit-text-size-adjust:100%;height:100%;}
 body{
-  font-family:'Noto Sans Thai','Plus Jakarta Sans',sans-serif;
-  background:var(--bg);color:var(--text);
-  min-height:100svh;line-height:1.55;
+  font-family:'IBM Plex Sans Thai',sans-serif;
+  background:var(--bg);color:var(--text-primary);
+  min-height:100%;line-height:1.55;
   -webkit-tap-highlight-color:transparent;
   overscroll-behavior-y:contain;
   -webkit-overflow-scrolling:touch;
-  transition:background .35s,color .35s;
 }
 
-/* ═══ ANIMATED MESH BG ═══ */
-body::before{
-  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:
-    radial-gradient(ellipse 80% 60% at 20% -10%,rgba(34,197,94,.12) 0%,transparent 60%),
-    radial-gradient(ellipse 60% 50% at 90% 10%,rgba(22,163,74,.09) 0%,transparent 60%),
-    radial-gradient(ellipse 50% 40% at 50% 100%,rgba(74,222,128,.07) 0%,transparent 60%);
-  animation:meshDrift 14s ease-in-out infinite alternate;
-}
-@keyframes meshDrift{
-  0%{opacity:1;background-position:0% 0%,100% 0%,50% 100%;}
-  50%{opacity:.8;}
-  100%{opacity:1;background-position:8% 15%,92% 8%,58% 92%;}
-}
-[data-theme="dark"] body::before{opacity:.6;}
-[data-theme="amoled"] body::before{opacity:.3;}
-
-/* ═══════════════════ DYNAMIC ISLAND ═══════════════════ */
-#dynamicIsland{
-  position:fixed;
-  top:max(10px,env(safe-area-inset-top,10px));
-  left:50%;transform:translateX(-50%) scaleX(0.35) scaleY(0.6);
-  z-index:99998;
-  background:#030303;
-  border-radius:99px;
-  width:120px;height:34px;
-  overflow:hidden;
-  transition:all .45s cubic-bezier(0.34,1.56,0.64,1);
-  opacity:0;pointer-events:none;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 20px rgba(0,0,0,.5);
-}
-#dynamicIsland.show{
-  opacity:1;pointer-events:auto;
-  width:min(300px,85vw);height:52px;
-  transform:translateX(-50%) scaleX(1) scaleY(1);
-}
-#dynamicIsland.mini{
-  opacity:1;width:120px;height:34px;
-  transform:translateX(-50%) scaleX(1) scaleY(1);
-}
-.di-inner{
-  display:flex;align-items:center;gap:9px;
-  padding:0 14px;white-space:nowrap;
-  opacity:0;transition:opacity .2s .25s;
-}
-#dynamicIsland.show .di-inner{opacity:1;}
-.di-dot{width:8px;height:8px;border-radius:50%;background:var(--p3);animation:diPulse 1.2s ease infinite;}
-@keyframes diPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.3);opacity:.7;}}
-.di-ico{font-size:18px;}
-.di-txt{font-size:13px;font-weight:700;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;}
-.di-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:-1px;}
-
-/* ═══════════════════ LOADING ═══════════════════ */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   LOADING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 #appLoading{
   position:fixed;inset:0;z-index:9999;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
-  background:var(--bg);transition:opacity .4s;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  background:linear-gradient(145deg,#e8f8ee 0%,#f4fcf7 40%,#daf5e8 100%);
 }
-#appLoading.fade{opacity:0;pointer-events:none;}
-
-/* Hero illustration behind loading */
-.ld-hero-bg{
-  position:absolute;inset:0;pointer-events:none;
-  opacity:.07;
+.ld-car{
+  font-size:52px;
+  animation:ldBounce 1.4s cubic-bezier(.36,.07,.19,.97) infinite;
 }
-.ld-hero-bg svg{width:100%;height:100%;}
-
-.ld-scene{position:relative;width:96px;height:96px;z-index:1;}
-.ld-road{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:80px;height:6px;border-radius:3px;background:var(--n200);overflow:hidden;}
-.ld-road-fill{height:100%;background:linear-gradient(90deg,var(--p3),var(--p4));border-radius:3px;animation:roadFill 1.6s ease-in-out infinite;}
-@keyframes roadFill{0%{width:0;transform:translateX(-100%)}60%{width:100%}100%{width:100%;transform:translateX(100%);opacity:0}}
-.ld-car-icon{position:absolute;left:50%;top:10px;transform:translateX(-50%);font-size:48px;animation:ldDrive 1.6s ease-in-out infinite;z-index:1;}
-@keyframes ldDrive{0%{transform:translateX(-60%) rotate(-3deg);}50%{transform:translateX(-50%) rotate(0);}100%{transform:translateX(-40%) rotate(3deg);}}
-.ld-shadow{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:40px;height:6px;border-radius:50%;background:rgba(0,80,30,.12);animation:ldShadow 1.6s ease-in-out infinite;}
-@keyframes ldShadow{0%,100%{width:32px;opacity:.5}50%{width:44px;opacity:.9}}
-
-/* GPS pulse ring */
-.ld-gps{
-  position:absolute;bottom:4px;left:50%;transform:translateX(-50%);
-  width:60px;height:60px;border-radius:50%;
-  border:1.5px solid rgba(34,197,94,.3);
-  animation:gpsPing 2s ease-out infinite;
+@keyframes ldBounce{
+  0%,100%{transform:translateY(0) scaleX(1);}
+  40%{transform:translateY(-18px) scaleX(1.06);}
+  60%{transform:translateY(-10px) scaleX(.97);}
 }
-.ld-gps:nth-child(2){animation-delay:.7s;}
-@keyframes gpsPing{0%{transform:translateX(-50%) scale(.3);opacity:.8;}100%{transform:translateX(-50%) scale(2.5);opacity:0;}}
+.ld-track{
+  width:64px;height:5px;border-radius:99px;
+  background:var(--mint-200);overflow:hidden;
+}
+.ld-track-fill{
+  height:100%;background:linear-gradient(90deg,var(--mint-500),var(--mint-400));
+  border-radius:99px;animation:ldFill 1.4s ease-in-out infinite;
+}
+@keyframes ldFill{0%{width:0;transform:translateX(0)}70%{width:100%}100%{width:100%;transform:translateX(100%);opacity:0}}
+.ld-text{font-size:17px;font-weight:600;color:var(--mint-700);letter-spacing:-.2px;}
+.ld-sub{font-size:13px;color:var(--neutral-500);}
 
-.ld-title{font-size:17px;font-weight:800;color:var(--p1);letter-spacing:-.3px;z-index:1;}
-[data-theme="dark"] .ld-title,[data-theme="amoled"] .ld-title{color:var(--p3);}
-.ld-sub{font-size:12.5px;color:var(--text-m);z-index:1;}
-.ld-dots{display:flex;gap:5px;z-index:1;}
-.ld-dots span{width:6px;height:6px;border-radius:50%;background:var(--p3);opacity:.3;animation:dotBounce 1.2s ease infinite;}
-.ld-dots span:nth-child(2){animation-delay:.2s;}
-.ld-dots span:nth-child(3){animation-delay:.4s;}
-@keyframes dotBounce{0%,80%,100%{opacity:.3;transform:scale(1)}40%{opacity:1;transform:scale(1.4)}}
-
-/* ═══════════════════ SCREENS + TRANSITIONS ═══════════════════ */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SCREENS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .screen{display:none!important;}
 .screen.active{display:block!important;}
 #screen-pending.active,#screen-suspended.active,#screen-car-in-use.active{display:flex!important;}
 
-/* Page transition classes */
-.screen.t-enter{animation:tEnter .38s cubic-bezier(0.16,1,0.3,1) both;}
-.screen.t-exit{animation:tExit .25s cubic-bezier(0.4,0,1,1) both;}
-@keyframes tEnter{from{opacity:0;transform:translateY(24px) scale(0.97);}to{opacity:1;transform:none;}}
-@keyframes tExit{from{opacity:1;transform:none;}to{opacity:0;transform:translateY(-12px) scale(1.02);}}
-
-/* ═══════════════════ HEADER ═══════════════════ */
-.site-hdr{
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STICKY HEADER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.site-header{
   position:sticky;top:0;z-index:300;
   height:56px;padding:0 14px;
   display:flex;align-items:center;gap:10px;
-  background:var(--glass-bd);
-  backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
-  box-shadow:var(--sh1);transition:background .3s;
+  box-shadow:var(--shadow-xs);
 }
+.hdr-brand{display:flex;align-items:center;gap:8px;flex:1;}
 .hdr-logo{
   width:34px;height:34px;border-radius:10px;
-  background:linear-gradient(135deg,var(--p1),var(--p2));
+  background:linear-gradient(135deg,var(--mint-700),var(--mint-500));
   display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:15px;flex-shrink:0;
-  box-shadow:0 2px 8px rgba(22,163,74,.4);
-  /* glass reflection */
-  position:relative;overflow:hidden;
+  color:#fff;font-size:15px;
+  box-shadow:0 2px 6px rgba(20,133,67,.35);
+  flex-shrink:0;
 }
-.hdr-logo::after{
-  content:'';position:absolute;top:-50%;left:-50%;
-  width:200%;height:200%;
-  background:linear-gradient(135deg,rgba(255,255,255,.18) 0%,transparent 60%);
-  pointer-events:none;
-}
-.hdr-brand{flex:1;}
-.hdr-name{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.3px;font-family:'Plus Jakarta Sans',sans-serif;}
-.hdr-tag{font-size:11px;color:var(--text-m);margin-top:-2px;}
-.hdr-actions{display:flex;align-items:center;gap:7px;}
-
-/* Theme cycle button */
-.theme-btn{
-  width:32px;height:32px;border-radius:50%;
-  border:1.5px solid var(--border);
-  background:var(--surface-2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:14px;cursor:pointer;touch-action:manipulation;
-  transition:all .22s;position:relative;overflow:hidden;
-}
-.theme-btn:active{transform:rotate(25deg) scale(.88);}
-
-.hdr-hist{
-  font-size:12px;font-weight:600;color:var(--text-2);
-  background:var(--surface-2);border:1px solid var(--border);
-  padding:6px 11px;border-radius:var(--rF);
-  text-decoration:none;display:flex;align-items:center;gap:5px;
-  touch-action:manipulation;transition:background .15s;
-}
-.hdr-hist:active{background:var(--primary-l);}
+.hdr-name{font-size:15px;font-weight:700;color:var(--neutral-800);letter-spacing:-.3px;}
+.hdr-tagline{font-size:11px;color:var(--neutral-500);margin-top:-2px;}
 .hdr-av{
-  width:32px;height:32px;border-radius:50%;
-  background:var(--primary-l);border:1.5px solid var(--p3);
+  width:34px;height:34px;border-radius:50%;
+  background:var(--mint-100);border:1.5px solid var(--mint-300);
   overflow:hidden;display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:800;color:var(--p1);flex-shrink:0;
+  font-size:13px;font-weight:700;color:var(--mint-700);
+  flex-shrink:0;cursor:pointer;
 }
 .hdr-av img{width:100%;height:100%;object-fit:cover;}
+.hdr-hist{
+  font-size:12px;font-weight:600;color:var(--neutral-600);
+  background:var(--neutral-100);border:1px solid var(--border);
+  padding:6px 11px;border-radius:var(--rFull);
+  text-decoration:none;display:flex;align-items:center;gap:5px;
+  touch-action:manipulation;white-space:nowrap;
+}
+.hdr-hist:active{background:var(--mint-100);border-color:var(--mint-300);}
 
-/* ═══════════════════ USER BANNER ═══════════════════ */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   USER BANNER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .user-banner{
+  background:linear-gradient(130deg,var(--mint-700) 0%,var(--mint-600) 60%,var(--mint-500) 100%);
+  padding:18px 16px 58px;
   position:relative;overflow:hidden;
-  background:linear-gradient(135deg,var(--p1) 0%,var(--p2) 55%,var(--p3) 100%);
-  padding:20px 16px 66px;
 }
-/* Animated gradient layer */
-.banner-gradient-anim{
-  position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(225deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.06) 40%,rgba(255,255,255,0) 80%);
-  animation:bannerShimmer 4s ease-in-out infinite;
+.user-banner::before{
+  content:'';position:absolute;
+  width:160px;height:160px;border-radius:50%;
+  background:rgba(255,255,255,.07);
+  top:-40px;right:-30px;pointer-events:none;
 }
-@keyframes bannerShimmer{0%,100%{transform:translateX(-100%) rotate(45deg);}50%{transform:translateX(200%) rotate(45deg);}}
-
-/* Hero SVG illustration */
-.banner-hero{
-  position:absolute;right:-10px;bottom:30px;
-  width:140px;height:100px;pointer-events:none;opacity:.18;
+.user-banner::after{
+  content:'';position:absolute;
+  bottom:-28px;left:0;right:0;height:56px;
+  background:var(--bg);border-radius:32px 32px 0 0;
 }
-
-.banner-bubbles{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
-.bubble{position:absolute;border-radius:50%;background:rgba(255,255,255,.07);animation:bubbleUp linear infinite;}
-.bubble:nth-child(1){width:70px;height:70px;left:5%;animation-duration:11s;animation-delay:-3s;}
-.bubble:nth-child(2){width:45px;height:45px;right:12%;top:0;animation-duration:8s;animation-delay:-1s;}
-.bubble:nth-child(3){width:100px;height:100px;right:-15px;top:-15px;animation-duration:14s;}
-.bubble:nth-child(4){width:28px;height:28px;left:38%;animation-duration:7s;animation-delay:-5s;}
-@keyframes bubbleUp{0%{transform:translateY(120%) scale(0)}100%{transform:translateY(-120%) scale(1)}}
-
-.banner-wave{position:absolute;bottom:-1px;left:0;right:0;height:56px;background:var(--bg);border-radius:40px 40px 0 0;}
-.banner-inner{position:relative;z-index:1;display:flex;align-items:center;gap:13px;}
+.banner-inner{position:relative;z-index:1;display:flex;align-items:center;gap:12px;}
 .banner-avi{
-  width:52px;height:52px;border-radius:50%;
-  border:2.5px solid rgba(255,255,255,.6);
+  width:50px;height:50px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.5);
   background:rgba(255,255,255,.2);
   display:flex;align-items:center;justify-content:center;
-  font-size:20px;font-weight:800;color:#fff;
+  font-size:20px;font-weight:700;color:#fff;
   flex-shrink:0;overflow:hidden;
-  /* glass reflection */
-  position:relative;
-}
-.banner-avi::after{
-  content:'';position:absolute;top:0;left:0;right:0;height:50%;
-  background:linear-gradient(rgba(255,255,255,.15),transparent);
-  border-radius:50% 50% 0 0;pointer-events:none;
 }
 .banner-avi img{width:100%;height:100%;object-fit:cover;}
-.banner-greet{font-size:11.5px;color:rgba(255,255,255,.72);margin-bottom:1px;}
-.banner-name{font-size:19px;font-weight:800;color:#fff;line-height:1.2;letter-spacing:-.3px;font-family:'Plus Jakarta Sans',sans-serif;}
-.banner-dept{margin-top:5px;display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);border-radius:99px;padding:3px 10px;font-size:11px;font-weight:600;color:rgba(255,255,255,.92);}
-
-/* Weather Widget */
-.weather-widget{
-  position:absolute;top:14px;right:14px;z-index:2;
-  background:rgba(255,255,255,.16);
-  border:1px solid rgba(255,255,255,.22);
-  border-radius:12px;padding:7px 11px;
-  display:flex;align-items:center;gap:7px;
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  cursor:pointer;touch-action:manipulation;
-  transition:background .2s;
-  min-width:90px;
+.banner-greet{font-size:11.5px;color:rgba(255,255,255,.7);margin-bottom:1px;}
+.banner-name{font-size:18px;font-weight:700;color:#fff;line-height:1.2;letter-spacing:-.2px;}
+.banner-dept{
+  margin-top:5px;display:inline-flex;align-items:center;gap:4px;
+  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:99px;padding:3px 9px;font-size:11px;font-weight:600;color:rgba(255,255,255,.9);
 }
-.weather-widget:active{background:rgba(255,255,255,.26);}
-.weather-ico{font-size:22px;line-height:1;}
-.weather-info{}
-.weather-temp{font-size:14px;font-weight:800;color:#fff;line-height:1;font-family:'Plus Jakarta Sans',sans-serif;}
-.weather-desc{font-size:10px;color:rgba(255,255,255,.72);font-weight:500;margin-top:1px;}
-.weather-skel{width:52px;height:28px;border-radius:6px;background:rgba(255,255,255,.15);animation:shimmer 1.5s infinite;}
 
-/* ═══════════════════ QUICK STATS ═══════════════════ */
-.stats-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 12px;margin-top:-20px;position:relative;z-index:2;}
-.stat-card{
-  background:var(--surface-2);border:1px solid var(--border);
-  border-radius:var(--r4);padding:12px 10px;text-align:center;
-  box-shadow:var(--sh3);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  transition:transform .2s,box-shadow .2s;
-  /* glass reflection */
-  position:relative;overflow:hidden;
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   PAGE WRAP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.page-wrap{
+  max-width:520px;margin:0 auto;
+  padding:0 12px 120px;
 }
-.stat-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:50%;
-  background:linear-gradient(rgba(255,255,255,.08),transparent);
-  pointer-events:none;
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SECTION TITLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.sec-title{
+  display:flex;align-items:center;gap:8px;
+  padding:18px 2px 8px;
 }
-.stat-card:active{transform:scale(.95);box-shadow:var(--sh1);}
-.stat-icon{font-size:20px;margin-bottom:3px;}
-.stat-val{font-size:18px;font-weight:800;color:var(--primary);line-height:1;font-family:'Plus Jakarta Sans',sans-serif;}
-.stat-lbl{font-size:10px;color:var(--text-m);margin-top:2px;font-weight:600;}
+.sec-title-text{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;}
+.sec-title-line{flex:1;height:1px;background:var(--border);}
 
-/* Ambient glow on stats */
-.stat-card:nth-child(1){box-shadow:var(--sh3),0 0 20px rgba(34,197,94,.07);}
-.stat-card:nth-child(2){box-shadow:var(--sh3),0 0 20px rgba(59,130,246,.06);}
-.stat-card:nth-child(3){box-shadow:var(--sh3),0 0 20px rgba(245,158,11,.06);}
-
-/* ═══════════════════ SHIMMER (Apple-style) ═══════════════════ */
-.skel{
-  background:linear-gradient(90deg,var(--n200) 0%,var(--n100) 30%,rgba(255,255,255,.9) 50%,var(--n100) 70%,var(--n200) 100%);
-  background-size:300% 100%;
-  animation:shimmer 1.6s cubic-bezier(0.4,0,0.6,1) infinite;
-  border-radius:4px;
-}
-[data-theme="dark"] .skel,[data-theme="amoled"] .skel{
-  background:linear-gradient(90deg,rgba(255,255,255,.04) 0%,rgba(255,255,255,.09) 30%,rgba(255,255,255,.14) 50%,rgba(255,255,255,.09) 70%,rgba(255,255,255,.04) 100%);
-  background-size:300% 100%;
-}
-@keyframes shimmer{0%{background-position:150% 0}100%{background-position:-150% 0}}
-.skel-val{width:40px;height:20px;margin:0 auto 3px;}
-.skel-lbl{width:32px;height:10px;margin:0 auto;}
-
-/* ═══════════════════ PAGE ═══════════════════ */
-.page{max-width:520px;margin:0 auto;padding:10px 12px 130px;position:relative;z-index:1;}
-.sec-lbl{display:flex;align-items:center;gap:8px;padding:16px 2px 8px;}
-.sec-lbl-text{font-size:11px;font-weight:800;color:var(--text-m);text-transform:uppercase;letter-spacing:1.1px;}
-.sec-lbl-line{flex:1;height:1px;background:var(--border);}
-
-/* ═══════════════════ CARDS + REFLECTION ═══════════════════ */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CARDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .card{
   background:var(--surface);
   border:1px solid var(--border);
-  border-radius:var(--r5);margin-bottom:10px;
-  box-shadow:var(--sh2);overflow:hidden;
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  transition:box-shadow .2s,transform .15s;
-  position:relative;
+  border-radius:var(--r5);
+  margin-bottom:10px;
+  box-shadow:var(--shadow-sm);
+  overflow:hidden;
 }
-/* Glass reflection on cards */
-.card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:44%;
-  background:linear-gradient(rgba(255,255,255,.06),transparent);
-  pointer-events:none;z-index:0;border-radius:var(--r5) var(--r5) 0 0;
+.card-hd{
+  padding:14px 16px 12px;
+  border-bottom:1px solid var(--border-soft);
+  display:flex;align-items:center;gap:10px;
 }
-.card>*{position:relative;z-index:1;}
-.card:focus-within{box-shadow:var(--sh3),var(--glow);}
-
-/* Card tilt micro-interaction */
-.card.tiltable{transition:box-shadow .2s,transform .1s;}
-
-.card-hd{padding:13px 15px 11px;border-bottom:1px solid var(--border-2);display:flex;align-items:center;gap:10px;}
 .card-ico{
   width:32px;height:32px;border-radius:9px;
-  background:var(--primary-l);
+  background:var(--primary-light);
   display:flex;align-items:center;justify-content:center;
   color:var(--primary);font-size:14px;flex-shrink:0;
-  /* ambient glow */
-  box-shadow:0 0 12px rgba(34,197,94,.15);
 }
-.card-ttl{font-size:14px;font-weight:700;color:var(--text);}
-.card-sub{font-size:12px;color:var(--text-m);margin-top:1px;}
-.card-bd{padding:14px 15px;}
+.card-ttl{font-size:14px;font-weight:700;color:var(--text-primary);}
+.card-sub{font-size:12px;color:var(--text-muted);margin-top:1px;}
+.card-bd{padding:14px 16px;}
 
-/* ═══════════════════ HISTORY ═══════════════════ */
-.hist-wrap{padding:4px 15px 12px;}
-.hist-skel-row{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--border-2);}
-.hist-skel-row:last-child{border-bottom:none;}
-.skel-circle{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.skel-line-a{height:13px;border-radius:4px;flex:1;}
-.skel-line-b{width:52px;height:20px;border-radius:6px;flex-shrink:0;}
-.hist-empty{padding:20px 0;text-align:center;color:var(--text-m);font-size:13px;}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   HISTORY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.hist-wrap{padding:4px 16px 12px;}
+.hist-empty{
+  padding:20px 0;text-align:center;color:var(--text-muted);font-size:13px;
+}
 .hist-row{
   display:flex;align-items:center;gap:11px;
-  padding:10px 0;border-bottom:1px solid var(--border-2);
-  animation:fadeUp .3s both;
-  transition:background .15s;border-radius:var(--r2);
+  padding:10px 0;border-bottom:1px solid var(--border-soft);
 }
 .hist-row:last-child{border-bottom:none;}
-.hist-pip{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.hist-pip.green{background:var(--p3);box-shadow:0 0 6px rgba(34,197,94,.5);}
-.hist-pip.amber{background:var(--amber);box-shadow:0 0 6px rgba(245,158,11,.5);}
+.hist-pip{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.hist-pip.green{background:var(--mint-500);}
+.hist-pip.amber{background:var(--amber);}
 .hist-body{flex:1;min-width:0;}
-.hist-car{font-size:13.5px;font-weight:700;color:var(--text);}
-.hist-meta{font-size:11.5px;color:var(--text-m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+.hist-car{font-size:13.5px;font-weight:600;color:var(--text-primary);}
+.hist-meta{font-size:11.5px;color:var(--text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .hist-tail{text-align:right;flex-shrink:0;}
 .hist-tag{font-size:11px;font-weight:700;}
-.hist-tag.green{color:var(--p2);}
+.hist-tag.green{color:var(--mint-600);}
 .hist-tag.amber{color:var(--amber);}
-.hist-km{font-size:11px;color:var(--text-m);margin-top:1px;}
+.hist-km{font-size:11px;color:var(--text-muted);margin-top:1px;}
 
-/* ═══════════════════ STEPS ═══════════════════ */
-.steps{display:flex;align-items:center;padding:0 15px 14px;}
-.step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;position:relative;}
-.step+.step::before{content:'';position:absolute;top:13px;right:50%;left:-50%;height:2px;background:var(--border);transition:background .35s;}
-.step.done+.step::before,.step.active+.step::before{background:var(--p3);}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STEP INDICATOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.steps{
+  display:flex;align-items:center;gap:0;
+  padding:0 16px 14px;
+}
+.step{
+  display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;
+  position:relative;
+}
+.step::after{
+  content:'';position:absolute;
+  top:13px;left:calc(50% + 14px);right:calc(-50% + 14px);
+  height:2px;background:var(--border);
+}
+.step:last-child::after{display:none;}
+.step.done::after{background:var(--mint-400);}
 .step-dot{
   width:26px;height:26px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:800;z-index:1;
-  background:var(--n100);border:2px solid var(--border);color:var(--text-m);
-  transition:all .28s cubic-bezier(0.34,1.56,0.64,1);
+  font-size:11px;font-weight:700;
+  background:var(--neutral-100);border:2px solid var(--border);
+  color:var(--text-muted);
+  transition:all .2s;
+  position:relative;z-index:1;
 }
-[data-theme="dark"] .step-dot,[data-theme="amoled"] .step-dot{background:rgba(255,255,255,.07);}
-.step.active .step-dot{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 0 0 3px rgba(34,197,94,.18),0 0 16px rgba(34,197,94,.25);}
-.step.done .step-dot{background:var(--primary-l);border-color:var(--p3);color:var(--p1);}
-[data-theme="dark"] .step.done .step-dot,[data-theme="amoled"] .step.done .step-dot{background:rgba(34,197,94,.15);color:var(--p3);}
-.step-lbl{font-size:10px;color:var(--text-m);font-weight:600;text-align:center;}
+.step.active .step-dot{background:var(--primary);border-color:var(--primary);color:#fff;}
+.step.done .step-dot{background:var(--mint-100);border-color:var(--mint-400);color:var(--mint-600);}
+.step-lbl{font-size:10px;color:var(--text-muted);font-weight:600;text-align:center;white-space:nowrap;}
 .step.active .step-lbl{color:var(--primary);font-weight:700;}
-.step.done .step-lbl{color:var(--p2);}
+.step.done .step-lbl{color:var(--mint-600);}
 
-/* ═══════════════════ FORM ═══════════════════ */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FORM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .frow{margin-bottom:13px;}
-.flabel{display:block;font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:6px;letter-spacing:.2px;}
-.flabel .req{color:var(--red);}
-.flabel .opt{font-size:10.5px;font-weight:400;color:var(--text-m);}
+.flabel{
+  display:block;font-size:12px;font-weight:700;color:var(--text-secondary);
+  margin-bottom:6px;letter-spacing:.2px;
+}
+.flabel .req{color:var(--red);margin-left:2px;}
+.flabel .opt{font-size:10.5px;font-weight:400;color:var(--text-muted);}
 .fwrap{position:relative;}
-.fic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--p3);font-size:14px;pointer-events:none;z-index:1;}
-.fic.top{top:14px;transform:none;}
+.ficon{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  color:var(--mint-500);font-size:14px;pointer-events:none;z-index:1;
+}
+.ficon.top{top:14px;transform:none;}
 input,select,textarea{
-  width:100%;padding:13px 13px 13px 38px;
-  border:1.5px solid var(--border);border-radius:var(--r3);
-  font-family:'Noto Sans Thai','Plus Jakarta Sans',sans-serif;
-  font-size:16px;color:var(--text);
-  background:var(--surface-2);
+  width:100%;padding:12px 13px 12px 38px;
+  border:1.5px solid var(--neutral-300);border-radius:var(--r3);
+  font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:16px;color:var(--text-primary);
+  background:var(--surface);
   transition:border .15s,box-shadow .15s,background .15s;
   appearance:none;-webkit-appearance:none;
+  -webkit-tap-highlight-color:transparent;
 }
-[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea,
-[data-theme="amoled"] input,[data-theme="amoled"] select,[data-theme="amoled"] textarea{background:rgba(255,255,255,.05);}
-input::placeholder,textarea::placeholder{color:var(--n400);}
-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2322c55e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:36px;}
-select option{background:#fff;color:#1a2a1f;}
-[data-theme="dark"] select option,[data-theme="amoled"] select option{background:#111;color:#e8f5ec;}
-textarea{padding-left:38px;min-height:80px;resize:none;line-height:1.65;}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--p3);background:var(--p7);box-shadow:var(--glow);}
-[data-theme="dark"] input:focus,[data-theme="dark"] select:focus,[data-theme="dark"] textarea:focus,
-[data-theme="amoled"] input:focus,[data-theme="amoled"] select:focus,[data-theme="amoled"] textarea:focus{background:rgba(34,197,94,.07);}
-.ferr{display:none;align-items:center;gap:5px;font-size:12px;color:var(--red);margin-top:5px;}
+input::placeholder,textarea::placeholder{color:var(--neutral-400);}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2318a857' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;
+  padding-right:36px;
+}
+select option{background:#fff;}
+textarea{
+  padding-left:38px;min-height:82px;
+  resize:none;line-height:1.6;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none;
+  border-color:var(--mint-400);
+  background:var(--mint-50);
+  box-shadow:0 0 0 3px rgba(37,201,110,.12);
+}
+.ferr{
+  display:none;align-items:center;gap:5px;
+  font-size:12px;color:var(--red);margin-top:5px;
+}
 .ferr.show{display:flex;}
 
-/* ═══════════════════ CAR PILLS + LIVE STATUS ═══════════════════ */
-.car-pills{display:flex;flex-wrap:wrap;gap:7px;}
+/* CAR PILL SELECT */
+.car-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:2px;}
 .car-pill{
   flex:1;min-width:calc(50% - 4px);
-  display:flex;align-items:center;gap:8px;
-  padding:10px 12px;border-radius:var(--r3);
-  border:1.5px solid var(--border);background:var(--surface-2);
-  cursor:pointer;transition:all .2s cubic-bezier(0.34,1.56,0.64,1);
-  touch-action:manipulation;position:relative;overflow:hidden;
+  display:flex;align-items:center;gap:7px;
+  padding:10px 11px;border-radius:var(--r3);
+  border:1.5px solid var(--neutral-200);
+  background:var(--neutral-50);
+  cursor:pointer;transition:all .15s;
+  touch-action:manipulation;
+}
+.car-pill:active,.car-pill.selected{
+  background:var(--mint-100);
+  border-color:var(--mint-400);
 }
 .car-pill input[type=radio]{display:none;}
-.car-pill-em{font-size:22px;flex-shrink:0;}
-.car-pill-nm{font-size:12px;font-weight:700;color:var(--text);}
-.car-pill-pl{font-size:11px;color:var(--text-m);}
+.car-pill-icon{font-size:20px;flex-shrink:0;}
+.car-pill-info{}
+.car-pill-name{font-size:12px;font-weight:700;color:var(--text-primary);}
+.car-pill-plate{font-size:11px;color:var(--text-muted);}
 
-/* Live status badge */
-.car-status{
-  position:absolute;top:6px;right:8px;
-  font-size:10px;font-weight:700;
-  border-radius:99px;padding:2px 7px;
-  display:flex;align-items:center;gap:3px;
+/* UPLOAD */
+.upload-area{
+  border:2px dashed var(--neutral-300);
+  border-radius:var(--r3);background:var(--neutral-50);
+  padding:20px;text-align:center;cursor:pointer;
+  transition:all .2s;position:relative;min-height:80px;
 }
-.car-status.free{background:rgba(34,197,94,.12);color:var(--p2);border:1px solid rgba(34,197,94,.25);}
-.car-status.busy{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);}
-.car-status-dot{width:5px;height:5px;border-radius:50%;}
-.car-status.free .car-status-dot{background:var(--p3);animation:statusPulse 1.8s ease infinite;}
-.car-status.busy .car-status-dot{background:var(--red);}
-@keyframes statusPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.4);}}
-
-.car-pill.selected{
-  background:var(--primary-l);border-color:var(--p3);
-  box-shadow:0 0 0 3px rgba(34,197,94,.12),0 0 20px rgba(34,197,94,.12);
-  transform:scale(1.01);
+.upload-area:active,.upload-area.has-file{
+  border-color:var(--mint-400);background:var(--mint-50);
 }
-[data-theme="dark"] .car-pill.selected,[data-theme="amoled"] .car-pill.selected{background:rgba(34,197,94,.12);}
-.car-pill.selected .car-pill-nm{color:var(--p1);}
-[data-theme="dark"] .car-pill.selected .car-pill-nm,[data-theme="amoled"] .car-pill.selected .car-pill-nm{color:var(--p3);}
-.car-pill.in-use{opacity:.55;cursor:not-allowed;}
-.car-pill.in-use:active{transform:none;}
+.upload-area input[type=file]{
+  position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;
+  padding:0;border:none;
+}
+.upload-ico{font-size:24px;color:var(--neutral-400);margin-bottom:5px;}
+.upload-area.has-file .upload-ico{color:var(--mint-500);}
+.upload-lbl{font-size:13px;color:var(--text-muted);font-weight:500;}
+.preview-wrap{display:none;margin-top:9px;}
+.preview-wrap.show{display:block;}
+.preview-img{width:100%;max-height:160px;object-fit:contain;border-radius:var(--r2);border:1px solid var(--border);}
+.preview-meta{font-size:12px;color:var(--mint-600);font-weight:600;margin-top:4px;}
+.preview-rm{
+  margin-top:6px;width:100%;padding:8px;
+  background:transparent;border:1px solid var(--border);
+  border-radius:var(--r2);font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:12.5px;color:var(--red);cursor:pointer;touch-action:manipulation;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.preview-rm:active{background:var(--red-l);}
 
-/* ═══════════════════ UPLOAD ═══════════════════ */
-.upload-zone{border:2px dashed var(--border);border-radius:var(--r3);background:var(--bg2);padding:20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;min-height:78px;}
-.upload-zone:active,.upload-zone.has-file{border-color:var(--p3);background:var(--p7);}
-.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;padding:0;border:none;}
-.upload-ico{font-size:24px;color:var(--n400);margin-bottom:5px;transition:.2s;}
-.upload-zone.has-file .upload-ico{color:var(--p3);}
-.upload-lbl{font-size:13px;color:var(--text-m);font-weight:500;}
-.prev-wrap{display:none;margin-top:9px;}
-.prev-wrap.show{display:block;}
-.prev-img{width:100%;max-height:160px;object-fit:contain;border-radius:var(--r2);border:1.5px solid var(--border);}
-.prev-meta{font-size:12px;color:var(--p2);font-weight:600;margin-top:4px;}
-.prev-rm{margin-top:6px;width:100%;padding:8px;display:flex;align-items:center;justify-content:center;gap:5px;background:transparent;border:1px solid var(--border);border-radius:var(--r2);font-family:'Noto Sans Thai',sans-serif;font-size:12.5px;color:var(--red);cursor:pointer;touch-action:manipulation;}
-.prev-rm:active{background:var(--red-l);}
-
-/* ═══════════════════ MAP ═══════════════════ */
-#map{width:100%;height:268px;border-radius:var(--r2);overflow:hidden;touch-action:pan-x pan-y;border:1px solid var(--border);}
-.map-srch{display:flex;gap:7px;margin-bottom:10px;}
-.map-srch input{padding-left:13px;}
-.route-chip{display:flex;align-items:center;gap:8px;margin-top:9px;background:var(--primary-l);border:1px solid rgba(34,197,94,.25);border-radius:var(--rF);padding:8px 13px;font-size:13px;color:var(--p1);font-weight:500;box-shadow:0 0 16px rgba(34,197,94,.1);}
-[data-theme="dark"] .route-chip,[data-theme="amoled"] .route-chip{color:var(--p4);}
-.route-chip i{color:var(--p3);}
-.dest-list{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:9px 12px;font-size:12.5px;color:var(--text-m);min-height:38px;white-space:pre-line;line-height:1.8;margin-top:7px;}
-.map-acts{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;}
+/* MAP */
+#map{
+  width:100%;height:270px;border-radius:var(--r2);
+  overflow:hidden;touch-action:pan-x pan-y;
+  border:1px solid var(--border);
+}
+.map-search{
+  display:flex;gap:7px;margin-bottom:10px;
+}
+.map-search input{padding-left:13px;}
+.route-chip{
+  display:flex;align-items:center;gap:8px;margin-top:9px;
+  background:var(--mint-100);border:1px solid var(--mint-200);
+  border-radius:var(--rFull);padding:8px 13px;
+  font-size:13px;color:var(--mint-700);font-weight:500;
+}
+.route-chip i{color:var(--mint-500);}
+.dest-list{
+  background:var(--neutral-50);border:1px solid var(--border);
+  border-radius:var(--r2);padding:9px 12px;
+  font-size:12.5px;color:var(--text-muted);
+  min-height:38px;white-space:pre-line;line-height:1.8;margin-top:7px;
+}
+.map-actions{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;
+}
 .map-btn{
   display:flex;flex-direction:column;align-items:center;gap:3px;
   padding:9px 5px;border-radius:var(--r2);
-  border:1px solid var(--border);background:var(--surface-2);
-  font-family:'Noto Sans Thai',sans-serif;font-size:11px;font-weight:600;color:var(--text-2);
-  cursor:pointer;touch-action:manipulation;min-height:50px;position:relative;overflow:hidden;
-  transition:all .18s;
+  border:1px solid var(--border);background:var(--surface);
+  font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:11px;font-weight:600;color:var(--text-secondary);
+  cursor:pointer;touch-action:manipulation;min-height:50px;
 }
-.map-btn i{font-size:15px;color:var(--p3);}
-.map-btn:active{background:var(--primary-l);transform:scale(.95);}
+.map-btn i{font-size:15px;color:var(--mint-500);}
+.map-btn:active{background:var(--mint-100);border-color:var(--mint-300);}
 
-/* ═══════════════════ BUTTONS + RIPPLE ═══════════════════ */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BUTTONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .btn{
   display:flex;align-items:center;justify-content:center;gap:8px;
-  padding:14px 18px;border-radius:var(--rF);
-  font-family:'Noto Sans Thai',sans-serif;font-size:15px;font-weight:700;
+  padding:14px 18px;border-radius:var(--rFull);
+  font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:15px;font-weight:700;
   border:none;cursor:pointer;width:100%;text-decoration:none;
-  transition:all .18s cubic-bezier(0.34,1.56,0.64,1);min-height:50px;
+  transition:all .15s;min-height:50px;
   touch-action:manipulation;user-select:none;
-  position:relative;overflow:hidden;
 }
 .btn:disabled{opacity:.5;pointer-events:none;}
 .btn-primary{
-  background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;
-  box-shadow:0 4px 16px rgba(22,163,74,.30),0 0 24px rgba(34,197,94,.15);
+  background:linear-gradient(135deg,var(--mint-700),var(--mint-500));
+  color:#fff;box-shadow:0 4px 14px rgba(20,133,67,.28);
 }
-.btn-primary:active{transform:scale(.96);}
-.btn-danger{background:linear-gradient(135deg,#dc2626,#f87171);color:#fff;box-shadow:0 4px 16px rgba(239,68,68,.22);}
-.btn-danger:active{transform:scale(.96);}
-.btn-blue{background:linear-gradient(135deg,var(--blue-d),var(--blue));color:#fff;box-shadow:0 4px 16px rgba(59,130,246,.22);}
-.btn-blue:active{transform:scale(.96);}
-.btn-ghost{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border);}
-.btn-ghost:active{background:var(--primary-l);transform:scale(.97);}
-.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text-2);}
-.btn-outline:active{background:var(--bg2);}
+.btn-primary:active{transform:scale(.97);box-shadow:0 2px 8px rgba(20,133,67,.2);}
+.btn-danger{background:linear-gradient(135deg,#dc2626,var(--red));color:#fff;box-shadow:0 4px 14px rgba(239,68,68,.22);}
+.btn-danger:active{transform:scale(.97);}
+.btn-blue{background:linear-gradient(135deg,var(--blue-d),var(--blue));color:#fff;box-shadow:0 4px 14px rgba(59,130,246,.22);}
+.btn-blue:active{transform:scale(.97);}
+.btn-ghost{background:var(--neutral-100);color:var(--text-secondary);border:1px solid var(--border);}
+.btn-ghost:active{background:var(--mint-100);}
+.btn-outline{background:transparent;border:1.5px solid var(--neutral-300);color:var(--text-secondary);}
+.btn-outline:active{background:var(--neutral-100);}
 
-/* Ripple */
-.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.35);pointer-events:none;transform:scale(0);animation:rippleAnim .6s linear;}
-.btn-ghost .ripple,.btn-outline .ripple{background:rgba(34,197,94,.22);}
-.car-pill .ripple{background:rgba(34,197,94,.18);}
-@keyframes rippleAnim{to{transform:scale(4);opacity:0}}
-
-/* ═══════════════════ FLOATING DOCK ═══════════════════ */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FIXED SUBMIT BAR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .action-bar{
   position:fixed;bottom:0;left:0;right:0;z-index:200;
-  padding:10px 16px;
-  padding-bottom:max(14px,env(safe-area-inset-bottom,14px));
-  /* no bg — just the dock floats */
-  pointer-events:none;
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  padding:10px 14px;
+  padding-bottom:max(10px,env(safe-area-inset-bottom,10px));
+  box-shadow:0 -4px 20px rgba(0,50,20,.07);
 }
-.action-bar .btn{
-  max-width:520px;margin:0 auto;
-  border-radius:20px;
-  box-shadow:0 8px 32px rgba(22,163,74,.35),0 2px 8px rgba(0,0,0,.12);
-  pointer-events:auto;
-}
-.progress-track{
-  height:3px;border-radius:2px;background:rgba(0,0,0,.1);
-  margin-bottom:8px;overflow:hidden;max-width:520px;
-  margin-left:auto;margin-right:auto;
-}
-[data-theme="dark"] .progress-track,[data-theme="amoled"] .progress-track{background:rgba(255,255,255,.1);}
-.progress-fill{
-  height:100%;border-radius:2px;
-  background:linear-gradient(90deg,var(--p3),var(--p4));
-  transition:width .4s cubic-bezier(0.34,1.56,0.64,1);width:0%;
-}
-.progress-fill.complete{background:linear-gradient(90deg,var(--p2),var(--p3));animation:progressGlow 1.5s ease-in-out infinite;}
-@keyframes progressGlow{0%,100%{box-shadow:none;}50%{box-shadow:0 0 8px rgba(34,197,94,.6);}}
+.action-bar .btn{max-width:520px;margin:0 auto;}
 
-/* ═══════════════════ STATUS SCREENS ═══════════════════ */
-#screen-pending,#screen-suspended{min-height:100svh;flex-direction:column;align-items:center;justify-content:center;padding:28px 18px;background:var(--bg);}
-.status-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r6);padding:36px 24px;max-width:380px;width:100%;text-align:center;box-shadow:var(--sh4);position:relative;overflow:hidden;}
-.status-card::before{content:'';position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(rgba(255,255,255,.05),transparent);pointer-events:none;}
-.st-icon{width:96px;height:96px;border-radius:50%;font-size:48px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;}
-.st-icon.warn{background:var(--amber-l);box-shadow:0 0 0 8px rgba(245,158,11,.08),0 0 30px rgba(245,158,11,.1);}
-.st-icon.err{background:var(--red-l);box-shadow:0 0 0 8px rgba(239,68,68,.06),0 0 30px rgba(239,68,68,.08);}
-.st-h{font-size:21px;font-weight:800;color:var(--text);margin-bottom:9px;font-family:'Plus Jakarta Sans',sans-serif;}
-.st-p{color:var(--text-m);font-size:14px;line-height:1.85;}
-.st-acts{margin-top:22px;display:flex;flex-direction:column;gap:8px;}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STATUS SCREENS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#screen-pending,#screen-suspended{
+  min-height:100vh;flex-direction:column;
+  align-items:center;justify-content:center;padding:28px 18px;
+  background:linear-gradient(155deg,#edfaf3,var(--bg) 60%);
+}
+.status-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r6);padding:36px 24px;
+  max-width:380px;width:100%;text-align:center;
+  box-shadow:var(--shadow-lg);
+}
+.status-icon{
+  width:96px;height:96px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:48px;
+  margin:0 auto 18px;
+}
+.status-icon.warn{background:var(--amber-l);box-shadow:0 0 0 8px rgba(245,158,11,.08);}
+.status-icon.danger{background:var(--red-l);box-shadow:0 0 0 8px rgba(239,68,68,.06);}
+.status-h{font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:9px;}
+.status-p{color:var(--text-muted);font-size:14px;line-height:1.85;}
+.status-actions{margin-top:22px;display:flex;flex-direction:column;gap:8px;}
 
-/* ═══════════════════ REGISTER ═══════════════════ */
-#screen-register{min-height:100svh;background:var(--bg);padding:28px 14px 30px;}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   REGISTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#screen-register{
+  min-height:100vh;
+  background:linear-gradient(155deg,#edfaf3,var(--bg) 60%);
+  padding:28px 14px 30px;
+}
 .reg-inner{max-width:460px;margin:0 auto;}
 .reg-top{text-align:center;margin-bottom:20px;}
-.reg-av{width:84px;height:84px;border-radius:50%;background:var(--primary-l);border:2.5px solid var(--p3);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:var(--p2);margin:0 auto 12px;overflow:hidden;box-shadow:0 0 0 6px rgba(34,197,94,.09);}
+.reg-av{
+  width:84px;height:84px;border-radius:50%;
+  background:var(--mint-100);border:2.5px solid var(--mint-300);
+  display:flex;align-items:center;justify-content:center;
+  font-size:34px;font-weight:700;color:var(--mint-600);
+  margin:0 auto 12px;overflow:hidden;
+  box-shadow:0 0 0 6px rgba(37,201,110,.09);
+}
 .reg-av img{width:100%;height:100%;object-fit:cover;}
-.reg-top h2{font-size:21px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;}
-.reg-top p{font-size:13.5px;color:var(--text-m);margin-top:4px;}
-.reg-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r5);padding:22px 16px;box-shadow:var(--sh3);}
+.reg-top h2{font-size:21px;font-weight:700;color:var(--text-primary);}
+.reg-top p{font-size:13.5px;color:var(--text-muted);margin-top:4px;}
+.reg-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r5);padding:22px 16px;box-shadow:var(--shadow-md);
+}
 
-/* ═══════════════════ CAR IN USE ═══════════════════ */
-#screen-car-in-use{min-height:100svh;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 14px 110px;overflow-y:auto;background:var(--bg);}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CAR IN USE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#screen-car-in-use{
+  min-height:100vh;flex-direction:column;
+  align-items:center;justify-content:flex-start;
+  padding:20px 14px 110px;overflow-y:auto;
+  background:linear-gradient(155deg,#edfaf3,var(--bg) 70%);
+}
 .iu-card{
-  background:var(--surface-2);border:1px solid var(--border);
-  border-radius:var(--r6);padding:26px 18px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r6);padding:24px 18px;
   max-width:440px;width:100%;text-align:center;
-  box-shadow:var(--sh5);position:relative;overflow:hidden;
+  box-shadow:var(--shadow-xl);
 }
-.iu-card::before{content:'';position:absolute;top:0;left:0;right:0;height:35%;background:linear-gradient(rgba(255,255,255,.06),transparent);pointer-events:none;}
-.iu-emoji{font-size:60px;display:block;margin-bottom:10px;animation:iuBounce 2.5s ease-in-out infinite;}
-@keyframes iuBounce{0%,100%{transform:translateY(0) rotate(-3deg);}50%{transform:translateY(-10px) rotate(3deg);}}
-.iu-h{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.3px;font-family:'Plus Jakarta Sans',sans-serif;}
-.iu-sub{font-size:13px;color:var(--text-m);margin-bottom:18px;}
-.iu-tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.iu-car{
+  font-size:56px;margin-bottom:10px;display:inline-block;
+  animation:iuFloat 3s ease-in-out infinite;
+}
+@keyframes iuFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.iu-h{font-size:21px;font-weight:700;color:var(--text-primary);margin-bottom:3px;}
+.iu-sub{font-size:13px;color:var(--text-muted);margin-bottom:18px;}
+
+/* info row */
+.iu-info{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;
+}
 .iu-tile{
-  background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.18);
+  background:var(--sage-100);border:1px solid var(--sage-200);
   border-radius:var(--r3);padding:10px 12px;text-align:left;
-  position:relative;overflow:hidden;
 }
-.iu-tile::after{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(rgba(255,255,255,.04),transparent);pointer-events:none;}
-.iu-tl{font-size:10px;font-weight:800;color:var(--p2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
-.iu-tv{font-size:13.5px;font-weight:700;color:var(--text);}
+.iu-tile-l{font-size:10px;font-weight:700;color:var(--sage-600);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.iu-tile-v{font-size:13.5px;font-weight:700;color:var(--text-primary);}
 
+/* timer */
 .timer-panel{
-  background:linear-gradient(135deg,var(--p1),var(--p2));
+  background:linear-gradient(135deg,var(--mint-800),var(--mint-600));
   border-radius:var(--r4);padding:16px;margin-bottom:14px;
-  box-shadow:0 6px 24px rgba(22,163,74,.30),0 0 40px rgba(34,197,94,.15);
-  position:relative;overflow:hidden;
+  box-shadow:0 4px 18px rgba(20,133,67,.25);
 }
-.timer-panel::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='30' cy='30' r='28' fill='none' stroke='rgba(255,255,255,.06)' stroke-width='2'/%3E%3C/svg%3E") center/60px;opacity:.6;}
-/* Glass reflection on timer */
-.timer-panel::after{content:'';position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(rgba(255,255,255,.08),transparent);pointer-events:none;}
-.timer-l{font-size:11px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;position:relative;z-index:1;}
-#timerDisplay{font-size:clamp(38px,10vw,54px);font-weight:800;color:#fff;letter-spacing:4px;font-variant-numeric:tabular-nums;line-height:1.05;text-shadow:0 2px 16px rgba(0,0,0,.2);font-family:'Plus Jakarta Sans',sans-serif;position:relative;z-index:1;}
+.timer-l{font-size:11px;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;}
+#timerDisplay{
+  font-size:clamp(38px,10vw,52px);font-weight:700;color:#fff;
+  letter-spacing:3px;font-variant-numeric:tabular-nums;line-height:1.05;
+  text-shadow:0 1px 12px rgba(0,0,0,.2);
+}
 
-.loc-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:10px 12px;font-size:13px;color:var(--text-m);text-align:left;margin:10px 0 6px;}
+/* location */
+.loc-bar{
+  background:var(--neutral-50);border:1px solid var(--border);
+  border-radius:var(--r2);padding:10px 12px;
+  font-size:13px;color:var(--text-muted);text-align:left;margin:10px 0 6px;
+}
 .loc-bar.loading{background:var(--amber-l);border-color:rgba(245,158,11,.3);color:#92400e;}
-.loc-bar.ok{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.3);color:var(--p2);}
+.loc-bar.ok{background:var(--mint-100);border-color:var(--mint-300);color:var(--mint-700);}
 .loc-bar.err{background:var(--red-l);border-color:rgba(239,68,68,.3);color:var(--red);}
 .acc-tag{display:inline-block;border-radius:99px;padding:2px 8px;font-size:11px;font-weight:700;margin-top:4px;}
-.acc-tag.hi{background:rgba(34,197,94,.12);color:var(--p2);}
+.acc-tag.hi{background:var(--mint-100);color:var(--mint-700);}
 .acc-tag.mid{background:var(--amber-l);color:#92400e;}
 .acc-tag.lo{background:var(--red-l);color:var(--red);}
-#locationDetail{font-size:12px;color:var(--text-m);text-align:left;padding:0 1px;margin-bottom:6px;}
-.iu-acts{display:flex;flex-direction:column;gap:8px;margin-top:2px;}
+#locationDetail{font-size:12px;color:var(--text-muted);text-align:left;padding:0 1px;margin-bottom:6px;}
+.iu-actions{display:flex;flex-direction:column;gap:8px;margin-top:2px;}
 
-/* ═══════════════════ SHEET ═══════════════════ */
-.overlay{display:none;position:fixed;inset:0;z-index:9000;background:rgba(5,20,10,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BOTTOM SHEET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.overlay{
+  display:none;position:fixed;inset:0;z-index:9000;
+  background:rgba(10,40,18,.45);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  align-items:flex-end;justify-content:center;
+}
 .overlay.show{display:flex;}
 .sheet{
-  background:var(--surface-2);border-radius:var(--r6) var(--r6) 0 0;
+  background:var(--surface);border-radius:var(--r6) var(--r6) 0 0;
   border:1px solid var(--border);border-bottom:none;
   padding:18px 16px;
   padding-bottom:max(18px,calc(env(safe-area-inset-bottom,0px)+12px));
-  width:100%;max-width:520px;box-shadow:var(--sh5);
-  animation:shUp .28s cubic-bezier(.16,1,.3,1);
-  max-height:88vh;overflow-y:auto;
-  position:relative;overflow:hidden;
+  width:100%;max-width:520px;
+  box-shadow:var(--shadow-xl);
+  animation:shUp .26s cubic-bezier(.16,1,.3,1);
+  max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
 }
-.sheet::before{content:'';position:absolute;top:0;left:0;right:0;height:30%;background:linear-gradient(rgba(255,255,255,.05),transparent);pointer-events:none;}
 @keyframes shUp{from{transform:translateY(100%)}to{transform:none}}
-.sheet-grip{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 16px;position:relative;}
-.sheet-title{font-size:16px;font-weight:800;color:var(--text);text-align:center;margin-bottom:14px;font-family:'Plus Jakarta Sans',sans-serif;}
-.conf-rows{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r3);padding:2px 14px;margin-bottom:14px;}
-.conf-row{display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-bottom:1px solid var(--border-2);font-size:13.5px;}
+.sheet-grip{
+  width:36px;height:4px;border-radius:2px;
+  background:var(--neutral-200);margin:0 auto 16px;
+}
+.sheet-title{font-size:16px;font-weight:700;color:var(--text-primary);text-align:center;margin-bottom:14px;}
+.conf-rows{
+  background:var(--neutral-50);border:1px solid var(--border);
+  border-radius:var(--r3);padding:2px 14px;margin-bottom:14px;
+}
+.conf-row{
+  display:flex;align-items:flex-start;gap:8px;padding:10px 0;
+  border-bottom:1px solid var(--border-soft);font-size:13.5px;
+}
 .conf-row:last-child{border-bottom:none;}
-.conf-l{color:var(--text-m);flex-shrink:0;width:76px;padding-top:1px;}
-.conf-v{font-weight:700;color:var(--text);flex:1;word-break:break-word;}
+.conf-l{color:var(--text-muted);flex-shrink:0;width:76px;padding-top:1px;}
+.conf-v{font-weight:600;color:var(--text-primary);flex:1;word-break:break-word;}
 .sheet-btns{display:flex;gap:8px;}
 .sheet-btns .btn{flex:1;}
 
-/* ═══════════════════ MODAL ═══════════════════ */
-.modal-overlay{display:none;position:fixed;inset:0;z-index:9500;background:rgba(5,20,10,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:22px;}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MODAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:9500;
+  background:rgba(10,40,18,.5);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:22px;
+}
 .modal-overlay.show{display:flex;}
-.modal{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r5);padding:30px 22px;max-width:320px;width:100%;text-align:center;box-shadow:var(--sh5);animation:mPop .3s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;}
-.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:35%;background:linear-gradient(rgba(255,255,255,.06),transparent);pointer-events:none;}
-@keyframes mPop{from{transform:scale(.82);opacity:0}to{transform:none;opacity:1}}
-.modal-ico{font-size:56px;margin-bottom:12px;}
-.modal-h{font-size:19px;font-weight:800;color:var(--text);margin-bottom:7px;font-family:'Plus Jakarta Sans',sans-serif;}
-.modal-p{color:var(--text-m);font-size:13.5px;line-height:1.8;margin-bottom:20px;}
+.modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r5);padding:30px 22px;
+  max-width:320px;width:100%;text-align:center;
+  box-shadow:var(--shadow-xl);
+  animation:mPop .25s cubic-bezier(.16,1,.3,1);
+}
+@keyframes mPop{from{transform:scale(.88);opacity:0}to{transform:none;opacity:1}}
+.modal-ico{font-size:54px;margin-bottom:12px;}
+.modal-h{font-size:19px;font-weight:700;color:var(--text-primary);margin-bottom:7px;}
+.modal-p{color:var(--text-muted);font-size:13.5px;line-height:1.8;margin-bottom:20px;}
 
-#confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:9600;}
-
-/* ═══════════════════ TOAST (fallback) ═══════════════════ */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TOAST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 #toast{
-  position:fixed;top:72px;left:50%;
+  position:fixed;top:16px;left:50%;
   transform:translateX(-50%) translateY(-110px);
-  z-index:9990;font-family:'Noto Sans Thai',sans-serif;
+  z-index:99999;
+  font-family:'IBM Plex Sans Thai',sans-serif;
   font-size:13.5px;font-weight:600;
-  padding:10px 18px;border-radius:var(--rF);
-  white-space:nowrap;max-width:88vw;box-shadow:var(--sh4);
+  padding:10px 18px;border-radius:var(--rFull);
+  white-space:nowrap;max-width:88vw;
+  box-shadow:var(--shadow-lg);
   transition:transform .28s cubic-bezier(.16,1,.3,1);
   display:flex;align-items:center;gap:7px;
-  background:var(--n800);color:#fff;
+  background:var(--neutral-700);color:#fff;
 }
 #toast.show{transform:translateX(-50%) translateY(0);}
-#toast.success{background:linear-gradient(135deg,var(--p1),var(--p2));}
-#toast.error{background:linear-gradient(135deg,#dc2626,#f87171);}
+#toast.success{background:linear-gradient(135deg,var(--mint-700),var(--mint-500));}
+#toast.error{background:linear-gradient(135deg,#dc2626,var(--red));}
 #toast.warning{background:linear-gradient(135deg,#d97706,var(--amber));}
 #toast.info{background:linear-gradient(135deg,var(--blue-d),var(--blue));}
 
-/* ═══════════════════ ANIMATIONS ═══════════════════ */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ANIMATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.anim>*{animation:fadeUp .35s cubic-bezier(.16,1,.3,1) both;}
-.anim>*:nth-child(1){animation-delay:.05s;}
-.anim>*:nth-child(2){animation-delay:.10s;}
-.anim>*:nth-child(3){animation-delay:.15s;}
-.anim>*:nth-child(4){animation-delay:.20s;}
-.anim>*:nth-child(5){animation-delay:.25s;}
-.anim>*:nth-child(6){animation-delay:.30s;}
+.anim>*{animation:fadeUp .3s cubic-bezier(.16,1,.3,1) both;}
+.anim>*:nth-child(1){animation-delay:.04s;}
+.anim>*:nth-child(2){animation-delay:.09s;}
+.anim>*:nth-child(3){animation-delay:.14s;}
+.anim>*:nth-child(4){animation-delay:.19s;}
+.anim>*:nth-child(5){animation-delay:.24s;}
 
-/* ═══════════════════ RESPONSIVE ═══════════════════ */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   RESPONSIVE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 @media(max-width:374px){
-  .page{padding:8px 10px 130px;}
+  .page-wrap{padding:0 10px 114px;}
   .card-bd{padding:12px;}
   .btn{font-size:14px;min-height:46px;}
   #timerDisplay{font-size:36px!important;}
-  .iu-tiles{grid-template-columns:1fr;}
+  .iu-info{grid-template-columns:1fr;}
   .car-pill{min-width:100%;}
-  .stats-strip{gap:6px;}
-  .stat-val{font-size:16px;}
-  .weather-widget{display:none;}
 }
-@media(min-width:480px){#map{height:310px;}.site-hdr{height:60px;}}
+@media(min-width:480px){
+  #map{height:310px;}
+  .site-header{height:60px;}
+}
 </style>
 </head>
 <body>
 
-<!-- ══ DYNAMIC ISLAND ══ -->
-<div id="dynamicIsland">
-  <div class="di-inner">
-    <div class="di-dot"></div>
-    <div class="di-ico" id="diIco">✅</div>
-    <div>
-      <div class="di-txt" id="diTxt">สำเร็จ</div>
-      <div class="di-sub" id="diSub">CarTrack</div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ LOADING ══════════ -->
+<!-- ════════════ LOADING ════════════ -->
 <div id="appLoading">
-  <!-- Hero SVG bg -->
-  <div class="ld-hero-bg">
-    <svg viewBox="0 0 400 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <g stroke="currentColor" fill="none" stroke-width="1.5">
-        <!-- road lines -->
-        <line x1="200" y1="0" x2="200" y2="600" stroke-dasharray="20 14" opacity=".5"/>
-        <line x1="100" y1="0" x2="100" y2="600" opacity=".2"/>
-        <line x1="300" y1="0" x2="300" y2="600" opacity=".2"/>
-        <!-- GPS rings -->
-        <circle cx="200" cy="300" r="40" opacity=".3"><animate attributeName="r" from="30" to="120" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" from=".5" to="0" dur="3s" repeatCount="indefinite"/></circle>
-        <circle cx="200" cy="300" r="40" opacity=".3"><animate attributeName="r" from="30" to="120" dur="3s" begin="1s" repeatCount="indefinite"/><animate attributeName="opacity" from=".5" to="0" dur="3s" begin="1s" repeatCount="indefinite"/></circle>
-        <!-- map paths -->
-        <path d="M50 150 Q150 100 200 200 Q250 300 350 250" opacity=".25" stroke-dasharray="8 6"/>
-        <path d="M50 400 Q120 350 180 400 Q250 450 370 380" opacity=".2" stroke-dasharray="8 6"/>
-      </g>
-    </svg>
-  </div>
-
-  <div class="ld-scene">
-    <div class="ld-gps"></div>
-    <div class="ld-gps"></div>
-    <div class="ld-car-icon">🚗</div>
-    <div class="ld-shadow"></div>
-    <div class="ld-road"><div class="ld-road-fill"></div></div>
-  </div>
-  <div class="ld-title">CarTrack</div>
+  <div class="ld-car">🚗</div>
+  <div class="ld-text">CarTrack</div>
   <div class="ld-sub">กำลังเชื่อมต่อ LINE LIFF…</div>
-  <div class="ld-dots"><span></span><span></span><span></span></div>
+  <div class="ld-track"><div class="ld-track-fill"></div></div>
 </div>
 
-<!-- ══════════ MAIN ══════════ -->
+<!-- ════════════ MAIN ════════════ -->
 <div id="screen-main" class="screen">
 
-  <header class="site-hdr">
-    <div class="hdr-logo"><i class="fas fa-car-side"></i></div>
+  <!-- Header -->
+  <header class="site-header">
     <div class="hdr-brand">
-      <div class="hdr-name">CarTrack</div>
-      <div class="hdr-tag">ระบบบันทึกการใช้รถ</div>
-    </div>
-    <div class="hdr-actions">
-      <button class="theme-btn" id="themeBtn" onclick="cycleTheme()" title="สลับธีม">🌙</button>
-      <a href="/history" class="hdr-hist"><i class="fas fa-clock-rotate-left"></i></a>
-      <div class="hdr-av" id="topbarAvatar"><i class="fas fa-user" style="font-size:13px"></i></div>
-    </div>
-  </header>
-
-  <div class="user-banner">
-    <!-- Weather Widget -->
-    <div class="weather-widget" id="weatherWidget" onclick="refreshWeather()">
-      <div id="weatherBody">
-        <div class="weather-skel skel"></div>
+      <div class="hdr-logo"><i class="fas fa-car-side"></i></div>
+      <div>
+        <div class="hdr-name">ระบบบันทึกการใช้รถ</div>
+        <div class="hdr-tagline">Powered by N/_\ck</div>
       </div>
     </div>
+    <a href="/history" class="hdr-hist"><i class="fas fa-clock-rotate-left"></i>ประวัติ</a>
+    <div class="hdr-av" id="topbarAvatar"><i class="fas fa-user" style="font-size:13px;color:var(--mint-600)"></i></div>
+  </header>
 
-    <div class="banner-gradient-anim"></div>
-
-    <!-- Hero SVG illustration -->
-    <svg class="banner-hero" viewBox="0 0 140 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="70" cy="50" r="35" stroke="white" stroke-width="1.5" stroke-dasharray="6 4">
-        <animateTransform attributeName="transform" type="rotate" from="0 70 50" to="360 70 50" dur="20s" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="70" cy="50" r="20" stroke="white" stroke-width="1" opacity=".6"/>
-      <circle cx="70" cy="50" r="5" fill="white" opacity=".8"><animate attributeName="r" from="4" to="7" dur="1.5s" repeatCount="indefinite" values="4;7;4"/></circle>
-      <line x1="70" y1="15" x2="70" y2="30" stroke="white" stroke-width="1.5" opacity=".5"/>
-      <line x1="105" y1="50" x2="90" y2="50" stroke="white" stroke-width="1.5" opacity=".5"/>
-      <line x1="70" y1="85" x2="70" y2="70" stroke="white" stroke-width="1.5" opacity=".5"/>
-      <line x1="35" y1="50" x2="50" y2="50" stroke="white" stroke-width="1.5" opacity=".5"/>
-    </svg>
-
-    <div class="banner-bubbles">
-      <div class="bubble"></div><div class="bubble"></div>
-      <div class="bubble"></div><div class="bubble"></div>
-    </div>
-    <div class="banner-wave"></div>
+  <!-- User Banner -->
+  <div class="user-banner">
     <div class="banner-inner">
       <div class="banner-avi" id="userAvatar">👤</div>
       <div>
         <div class="banner-greet" id="userGreeting">สวัสดี คุณ</div>
         <div class="banner-name" id="userName">—</div>
-        <div class="banner-dept" id="userDept"><i class="fas fa-building" style="font-size:9px"></i> —</div>
+        <div class="banner-dept" id="userDept">
+          <i class="fas fa-building" style="font-size:9px"></i> —
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="stats-strip" id="statsStrip">
-    <div class="stat-card">
-      <div class="stat-icon">🚗</div>
-      <div class="skel skel-val" id="statTripsEl"></div>
-      <div class="skel skel-lbl" id="statTripsLbl"></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">🛣️</div>
-      <div class="skel skel-val" id="statKmEl"></div>
-      <div class="skel skel-lbl" id="statKmLbl"></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">📅</div>
-      <div class="skel skel-val" id="statReturnEl"></div>
-      <div class="skel skel-lbl" id="statReturnLbl"></div>
-    </div>
-  </div>
+  <div class="page-wrap anim">
 
-  <div class="page anim">
-
-    <div class="sec-lbl">
-      <div class="sec-lbl-text">ประวัติล่าสุด</div>
-      <div class="sec-lbl-line"></div>
-    </div>
-
-    <div class="card tiltable">
-      <div class="card-hd">
-        <div class="card-ico"><i class="fas fa-clock-rotate-left"></i></div>
-        <div><div class="card-ttl">บันทึกของคุณ</div><div class="card-sub">5 รายการล่าสุด</div></div>
-      </div>
-      <div class="hist-wrap" id="userHistorySection">
-        <div class="hist-skel-row"><div class="skel skel-circle"></div><div class="skel skel-line-a"></div><div class="skel skel-line-b"></div></div>
-        <div class="hist-skel-row"><div class="skel skel-circle"></div><div class="skel skel-line-a"></div><div class="skel skel-line-b"></div></div>
-        <div class="hist-skel-row"><div class="skel skel-circle"></div><div class="skel skel-line-a" style="max-width:70%"></div><div class="skel skel-line-b"></div></div>
-      </div>
-    </div>
-
-    <div class="sec-lbl">
-      <div class="sec-lbl-text">บันทึกการใช้รถใหม่</div>
-      <div class="sec-lbl-line"></div>
+    <!-- ── ประวัติ ── -->
+    <div class="sec-title">
+      <div class="sec-title-text">ประวัติล่าสุด</div>
+      <div class="sec-title-line"></div>
     </div>
 
     <div class="card">
+      <div class="card-hd">
+        <div class="card-ico"><i class="fas fa-clock-rotate-left"></i></div>
+        <div>
+          <div class="card-ttl">บันทึกการใช้รถของคุณ</div>
+          <div class="card-sub">5 รายการล่าสุด</div>
+        </div>
+      </div>
+      <div class="hist-wrap" id="userHistorySection">
+        <div class="hist-empty">
+          <i class="fas fa-spinner fa-spin" style="color:var(--mint-400);margin-right:6px"></i>กำลังโหลด...
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ฟอร์ม ── -->
+    <div class="sec-title">
+      <div class="sec-title-text">บันทึกการใช้รถใหม่</div>
+      <div class="sec-title-line"></div>
+    </div>
+
+    <!-- Steps -->
+    <div class="card">
       <div class="steps" id="stepBar" style="padding-top:14px">
-        <div class="step active" id="step1"><div class="step-dot">1</div><div class="step-lbl">ข้อมูลรถ</div></div>
-        <div class="step" id="step2"><div class="step-dot">2</div><div class="step-lbl">ภารกิจ</div></div>
-        <div class="step" id="step3"><div class="step-dot">3</div><div class="step-lbl">เส้นทาง</div></div>
-        <div class="step" id="step4"><div class="step-dot">4</div><div class="step-lbl">ส่ง</div></div>
+        <div class="step active" id="step1">
+          <div class="step-dot">1</div>
+          <div class="step-lbl">ข้อมูลรถ</div>
+        </div>
+        <div class="step" id="step2">
+          <div class="step-dot">2</div>
+          <div class="step-lbl">ภารกิจ</div>
+        </div>
+        <div class="step" id="step3">
+          <div class="step-dot">3</div>
+          <div class="step-lbl">เส้นทาง</div>
+        </div>
+        <div class="step" id="step4">
+          <div class="step-dot">4</div>
+          <div class="step-lbl">ส่ง</div>
+        </div>
       </div>
     </div>
 
     <form id="mainForm" novalidate>
 
-      <!-- Card 1: รถ -->
-      <div class="card tiltable">
+      <!-- ── Card 1: ข้อมูลรถ ── -->
+      <div class="card" id="formCard1">
         <div class="card-hd">
           <div class="card-ico"><i class="fas fa-car-side"></i></div>
-          <div><div class="card-ttl">เลือกรถ & เลขไมล์</div><div class="card-sub">แตะที่รถเพื่อเลือก — แสดงสถานะ Live</div></div>
+          <div>
+            <div class="card-ttl">เลือกรถที่จะใช้</div>
+            <div class="card-sub">แตะเพื่อเลือกทะเบียน</div>
+          </div>
         </div>
         <div class="card-bd">
           <div class="frow">
             <div class="car-pills" id="carPills">
-              <label class="car-pill" id="pill_nissan">
-                <input type="radio" name="cp" value="Nissan : ผอ 5757" onchange="onCarPick(this)">
-                <span class="car-pill-em">🚙</span>
-                <div><div class="car-pill-nm">Nissan</div><div class="car-pill-pl">ผอ 5757</div></div>
-                <span class="car-status free"><span class="car-status-dot"></span>ว่าง</span>
+              <label class="car-pill">
+                <input type="radio" name="carPill" value="Nissan : ผอ 5757" onchange="onCarPick(this)">
+                <div class="car-pill-icon">🚙</div>
+                <div class="car-pill-info">
+                  <div class="car-pill-name">Nissan</div>
+                  <div class="car-pill-plate">ผอ 5757</div>
+                </div>
               </label>
-              <label class="car-pill" id="pill_mazda">
-                <input type="radio" name="cp" value="Mazda : ยค 3777" onchange="onCarPick(this)">
-                <span class="car-pill-em">🚗</span>
-                <div><div class="car-pill-nm">Mazda</div><div class="car-pill-pl">ยค 3777</div></div>
-                <span class="car-status free"><span class="car-status-dot"></span>ว่าง</span>
+              <label class="car-pill">
+                <input type="radio" name="carPill" value="Mazda : ยค 3777" onchange="onCarPick(this)">
+                <div class="car-pill-icon">🚗</div>
+                <div class="car-pill-info">
+                  <div class="car-pill-name">Mazda</div>
+                  <div class="car-pill-plate">ยค 3777</div>
+                </div>
               </label>
-              <label class="car-pill" id="pill_mg">
-                <input type="radio" name="cp" value="MG : งบ 255" onchange="onCarPick(this)">
-                <span class="car-pill-em">🚘</span>
-                <div><div class="car-pill-nm">MG</div><div class="car-pill-pl">งบ 255</div></div>
-                <span class="car-status free"><span class="car-status-dot"></span>ว่าง</span>
+              <label class="car-pill">
+                <input type="radio" name="carPill" value="MG : งบ 255" onchange="onCarPick(this)">
+                <div class="car-pill-icon">🚘</div>
+                <div class="car-pill-info">
+                  <div class="car-pill-name">MG</div>
+                  <div class="car-pill-plate">งบ 255</div>
+                </div>
               </label>
-              <label class="car-pill" id="pill_click">
-                <input type="radio" name="cp" value="Click : จงจ 222" onchange="onCarPick(this)">
-                <span class="car-pill-em">🛵</span>
-                <div><div class="car-pill-nm">Click</div><div class="car-pill-pl">จงจ 222</div></div>
-                <span class="car-status free"><span class="car-status-dot"></span>ว่าง</span>
+              <label class="car-pill">
+                <input type="radio" name="carPill" value="Click : จงจ 222" onchange="onCarPick(this)">
+                <div class="car-pill-icon">🛵</div>
+                <div class="car-pill-info">
+                  <div class="car-pill-name">Honda Click</div>
+                  <div class="car-pill-plate">จงจ 222</div>
+                </div>
               </label>
-              <label class="car-pill" id="pill_fino">
-                <input type="radio" name="cp" value="Fino : งธท 222" onchange="onCarPick(this)">
-                <span class="car-pill-em">🛵</span>
-                <div><div class="car-pill-nm">Fino</div><div class="car-pill-pl">งธท 222</div></div>
-                <span class="car-status free"><span class="car-status-dot"></span>ว่าง</span>
+              <label class="car-pill">
+                <input type="radio" name="carPill" value="Fino : งธท 222" onchange="onCarPick(this)">
+                <div class="car-pill-icon">🛵</div>
+                <div class="car-pill-info">
+                  <div class="car-pill-name">Fino</div>
+                  <div class="car-pill-plate">งธท 222</div>
+                </div>
               </label>
             </div>
+            <!-- hidden select for validation -->
             <select id="car" style="display:none" required>
               <option value="" disabled selected></option>
               <option value="Nissan : ผอ 5757">Nissan : ผอ 5757</option>
@@ -935,98 +838,127 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--p3);back
             </select>
             <div class="ferr" id="car-error" style="margin-top:8px"><i class="fas fa-circle-exclamation"></i><span></span></div>
           </div>
+
           <div class="frow">
             <label class="flabel">เลขไมล์รถ <span class="req">*</span></label>
-            <div class="fwrap"><i class="fas fa-gauge-high fic"></i><input type="number" id="mileage" placeholder="เช่น 12500" inputmode="numeric" min="0" required></div>
+            <div class="fwrap">
+              <i class="fas fa-gauge-high ficon"></i>
+              <input type="number" id="mileage" placeholder="กรอกเลขไมล์" inputmode="numeric" min="0" required>
+            </div>
             <div class="ferr" id="mileage-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
           </div>
+
           <div class="frow" style="margin-bottom:0">
-            <label class="flabel">รูปถ่ายเลขไมล์ <span class="opt">(ไม่บังคับ)</span></label>
-            <div class="upload-zone" id="photoArea">
+            <label class="flabel">รูปถ่ายเลขไมล์</label>
+            <div class="upload-area" id="photoArea">
               <input type="file" id="mileagePhoto" accept="image/*" capture="environment">
               <div class="upload-ico"><i class="fas fa-camera"></i></div>
               <div class="upload-lbl">แตะเพื่อถ่ายรูปหน้าปัดไมล์</div>
             </div>
-            <div class="prev-wrap" id="photoPreviewWrap">
-              <img class="prev-img" id="photoPreview" alt="">
-              <div class="prev-meta" id="photoInfo"></div>
-              <button type="button" class="prev-rm" onclick="clearPhoto()"><i class="fas fa-trash-alt"></i> ลบรูปนี้</button>
+            <div class="preview-wrap" id="photoPreviewWrap">
+              <img class="preview-img" id="photoPreview" alt="">
+              <div class="preview-meta" id="photoInfo"></div>
+              <button type="button" class="preview-rm" onclick="clearPhoto()">
+                <i class="fas fa-trash-alt"></i> ลบรูปนี้
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Card 2: ภารกิจ -->
-      <div class="card tiltable">
+      <!-- ── Card 2: ภารกิจ ── -->
+      <div class="card" id="formCard2">
         <div class="card-hd">
           <div class="card-ico"><i class="fas fa-pen-to-square"></i></div>
-          <div><div class="card-ttl">ภารกิจ / สาเหตุ</div><div class="card-sub">ระบุจุดประสงค์การใช้รถ</div></div>
+          <div>
+            <div class="card-ttl">ภารกิจ / สาเหตุ</div>
+            <div class="card-sub">ระบุว่าจะใช้รถทำอะไร</div>
+          </div>
         </div>
         <div class="card-bd">
           <div class="frow" style="margin-bottom:0">
             <div class="fwrap">
-              <i class="fas fa-clipboard-list fic top"></i>
-              <textarea id="reason" placeholder="เช่น ส่งของที่ลูกค้า / ประชุมนอกสถานที่..." required></textarea>
+              <i class="fas fa-clipboard-list ficon top"></i>
+              <textarea id="reason" placeholder="เช่น ไปส่งของที่ลูกค้า / ประชุมนอกสถานที่..." required></textarea>
             </div>
             <div class="ferr" id="reason-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
           </div>
         </div>
       </div>
 
-      <!-- Card 3: แผนที่ -->
-      <div class="card tiltable">
+      <!-- ── Card 3: แผนที่ ── -->
+      <div class="card" id="formCard3">
         <div class="card-hd">
           <div class="card-ico"><i class="fas fa-map-location-dot"></i></div>
-          <div><div class="card-ttl">เส้นทาง & ปลายทาง</div><div class="card-sub">แตะแผนที่เพื่อปักหมุด (สูงสุด 3 จุด)</div></div>
+          <div>
+            <div class="card-ttl">เส้นทาง & ปลายทาง</div>
+            <div class="card-sub">แตะแผนที่เพื่อปักหมุด (สูงสุด 3 จุด)</div>
+          </div>
         </div>
         <div class="card-bd" style="padding-top:10px">
-          <div class="map-srch">
-            <div class="fwrap" style="flex:1"><i class="fas fa-magnifying-glass fic"></i><input type="text" id="searchInput" placeholder="ค้นหาสถานที่..." style="padding-left:38px"></div>
+          <div class="map-search">
+            <div class="fwrap" style="flex:1">
+              <i class="fas fa-magnifying-glass ficon"></i>
+              <input type="text" id="searchInput" placeholder="ค้นหาสถานที่..." style="padding-left:38px">
+            </div>
           </div>
           <div id="map"></div>
           <div class="dest-list" id="selectedDestinations">📍 แตะบนแผนที่เพื่อปักหมุดปลายทาง</div>
-          <div class="route-chip" id="routeInfo"><i class="fas fa-route"></i><span>เลือกปลายทางเพื่อคำนวณระยะทาง</span></div>
+          <div class="route-chip" id="routeInfo">
+            <i class="fas fa-route"></i>
+            <span>เลือกปลายทางเพื่อคำนวณระยะทาง</span>
+          </div>
           <div class="ferr" id="destinations-error" style="margin-top:7px"><i class="fas fa-circle-exclamation"></i><span></span></div>
-          <div class="map-acts">
+          <div class="map-actions">
             <button type="button" class="map-btn" onclick="clearAllMarkers()"><i class="fas fa-trash-can"></i>ล้างหมุด</button>
             <button type="button" class="map-btn" onclick="centerMap()"><i class="fas fa-crosshairs"></i>จุดเริ่มต้น</button>
             <button type="button" class="map-btn" onclick="toggleMapType()"><i class="fas fa-satellite-dish"></i>สลับมุมมอง</button>
           </div>
         </div>
       </div>
-    </form>
-  </div>
 
-  <!-- Floating Dock -->
+    </form>
+  </div><!-- /page-wrap -->
+
+  <!-- Action Bar -->
   <div class="action-bar">
-    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
     <button type="submit" form="mainForm" class="btn btn-primary" id="submitBtn">
-      <i class="fas fa-share-nodes"></i> บันทึก & แชร์ไปกลุ่ม LINE
+      <i class="fas fa-share-nodes"></i>
+      บันทึก & แชร์ไปกลุ่ม LINE
     </button>
   </div>
-</div>
 
-<!-- PENDING -->
+</div><!-- /screen-main -->
+
+<!-- ════════════ PENDING ════════════ -->
 <div id="screen-pending" class="screen">
   <div class="status-card">
-    <div class="st-icon warn">⏳</div>
-    <div class="st-h" id="pendingTitle">รอการอนุมัติ</div>
-    <p class="st-p" id="pendingMsg">คำขอของคุณส่งเรียบร้อยแล้ว<br>กรุณารอแอดมินยืนยัน</p>
-    <div class="st-acts"><a href="https://line.me/ti/p/~" class="btn btn-ghost" style="max-width:280px;margin:0 auto"><i class="fab fa-line" style="color:#06c755"></i> ติดต่อแอดมิน</a></div>
+    <div class="status-icon warn">⏳</div>
+    <div class="status-h" id="pendingTitle">รอการอนุมัติ</div>
+    <p class="status-p" id="pendingMsg">คำขอของคุณส่งเรียบร้อยแล้ว<br>กรุณารอแอดมินยืนยัน</p>
+    <div class="status-actions">
+      <a href="https://line.me/ti/p/~" class="btn btn-ghost" style="max-width:280px;margin:0 auto">
+        <i class="fab fa-line" style="color:#06c755"></i> ติดต่อแอดมิน
+      </a>
+    </div>
   </div>
 </div>
 
-<!-- SUSPENDED -->
+<!-- ════════════ SUSPENDED ════════════ -->
 <div id="screen-suspended" class="screen">
   <div class="status-card">
-    <div class="st-icon err">⛔</div>
-    <div class="st-h">บัญชีถูกระงับ</div>
-    <p class="st-p" id="suspendedMsg">บัญชีของคุณถูกระงับ<br>กรุณาติดต่อผู้ดูแลระบบ</p>
-    <div class="st-acts"><a href="https://line.me/ti/p/~" class="btn btn-danger" style="max-width:280px;margin:0 auto"><i class="fab fa-line"></i> ติดต่อแอดมิน</a></div>
+    <div class="status-icon danger">⛔</div>
+    <div class="status-h">บัญชีถูกระงับ</div>
+    <p class="status-p" id="suspendedMsg">บัญชีของคุณถูกระงับการใช้งาน<br>กรุณาติดต่อผู้ดูแลระบบ</p>
+    <div class="status-actions">
+      <a href="https://line.me/ti/p/~" class="btn btn-danger" style="max-width:280px;margin:0 auto">
+        <i class="fab fa-line"></i> ติดต่อแอดมิน
+      </a>
+    </div>
   </div>
 </div>
 
-<!-- REGISTER -->
+<!-- ════════════ REGISTER ════════════ -->
 <div id="screen-register" class="screen">
   <div class="reg-inner">
     <div class="reg-top">
@@ -1036,47 +968,107 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--p3);back
     </div>
     <div class="reg-card">
       <form id="regForm" novalidate>
-        <div class="frow"><label class="flabel">ชื่อ-นามสกุล <span class="req">*</span></label><div class="fwrap"><i class="fas fa-user fic"></i><input type="text" id="regName" placeholder="ชื่อจริง นามสกุลจริง" required></div><div class="ferr" id="regName-error"><i class="fas fa-circle-exclamation"></i><span></span></div></div>
-        <div class="frow"><label class="flabel">เบอร์โทร <span class="req">*</span></label><div class="fwrap"><i class="fas fa-phone fic"></i><input type="tel" id="regPhone" placeholder="0XX-XXX-XXXX" maxlength="10" inputmode="tel" required></div><div class="ferr" id="regPhone-error"><i class="fas fa-circle-exclamation"></i><span></span></div></div>
-        <div class="frow"><label class="flabel">แผนก <span class="req">*</span></label><div class="fwrap"><i class="fas fa-building fic"></i><select id="regDept" required><option value="" disabled selected>— เลือกแผนก —</option><option>AE</option><option>Graphics</option><option>Graphics &amp; Print</option><option>Prod &amp; Print</option><option>นักศึกษาฝึกงาน</option><option value="อื่นๆ">อื่นๆ (ระบุ)</option></select></div><div class="ferr" id="regDept-error"><i class="fas fa-circle-exclamation"></i><span></span></div></div>
-        <div class="frow" id="otherDeptGroup" style="display:none"><label class="flabel">ระบุแผนก</label><div class="fwrap"><i class="fas fa-pen fic"></i><input type="text" id="regOtherDept" placeholder="ชื่อแผนก"></div></div>
-        <button type="submit" class="btn btn-primary" id="regSubmitBtn" style="margin-top:6px"><i class="fas fa-paper-plane"></i> ส่งคำขอสมัคร</button>
+        <div class="frow">
+          <label class="flabel">ชื่อ-นามสกุล <span class="req">*</span></label>
+          <div class="fwrap">
+            <i class="fas fa-user ficon"></i>
+            <input type="text" id="regName" placeholder="ชื่อจริง นามสกุลจริง" required>
+          </div>
+          <div class="ferr" id="regName-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
+        </div>
+        <div class="frow">
+          <label class="flabel">เบอร์โทรศัพท์ <span class="req">*</span></label>
+          <div class="fwrap">
+            <i class="fas fa-phone ficon"></i>
+            <input type="tel" id="regPhone" placeholder="0XX-XXX-XXXX" maxlength="10" inputmode="tel" required>
+          </div>
+          <div class="ferr" id="regPhone-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
+        </div>
+        <div class="frow">
+          <label class="flabel">แผนก <span class="req">*</span></label>
+          <div class="fwrap">
+            <i class="fas fa-building ficon"></i>
+            <select id="regDept" required>
+              <option value="" disabled selected>— เลือกแผนก —</option>
+              <option>AE</option><option>Graphics</option>
+              <option>Graphics &amp; Print</option>
+              <option>Prod &amp; Print</option>
+              <option>นักศึกษาฝึกงาน</option>
+              <option value="อื่นๆ">อื่นๆ (ระบุ)</option>
+            </select>
+          </div>
+          <div class="ferr" id="regDept-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
+        </div>
+        <div class="frow" id="otherDeptGroup" style="display:none">
+          <label class="flabel">ระบุแผนก</label>
+          <div class="fwrap">
+            <i class="fas fa-pen ficon"></i>
+            <input type="text" id="regOtherDept" placeholder="ชื่อแผนก">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" id="regSubmitBtn" style="margin-top:6px">
+          <i class="fas fa-paper-plane"></i> ส่งคำขอสมัคร
+        </button>
       </form>
     </div>
   </div>
 </div>
 
-<!-- CAR IN USE -->
+<!-- ════════════ CAR IN USE ════════════ -->
 <div id="screen-car-in-use" class="screen">
   <div class="iu-card">
-    <span class="iu-emoji">🚗</span>
+    <div class="iu-car">🚗</div>
     <div class="iu-h">กำลังใช้รถอยู่</div>
     <div class="iu-sub">คืนรถเมื่อเสร็จภารกิจด้วยนะครับ 🙏</div>
-    <div class="iu-tiles">
-      <div class="iu-tile"><div class="iu-tl">ทะเบียนรถ</div><div class="iu-tv" id="infoCarPlate">—</div></div>
-      <div class="iu-tile"><div class="iu-tl">ผู้ใช้งาน</div><div class="iu-tv" id="infoUserName" style="font-size:12px">—</div></div>
-      <div class="iu-tile"><div class="iu-tl">เลขไมล์</div><div class="iu-tv" id="infoMileage">—</div></div>
-      <div class="iu-tile"><div class="iu-tl">เริ่มใช้เมื่อ</div><div class="iu-tv" id="infoStartTime" style="font-size:10.5px;line-height:1.4">—</div></div>
+
+    <div class="iu-info">
+      <div class="iu-tile">
+        <div class="iu-tile-l">ทะเบียนรถ</div>
+        <div class="iu-tile-v" id="infoCarPlate">—</div>
+      </div>
+      <div class="iu-tile">
+        <div class="iu-tile-l">ผู้ใช้</div>
+        <div class="iu-tile-v" id="infoUserName" style="font-size:12px">—</div>
+      </div>
+      <div class="iu-tile">
+        <div class="iu-tile-l">เลขไมล์</div>
+        <div class="iu-tile-v" id="infoMileage">—</div>
+      </div>
+      <div class="iu-tile">
+        <div class="iu-tile-l">เริ่มใช้เมื่อ</div>
+        <div class="iu-tile-v" id="infoStartTime" style="font-size:10.5px;line-height:1.4">—</div>
+      </div>
     </div>
+
     <div class="timer-panel">
-      <div class="timer-l">⏱ ระยะเวลาที่ใช้งาน</div>
+      <div class="timer-l">⏱ เวลาที่ใช้งาน</div>
       <div id="timerDisplay">00:00:00</div>
     </div>
-    <div class="loc-bar" id="locationStatus"><i class="fas fa-location-dot"></i> ยังไม่ได้ดึงตำแหน่ง (ไม่บังคับ)</div>
+
+    <div class="loc-bar" id="locationStatus">
+      <i class="fas fa-location-dot"></i> ยังไม่ได้ดึงตำแหน่ง (ไม่บังคับ)
+    </div>
     <div id="locationDetail" style="display:none"></div>
-    <div class="iu-acts">
-      <button class="btn btn-blue" id="getLocationBtn" onclick="getReturnLocation()"><i class="fas fa-location-crosshairs"></i> ดึงตำแหน่งปัจจุบัน</button>
-      <button class="btn btn-danger" id="returnCarBtn" onclick="handleReturnCar()"><i class="fas fa-rotate-left"></i> คืนรถ & แจ้งกลุ่ม LINE</button>
-      <button class="btn btn-ghost" onclick="handleCancelUsage()" style="font-size:13px;min-height:42px"><i class="fas fa-xmark"></i> ยกเลิก (ไม่ได้ใช้จริง)</button>
+
+    <div class="iu-actions">
+      <button class="btn btn-blue" id="getLocationBtn" onclick="getReturnLocation()">
+        <i class="fas fa-location-crosshairs"></i> ดึงตำแหน่งปัจจุบัน
+      </button>
+      <button class="btn btn-danger" id="returnCarBtn" onclick="handleReturnCar()">
+        <i class="fas fa-rotate-left"></i> คืนรถ & แจ้งกลุ่ม LINE
+      </button>
+      <button class="btn btn-ghost" onclick="handleCancelUsage()" style="font-size:13px;min-height:42px">
+        <i class="fas fa-xmark"></i> ยกเลิก (ไม่ได้ใช้จริง)
+      </button>
     </div>
   </div>
 </div>
 
-<!-- CONFIRM SHEET -->
+<!-- ════════════ CONFIRM SHEET ════════════ -->
 <div class="overlay" id="confirmSubmitModal">
   <div class="sheet">
     <div class="sheet-grip"></div>
-    <div class="sheet-title">📋 ตรวจสอบก่อนส่ง</div>
+    <div class="sheet-title">📋 ตรวจสอบข้อมูลก่อนส่ง</div>
     <div class="conf-rows" id="confirmSummaryContent"></div>
     <div class="sheet-btns">
       <button class="btn btn-outline" onclick="closeConfirmSubmit()"><i class="fas fa-xmark"></i> ยกเลิก</button>
@@ -1085,7 +1077,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--p3);back
   </div>
 </div>
 
-<!-- SUCCESS MODAL -->
+<!-- ════════════ SUCCESS MODAL ════════════ -->
 <div class="modal-overlay" id="successModal">
   <div class="modal">
     <div class="modal-ico" id="modalIcon">✅</div>
@@ -1095,11 +1087,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--p3);back
   </div>
 </div>
 
+<!-- Toast -->
 <div id="toast"></div>
 
 <script src="https://static.line-scdn.net/liff/edge/versions/2.22.3/sdk.js"></script>
 <script>
-/* ═══════════════════ CONFIG ═══════════════════ */
+/* ─── CONFIG ─── */
 const CONFIG={
   liffId:'2007130450-YVNvyNbL',
   googleMapsKey:'AIzaSyAw5sDr5qXKIpun2dp4jpu8NerbXy6Hfew',
@@ -1107,273 +1100,148 @@ const CONFIG={
   autoDestination:{userId:'Uc8695dc6e2569a960fe8912809a2e2ff',startTime:{h:16,m:40},endTime:{h:17,m:20},location:{lat:14.975057297021436,lng:102.11365790021132}}
 };
 
-/* ═══════════════════ STATE ═══════════════════ */
+/* ─── STATE ─── */
 let currentUser=null,map=null,markers=[],directionsRenderer,directionsService,mapInitialized=false,mapType='roadmap';
 let autocomplete=null,cachedPhotoBase64=null,cachedPhotoFile=null,returnLocation=null,timerInterval=null;
 const CAR_USAGE_KEY='car_usage_v2';
 
-/* ═══════════════════ STORAGE ═══════════════════ */
+/* ─── UTILS ─── */
 function loadUsage(){try{const s=localStorage.getItem(CAR_USAGE_KEY);if(!s)return null;const u=JSON.parse(s);if(u.startedAt&&(Date.now()-new Date(u.startedAt))>86400000){localStorage.removeItem(CAR_USAGE_KEY);return null;}return u.isUsing?u:null;}catch{return null;}}
 function saveUsage(d){localStorage.setItem(CAR_USAGE_KEY,JSON.stringify(d));}
 function clearUsage(){localStorage.removeItem(CAR_USAGE_KEY);}
 function escapeHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
-/* ═══════════════════ THEME CYCLE ═══════════════════ */
-const THEMES=['light','dark','amoled'];
-const THEME_ICONS={light:'🌙',dark:'🌑',amoled:'☀️'};
-(function(){
-  const t=localStorage.getItem('car_theme')||'light';
-  document.documentElement.setAttribute('data-theme',t);
-  document.getElementById('themeBtn').textContent=THEME_ICONS[t]||'🌙';
-})();
-function cycleTheme(){
-  const cur=document.documentElement.getAttribute('data-theme')||'light';
-  const idx=THEMES.indexOf(cur);
-  const next=THEMES[(idx+1)%THEMES.length];
-  document.documentElement.setAttribute('data-theme',next);
-  localStorage.setItem('car_theme',next);
-  document.getElementById('themeBtn').textContent=THEME_ICONS[next];
-  playSound('tap');
-  showDynamicIsland(next==='amoled'?'🌑':'next'==='dark'?'🌙':'☀️',
-    next==='amoled'?'AMOLED Mode':next==='dark'?'Dark Mode':'Light Mode','เปลี่ยนธีมแล้ว');
-}
-
-/* ═══════════════════ DYNAMIC ISLAND ═══════════════════ */
-let _diTimer;
-function showDynamicIsland(ico,txt,sub,duration=2800){
-  const el=document.getElementById('dynamicIsland');
-  document.getElementById('diIco').textContent=ico;
-  document.getElementById('diTxt').textContent=txt;
-  document.getElementById('diSub').textContent=sub||'CarTrack';
-  el.classList.remove('mini');
-  el.classList.add('show');
-  clearTimeout(_diTimer);
-  _diTimer=setTimeout(()=>{
-    el.classList.remove('show');
-    el.classList.add('mini');
-    setTimeout(()=>el.classList.remove('mini'),500);
-  },duration);
-}
-
-/* ═══════════════════ SOUND FEEDBACK ═══════════════════ */
-let _audioCtx;
-function getAudioCtx(){if(!_audioCtx)_audioCtx=new(window.AudioContext||window.webkitAudioContext)();return _audioCtx;}
-function playSound(type){
-  try{
-    const ctx=getAudioCtx();
-    if(ctx.state==='suspended')ctx.resume();
-    const osc=ctx.createOscillator(),gain=ctx.createGain();
-    osc.connect(gain);gain.connect(ctx.destination);
-    const t=ctx.currentTime;
-    if(type==='success'){
-      osc.frequency.setValueAtTime(523,t);
-      osc.frequency.setValueAtTime(659,t+.12);
-      osc.frequency.setValueAtTime(784,t+.24);
-      gain.gain.setValueAtTime(.12,t);gain.gain.exponentialRampToValueAtTime(.001,t+.5);
-      osc.start(t);osc.stop(t+.5);
-    }else if(type==='tap'){
-      osc.frequency.setValueAtTime(880,t);
-      gain.gain.setValueAtTime(.05,t);gain.gain.exponentialRampToValueAtTime(.001,t+.08);
-      osc.start(t);osc.stop(t+.08);
-    }else if(type==='error'){
-      osc.type='sawtooth';
-      osc.frequency.setValueAtTime(200,t);
-      gain.gain.setValueAtTime(.08,t);gain.gain.exponentialRampToValueAtTime(.001,t+.25);
-      osc.start(t);osc.stop(t+.25);
-    }else if(type==='select'){
-      osc.frequency.setValueAtTime(440,t);
-      gain.gain.setValueAtTime(.06,t);gain.gain.exponentialRampToValueAtTime(.001,t+.1);
-      osc.start(t);osc.stop(t+.1);
-    }
-  }catch(_){}
-}
-function vibrate(pattern){try{if(navigator.vibrate)navigator.vibrate(pattern);}catch(_){}}
-
-/* ═══════════════════ SCREENS WITH TRANSITION ═══════════════════ */
-let _currentScreen=null;
+/* ─── SCREENS ─── */
 function showScreen(id){
-  const next=document.getElementById(id);
-  if(!next)return;
-  if(_currentScreen&&_currentScreen!==next){
-    _currentScreen.classList.add('t-exit');
-    setTimeout(()=>{
-      if(_currentScreen){_currentScreen.classList.remove('active','t-exit');}
-      next.classList.add('active','t-enter');
-      _currentScreen=next;
-      setTimeout(()=>next.classList.remove('t-enter'),400);
-    },220);
-  }else{
-    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active','t-enter','t-exit'));
-    next.classList.add('active','t-enter');
-    _currentScreen=next;
-    setTimeout(()=>next.classList.remove('t-enter'),400);
-  }
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id);if(el)el.classList.add('active');
 }
 
-/* ═══════════════════ CARD TILT ═══════════════════ */
-document.querySelectorAll('.tiltable').forEach(card=>{
-  card.addEventListener('touchmove',e=>{
-    const t=e.touches[0];const r=card.getBoundingClientRect();
-    const x=((t.clientX-r.left)/r.width-.5)*8;
-    const y=((t.clientY-r.top)/r.height-.5)*-6;
-    card.style.transform=`perspective(600px) rotateX(${y}deg) rotateY(${x}deg) scale(1.01)`;
-  },{passive:true});
-  ['touchend','touchcancel'].forEach(ev=>card.addEventListener(ev,()=>{
-    card.style.transform='';
-    card.style.transition='transform .35s cubic-bezier(0.34,1.56,0.64,1)';
-    setTimeout(()=>card.style.transition='',350);
-  }));
-});
-
-/* ═══════════════════ TOAST (simple fallback) ═══════════════════ */
+/* ─── TOAST ─── */
 let _tt;
 function showToast(msg,type='info'){
   const t=document.getElementById('toast');t.textContent=msg;t.className=`${type} show`;
   clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),3500);
 }
 
-/* ═══════════════════ ERRORS ═══════════════════ */
-function showErr(id,msg){const e=document.getElementById(id+'-error');if(e){e.querySelector('span').textContent=msg;e.classList.add('show');}playSound('error');vibrate([20,10,20]);}
+/* ─── ERRORS ─── */
+function showErr(id,msg){const e=document.getElementById(id+'-error');if(e){e.querySelector('span').textContent=msg;e.classList.add('show');}}
 function clearErr(id){const e=document.getElementById(id+'-error');if(e)e.classList.remove('show');}
 
-/* ═══════════════════ RIPPLE ═══════════════════ */
-function addRipple(btn,e){
-  const r=btn.getBoundingClientRect();const size=Math.max(r.width,r.height)*2;
-  const x=(e.clientX||r.left+r.width/2)-r.left-size/2;const y=(e.clientY||r.top+r.height/2)-r.top-size/2;
-  const rip=document.createElement('span');rip.className='ripple';
-  Object.assign(rip.style,{width:size+'px',height:size+'px',left:x+'px',top:y+'px'});
-  btn.appendChild(rip);setTimeout(()=>rip.remove(),650);
-}
-document.addEventListener('click',e=>{
-  const b=e.target.closest('.btn,.map-btn,.car-pill');
-  if(b){addRipple(b,e);vibrate(8);}
-});
-
-/* ═══════════════════ CONFETTI ═══════════════════ */
-function launchConfetti(){
-  const canvas=document.getElementById('confettiCanvas');const ctx=canvas.getContext('2d');
-  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
-  const colors=['#22c55e','#4ade80','#86efac','#16a34a','#bbf7d0','#fbbf24','#60a5fa'];
-  const pieces=[];
-  for(let i=0;i<130;i++)pieces.push({x:Math.random()*canvas.width,y:-20,r:Math.random()*6+2,d:Math.random()*8+2,color:colors[Math.floor(Math.random()*colors.length)],tilt:Math.random()*10-5,tiltAngle:0,tiltAngleInc:Math.random()*.1+.05});
-  let frame=0;
-  function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);pieces.forEach(p=>{ctx.beginPath();ctx.lineWidth=p.r;ctx.strokeStyle=p.color;ctx.moveTo(p.x+p.tilt+p.r/3,p.y);ctx.lineTo(p.x+p.tilt,p.y+p.tilt+p.r);ctx.stroke();p.tiltAngle+=p.tiltAngleInc;p.y+=Math.cos(frame*.01*p.d)+1+p.r/2;p.x+=Math.sin(frame*.01);p.tilt=Math.sin(p.tiltAngle)*12;});frame++;if(frame<170)requestAnimationFrame(draw);else ctx.clearRect(0,0,canvas.width,canvas.height);}
-  draw();
-}
-
-/* ═══════════════════ PROGRESS ═══════════════════ */
-function updateProgress(){
-  const hasCar=!!document.getElementById('car').value,hasMile=!!document.getElementById('mileage').value,hasReason=!!document.getElementById('reason').value.trim(),hasMap=markers.length>0;
-  const pct=[hasCar,hasMile,hasReason,hasMap].filter(Boolean).length/4*100;
-  const fill=document.getElementById('progressFill');fill.style.width=pct+'%';fill.classList.toggle('complete',pct===100);
-}
-
-/* ═══════════════════ STEPS ═══════════════════ */
+/* ─── STEP INDICATOR ─── */
 function updateSteps(){
-  const hasCar=!!document.getElementById('car').value,hasMile=!!document.getElementById('mileage').value,hasReason=!!document.getElementById('reason').value.trim(),hasMap=markers.length>0;
-  const s=(n,done,active)=>{const el=document.getElementById('step'+n);el.classList.toggle('done',!!done);el.classList.toggle('active',!!active&&!done);};
-  s(1,hasCar&&hasMile,true);s(2,hasReason,hasCar&&hasMile);s(3,hasMap,hasReason);s(4,false,hasMap);
-  updateProgress();
+  const hasCar=document.getElementById('car').value;
+  const hasMile=document.getElementById('mileage').value;
+  const hasReason=document.getElementById('reason').value.trim();
+  const hasMap=markers.length>0;
+  const s=(n,done,active)=>{
+    const el=document.getElementById('step'+n);
+    el.classList.toggle('done',done);el.classList.toggle('active',active&&!done);
+    const prev=document.getElementById('step'+(n-1));
+    if(prev)prev.classList.toggle('done',done||active);
+  };
+  s(1,hasCar&&hasMile,true);
+  s(2,hasReason,hasCar&&hasMile);
+  s(3,hasMap,hasReason);
+  s(4,false,hasMap);
 }
 
-/* ═══════════════════ LIVE CAR STATUS ═══════════════════ */
-async function updateCarStatus(){
-  const usage=loadUsage();
-  const usedCar=usage?.carPlate||'';
-  document.querySelectorAll('.car-pill').forEach(pill=>{
-    const val=pill.querySelector('input')?.value||'';
-    const badge=pill.querySelector('.car-status');
-    if(!badge)return;
-    const isBusy=usedCar&&val===usedCar;
-    badge.className='car-status '+(isBusy?'busy':'free');
-    badge.innerHTML=`<span class="car-status-dot"></span>${isBusy?'ใช้งาน':'ว่าง'}`;
-    pill.classList.toggle('in-use',isBusy);
-    if(isBusy){const inp=pill.querySelector('input');if(inp)inp.disabled=true;}
-  });
-}
-
-/* ═══════════════════ CAR PICK ═══════════════════ */
+/* ─── CAR PILLS ─── */
 function onCarPick(radio){
   document.getElementById('car').value=radio.value;
   document.querySelectorAll('.car-pill').forEach(p=>p.classList.toggle('selected',p.querySelector('input')===radio));
-  clearErr('car');updateSteps();playSound('select');
+  clearErr('car');updateSteps();
 }
 
-/* ═══════════════════ PHOTO ═══════════════════ */
+/* ─── PHOTO ─── */
 document.getElementById('mileagePhoto').addEventListener('change',e=>{
   const f=e.target.files[0];cachedPhotoBase64=null;cachedPhotoFile=null;
   const prev=document.getElementById('photoPreview'),wrap=document.getElementById('photoPreviewWrap'),info=document.getElementById('photoInfo'),area=document.getElementById('photoArea');
   if(!f){wrap.classList.remove('show');area.classList.remove('has-file');return;}
   if(!['image/jpeg','image/png','image/gif','image/webp'].includes(f.type)){showToast('รองรับ JPG, PNG, WEBP เท่านั้น','warning');e.target.value='';return;}
   if(f.size>10*1024*1024){showToast('ไฟล์ต้องไม่เกิน 10MB','warning');e.target.value='';return;}
-  cachedPhotoFile=f;const r=new FileReader();
+  cachedPhotoFile=f;
+  const r=new FileReader();
   r.onloadend=()=>{cachedPhotoBase64=r.result;prev.src=r.result;wrap.classList.add('show');area.classList.add('has-file');info.textContent=`✅ ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)`;};
   r.readAsDataURL(f);
 });
 function clearPhoto(){document.getElementById('mileagePhoto').value='';cachedPhotoBase64=null;cachedPhotoFile=null;document.getElementById('photoPreviewWrap').classList.remove('show');document.getElementById('photoArea').classList.remove('has-file');document.getElementById('photoInfo').textContent='';}
 
-/* ═══════════════════ WEATHER ═══════════════════ */
-const WEATHER_ICONS={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',61:'🌧️',71:'🌨️',80:'🌦️',95:'⛈️'};
-const WEATHER_DESC={0:'ฟ้าใส',1:'แจ่มใส',2:'มีเมฆบาง',3:'มีเมฆมาก',45:'หมอก',51:'ฝนเบา',61:'ฝนตก',71:'หิมะ',80:'ฝนกระโชก',95:'พายุฝน'};
-async function fetchWeather(){
-  const wb=document.getElementById('weatherBody');
-  try{
-    const lat=CONFIG.originLatLng.lat,lng=CONFIG.originLatLng.lng;
-    const res=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weathercode&timezone=Asia%2FBangkok`);
-    const data=await res.json();
-    const temp=Math.round(data.current.temperature_2m);
-    const code=data.current.weathercode;
-    const ico=WEATHER_ICONS[code]||'🌡️';
-    const desc=WEATHER_DESC[code]||'ไม่ทราบ';
-    wb.innerHTML=`<div class="weather-ico">${ico}</div><div class="weather-info"><div class="weather-temp">${temp}°C</div><div class="weather-desc">${desc}</div></div>`;
-  }catch{wb.innerHTML='<div class="weather-ico">🌡️</div><div class="weather-info"><div class="weather-temp">—</div><div class="weather-desc">อากาศ</div></div>';}
-}
-function refreshWeather(){fetchWeather();vibrate(10);}
-
-/* ═══════════════════ MAP ═══════════════════ */
+/* ─── MAP ─── */
 function initMap(){
   if(mapInitialized)return;
   try{
     map=new google.maps.Map(document.getElementById('map'),{center:CONFIG.originLatLng,zoom:12,mapTypeId:'roadmap',mapTypeControl:false,fullscreenControl:false,streetViewControl:false,zoomControl:true});
-    directionsRenderer=new google.maps.DirectionsRenderer({map,suppressMarkers:true,polylineOptions:{strokeColor:'#22c55e',strokeWeight:4}});
+    directionsRenderer=new google.maps.DirectionsRenderer({map,suppressMarkers:true,polylineOptions:{strokeColor:'#18a857',strokeWeight:4}});
     directionsService=new google.maps.DirectionsService();
-    new google.maps.Marker({position:CONFIG.originLatLng,map,title:'บริษัท',icon:{url:'https://maps.google.com/mapfiles/ms/icons/green-dot.png',scaledSize:new google.maps.Size(40,40)}});
+    new google.maps.Marker({position:CONFIG.originLatLng,map,title:'บริษัท (จุดเริ่มต้น)',icon:{url:'https://maps.google.com/mapfiles/ms/icons/green-dot.png',scaledSize:new google.maps.Size(40,40)}});
     autocomplete=new google.maps.places.Autocomplete(document.getElementById('searchInput'),{types:['establishment','geocode'],componentRestrictions:{country:'th'}});
     autocomplete.bindTo('bounds',map);
     autocomplete.addListener('place_changed',()=>{const p=autocomplete.getPlace();if(!p.geometry?.location)return;if(markers.length>=3){showToast('เลือกได้สูงสุด 3 จุด','warning');return;}addMarker(p.geometry.location);map.panTo(p.geometry.location);document.getElementById('searchInput').value='';});
     map.addListener('click',e=>{if(markers.length>=3){showToast('เลือกได้สูงสุด 3 จุด','warning');return;}addMarker(e.latLng);});
     mapInitialized=true;
     setTimeout(()=>{if(currentUser&&!loadUsage())checkAutoDestination();},1500);
-  }catch{document.getElementById('map').innerHTML='<div style="padding:40px;text-align:center;color:var(--text-m)"><i class="fas fa-map" style="font-size:32px;display:block;margin-bottom:8px"></i>ไม่สามารถโหลดแผนที่ได้</div>';}
+  }catch{document.getElementById('map').innerHTML='<div style="padding:40px;text-align:center;color:var(--text-muted)"><i class="fas fa-map" style="font-size:32px;display:block;margin-bottom:8px"></i>ไม่สามารถโหลดแผนที่ได้</div>';}
 }
 function addMarker(pos){
   const m=new google.maps.Marker({position:pos,map,icon:{url:'https://maps.google.com/mapfiles/ms/icons/red-dot.png',scaledSize:new google.maps.Size(32,32)},animation:google.maps.Animation.DROP});
   m.addListener('click',()=>{m.setMap(null);markers=markers.filter(x=>x!==m);updateDest();calcRoute();updateSteps();});
-  markers.push(m);updateDest();calcRoute();clearErr('destinations');updateSteps();playSound('select');
+  markers.push(m);updateDest();calcRoute();clearErr('destinations');updateSteps();
 }
-function updateDest(){const el=document.getElementById('selectedDestinations');el.textContent=markers.length===0?'📍 แตะบนแผนที่เพื่อปักหมุดปลายทาง':markers.map((m,i)=>`📍 จุดที่ ${i+1}: ${m.getPosition().lat().toFixed(5)}, ${m.getPosition().lng().toFixed(5)}`).join('\n');}
+function updateDest(){
+  const el=document.getElementById('selectedDestinations');
+  el.textContent=markers.length===0?'📍 แตะบนแผนที่เพื่อปักหมุดปลายทาง':markers.map((m,i)=>`📍 จุดที่ ${i+1}: ${m.getPosition().lat().toFixed(5)}, ${m.getPosition().lng().toFixed(5)}`).join('\n');
+}
 function calcRoute(){
   const el=document.getElementById('routeInfo');
   if(markers.length===0){directionsRenderer?.set('directions',null);el.innerHTML='<i class="fas fa-route"></i><span>เลือกปลายทางเพื่อคำนวณระยะทาง</span>';return;}
-  directionsService.route({origin:CONFIG.originLatLng,destination:markers[markers.length-1].getPosition(),waypoints:markers.slice(0,-1).map(m=>({location:m.getPosition(),stopover:true})),travelMode:google.maps.TravelMode.DRIVING},(res,st)=>{
-    if(st==='OK'){directionsRenderer.setDirections(res);let d=0,t=0;res.routes[0].legs.forEach(l=>{d+=l.distance.value;t+=l.duration.value;});el.innerHTML=`<i class="fas fa-route"></i><span>🛣️ <strong>${(d/1000).toFixed(2)} กม.</strong> &nbsp;·&nbsp; ⏱ <strong>${Math.round(t/60)} นาที</strong></span>`;}});
+  const wp=markers.slice(0,-1).map(m=>({location:m.getPosition(),stopover:true}));
+  directionsService.route({origin:CONFIG.originLatLng,destination:markers[markers.length-1].getPosition(),waypoints:wp,travelMode:google.maps.TravelMode.DRIVING},(res,st)=>{
+    if(st==='OK'){
+      directionsRenderer.setDirections(res);let d=0,t=0;
+      res.routes[0].legs.forEach(l=>{d+=l.distance.value;t+=l.duration.value;});
+      el.innerHTML=`<i class="fas fa-route"></i><span>🛣️ <strong>${(d/1000).toFixed(2)} กม.</strong> &nbsp;·&nbsp; ⏱ <strong>${Math.round(t/60)} นาที</strong></span>`;
+    }
+  });
 }
-function clearAllMarkers(){markers.forEach(m=>m.setMap(null));markers=[];updateDest();calcRoute();updateSteps();showDynamicIsland('🗺️','ล้างหมุดแล้ว','แผนที่พร้อมใช้งาน');}
+function clearAllMarkers(){markers.forEach(m=>m.setMap(null));markers=[];updateDest();calcRoute();updateSteps();showToast('ล้างหมุดแล้ว','info');}
 function centerMap(){if(map){map.panTo(CONFIG.originLatLng);map.setZoom(12);}}
-function toggleMapType(){if(!map)return;mapType=mapType==='roadmap'?'satellite':'roadmap';map.setMapTypeId(mapType);vibrate(10);}
-function checkAutoDestination(){if(!currentUser||currentUser.userId!==CONFIG.autoDestination.userId)return;const now=new Date(),tot=now.getHours()*60+now.getMinutes(),s=CONFIG.autoDestination.startTime.h*60+CONFIG.autoDestination.startTime.m,e=CONFIG.autoDestination.endTime.h*60+CONFIG.autoDestination.endTime.m;if(tot>=s&&tot<=e&&markers.length===0){const l=CONFIG.autoDestination.location;addMarker(new google.maps.LatLng(l.lat,l.lng));map.panTo(l);showDynamicIsland('📍','เพิ่มปลายทางอัตโนมัติ','16:40–17:20 น.');}}
+function toggleMapType(){if(!map)return;mapType=mapType==='roadmap'?'satellite':'roadmap';map.setMapTypeId(mapType);}
+function checkAutoDestination(){
+  if(!currentUser||currentUser.userId!==CONFIG.autoDestination.userId)return;
+  const now=new Date(),tot=now.getHours()*60+now.getMinutes(),s=CONFIG.autoDestination.startTime.h*60+CONFIG.autoDestination.startTime.m,e=CONFIG.autoDestination.endTime.h*60+CONFIG.autoDestination.endTime.m;
+  if(tot>=s&&tot<=e&&markers.length===0){const l=CONFIG.autoDestination.location;addMarker(new google.maps.LatLng(l.lat,l.lng));map.panTo(l);showToast('📍 เพิ่มปลายทางอัตโนมัติ','info');}
+}
 
-/* ═══════════════════ FLEX MESSAGES ═══════════════════ */
-function buildFlexMessage(name,phone,car,mileage,reason,markerList,routeText,hasPhoto){const dm=String(routeText).match(/([\d.]+)\s*กม/),tm=String(routeText).match(/(\d+)\s*นาที/);const now=new Date(),ds=now.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}),ts=now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});const dests=markerList.length>0?markerList.map((m,i)=>({type:'text',size:'sm',wrap:true,color:'#6b7280',text:`• จุดที่ ${i+1}: ${m.getPosition().lat().toFixed(5)}, ${m.getPosition().lng().toFixed(5)}`})):[{type:'text',size:'sm',color:'#9ca3af',text:'• ไม่ได้ระบุปลายทาง'}];return{type:'flex',altText:`🚗 ${name} ขอใช้รถ ${car} เลขไมล์ ${mileage}`,contents:{type:'bubble',size:'mega',header:{type:'box',layout:'vertical',backgroundColor:'#16a34a',paddingAll:'16px',contents:[{type:'text',text:'บันทึกการใช้รถ',weight:'bold',size:'xl',color:'#FFFFFF',align:'center'},{type:'text',text:`${ds}  ${ts} น.`,size:'xs',color:'#d1fae5',align:'center',margin:'sm'}]},body:{type:'box',layout:'vertical',spacing:'sm',contents:[{type:'text',text:`ชื่อ : ${name}`,size:'md',wrap:true},{type:'text',text:`เบอร์โทร : ${phone}`,size:'md',wrap:true,color:'#374151'},{type:'text',text:`ทะเบียนรถ : ${car}`,size:'md',wrap:true,weight:'bold'},{type:'text',text:`ไมล์รถ : ${mileage}`,size:'md',wrap:true},{type:'text',text:`สาเหตุ : ${reason}`,size:'sm',wrap:true,color:'#6b7280',margin:'md'},{type:'separator',margin:'md'},{type:'text',text:'ปลายทาง',weight:'bold',size:'sm',margin:'md'},...dests,{type:'separator',margin:'md'},{type:'box',layout:'horizontal',spacing:'lg',margin:'md',contents:[{type:'box',layout:'vertical',alignItems:'center',contents:[{type:'text',text:dm?`${dm[1]} กม.`:'-',size:'lg',weight:'bold',color:'#16a34a'},{type:'text',text:'ระยะทาง',size:'xs',color:'#9ca3af'}]},{type:'box',layout:'vertical',alignItems:'center',contents:[{type:'text',text:tm?`${tm[1]} นาที`:'-',size:'lg',weight:'bold',color:'#16a34a'},{type:'text',text:'เวลาประมาณ',size:'xs',color:'#9ca3af'}]}]},{type:'text',text:hasPhoto?'แนบรูปเลขไมล์แล้ว ✓':'ไม่มีรูปเลขไมล์',size:'sm',align:'center',margin:'sm',color:hasPhoto?'#16a34a':'#ef4444'}]},footer:{type:'box',layout:'vertical',contents:[{type:'button',action:{type:'uri',label:'ดูประวัติการใช้งานรถ',uri:`${window.location.origin}/history`},style:'primary',color:'#16a34a',height:'sm'}]}}};}
-function buildReturnFlexMessage(carPlate,userName,returnTime,durationText,returnLoc){const ml=`https://www.google.com/maps?q=${returnLoc.lat},${returnLoc.lng}`;const ds=returnTime.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}),ts=returnTime.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});return{type:'flex',altText:`🔑 คืนรถแล้ว: ${carPlate} โดย ${userName}`,contents:{type:'bubble',header:{type:'box',layout:'vertical',backgroundColor:'#dc2626',paddingAll:'16px',contents:[{type:'text',text:'แจ้งคืนรถแล้ว',weight:'bold',size:'xl',color:'#FFFFFF',align:'center'},{type:'text',text:`${ds}  ${ts} น.`,size:'xs',color:'#fecaca',align:'center',margin:'sm'}]},body:{type:'box',layout:'vertical',spacing:'sm',contents:[{type:'text',text:`ทะเบียนรถ : ${carPlate}`,size:'xl',weight:'bold',wrap:true},{type:'text',text:`ชื่อ : ${userName}`,size:'md',wrap:true,margin:'sm'},{type:'separator',margin:'md'},{type:'box',layout:'vertical',margin:'md',backgroundColor:'#fff1f2',cornerRadius:'10px',paddingAll:'12px',contents:[{type:'text',text:'ระยะเวลาใช้งาน',size:'xs',color:'#9ca3af'},{type:'text',text:durationText,size:'xl',weight:'bold',color:'#dc2626',margin:'sm'}]},{type:'text',text:`พิกัดคืนรถ : ${returnLoc.lat.toFixed(5)}, ${returnLoc.lng.toFixed(5)}`,size:'xs',wrap:true,color:'#9ca3af',margin:'md'}]},footer:{type:'box',layout:'vertical',spacing:'sm',contents:[{type:'button',action:{type:'uri',label:'ดูตำแหน่งคืนรถ',uri:ml},style:'link',color:'#2563eb',height:'sm'},{type:'button',action:{type:'uri',label:'ดูประวัติการใช้รถ',uri:`${window.location.origin}/history`},style:'primary',color:'#16a34a',height:'sm'}]}}};}
+/* ─── FLEX MSG ─── */
+function buildFlexMessage(name,phone,car,mileage,reason,markerList,routeText,hasPhoto){
+  const dm=String(routeText).match(/([\d.]+)\s*กม/),tm=String(routeText).match(/(\d+)\s*นาที/);
+  const now=new Date(),ds=now.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}),ts=now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  const dests=markerList.length>0?markerList.map((m,i)=>({type:'text',size:'sm',wrap:true,color:'#6b7280',text:`• จุดที่ ${i+1}: ${m.getPosition().lat().toFixed(5)}, ${m.getPosition().lng().toFixed(5)}`})):[{type:'text',size:'sm',color:'#9ca3af',text:'• ไม่ได้ระบุปลายทาง'}];
+  return{type:'flex',altText:`🚗 ${name} ขอใช้รถ ${car} เลขไมล์ ${mileage}`,contents:{type:'bubble',size:'mega',header:{type:'box',layout:'vertical',backgroundColor:'#16a34a',paddingAll:'16px',contents:[{type:'text',text:'บันทึกการใช้รถ',weight:'bold',size:'xl',color:'#FFFFFF',align:'center'},{type:'text',text:`${ds}  ${ts} น.`,size:'xs',color:'#d1fae5',align:'center',margin:'sm'}]},body:{type:'box',layout:'vertical',spacing:'sm',contents:[{type:'text',text:`ชื่อ : ${name}`,size:'md',wrap:true},{type:'text',text:`เบอร์โทร : ${phone}`,size:'md',wrap:true,color:'#374151'},{type:'text',text:`ทะเบียนรถ : ${car}`,size:'md',wrap:true,weight:'bold'},{type:'text',text:`ไมล์รถ : ${mileage}`,size:'md',wrap:true},{type:'text',text:`สาเหตุ : ${reason}`,size:'sm',wrap:true,color:'#6b7280',margin:'md'},{type:'separator',margin:'md'},{type:'text',text:'ปลายทาง',weight:'bold',size:'sm',margin:'md'},...dests,{type:'separator',margin:'md'},{type:'box',layout:'horizontal',spacing:'lg',margin:'md',contents:[{type:'box',layout:'vertical',alignItems:'center',contents:[{type:'text',text:dm?`${dm[1]} กม.`:'-',size:'lg',weight:'bold',color:'#16a34a'},{type:'text',text:'ระยะทาง',size:'xs',color:'#9ca3af'}]},{type:'box',layout:'vertical',alignItems:'center',contents:[{type:'text',text:tm?`${tm[1]} นาที`:'-',size:'lg',weight:'bold',color:'#16a34a'},{type:'text',text:'เวลาประมาณ',size:'xs',color:'#9ca3af'}]}]},{type:'text',text:hasPhoto?'แนบรูปเลขไมล์แล้ว ✓':'ไม่มีรูปเลขไมล์',size:'sm',align:'center',margin:'sm',color:hasPhoto?'#16a34a':'#ef4444'}]},footer:{type:'box',layout:'vertical',contents:[{type:'button',action:{type:'uri',label:'ดูประวัติการใช้งานรถ',uri:`${window.location.origin}/history`},style:'primary',color:'#16a34a',height:'sm'}]}}};
+}
+function buildReturnFlexMessage(carPlate,userName,returnTime,durationText,returnLoc){
+  const ml=`https://www.google.com/maps?q=${returnLoc.lat},${returnLoc.lng}`;
+  const ds=returnTime.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}),ts=returnTime.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  return{type:'flex',altText:`🔑 คืนรถแล้ว: ${carPlate} โดย ${userName}`,contents:{type:'bubble',header:{type:'box',layout:'vertical',backgroundColor:'#dc2626',paddingAll:'16px',contents:[{type:'text',text:'แจ้งคืนรถแล้ว',weight:'bold',size:'xl',color:'#FFFFFF',align:'center'},{type:'text',text:`${ds}  ${ts} น.`,size:'xs',color:'#fecaca',align:'center',margin:'sm'}]},body:{type:'box',layout:'vertical',spacing:'sm',contents:[{type:'text',text:`ทะเบียนรถ : ${carPlate}`,size:'xl',weight:'bold',wrap:true},{type:'text',text:`ชื่อ : ${userName}`,size:'md',wrap:true,margin:'sm'},{type:'separator',margin:'md'},{type:'box',layout:'vertical',margin:'md',backgroundColor:'#fff1f2',cornerRadius:'10px',paddingAll:'12px',contents:[{type:'text',text:'ระยะเวลาใช้งาน',size:'xs',color:'#9ca3af'},{type:'text',text:durationText,size:'xl',weight:'bold',color:'#dc2626',margin:'sm'}]},{type:'text',text:`พิกัดคืนรถ : ${returnLoc.lat.toFixed(5)}, ${returnLoc.lng.toFixed(5)}`,size:'xs',wrap:true,color:'#9ca3af',margin:'md'}]},footer:{type:'box',layout:'vertical',spacing:'sm',contents:[{type:'button',action:{type:'uri',label:'ดูตำแหน่งคืนรถ',uri:ml},style:'link',color:'#2563eb',height:'sm'},{type:'button',action:{type:'uri',label:'ดูประวัติการใช้รถ',uri:`${window.location.origin}/history`},style:'primary',color:'#16a34a',height:'sm'}]}}};
+}
 
-/* ═══════════════════ VALIDATE ═══════════════════ */
-function validateForm(){let ok=true;const car=document.getElementById('car').value,mile=document.getElementById('mileage').value,reason=document.getElementById('reason').value.trim();if(!car){showErr('car','กรุณาเลือกทะเบียนรถ');ok=false;}else clearErr('car');if(!mile||isNaN(mile)||Number(mile)<0){showErr('mileage','กรุณากรอกเลขไมล์ให้ถูกต้อง');ok=false;}else clearErr('mileage');if(!reason){showErr('reason','กรุณากรอกสาเหตุการใช้รถ');ok=false;}else clearErr('reason');if(markers.length===0){showErr('destinations','กรุณาเลือกปลายทางอย่างน้อย 1 จุด');ok=false;}else clearErr('destinations');return ok;}
+/* ─── VALIDATION ─── */
+function validateForm(){
+  let ok=true;
+  const car=document.getElementById('car').value,mile=document.getElementById('mileage').value,reason=document.getElementById('reason').value.trim();
+  if(!car){showErr('car','กรุณาเลือกทะเบียนรถ');ok=false;}else clearErr('car');
+  if(!mile||isNaN(mile)||Number(mile)<0){showErr('mileage','กรุณากรอกเลขไมล์ให้ถูกต้อง');ok=false;}else clearErr('mileage');
+  if(!reason){showErr('reason','กรุณากรอกสาเหตุการใช้รถ');ok=false;}else clearErr('reason');
+  if(markers.length===0){showErr('destinations','กรุณาเลือกปลายทางอย่างน้อย 1 จุด');ok=false;}else clearErr('destinations');
+  return ok;
+}
 
-/* ═══════════════════ SUBMIT ═══════════════════ */
+/* ─── SUBMIT ─── */
 let _ps=null;
 document.getElementById('mainForm').addEventListener('submit',async function(e){
-  e.preventDefault();if(loadUsage()){showCarInUseScreen(loadUsage());return;}
+  e.preventDefault();
+  if(loadUsage()){showCarInUseScreen(loadUsage());return;}
   if(!currentUser){showToast('กรุณาเข้าสู่ระบบก่อน','warning');return;}
   if(!validateForm())return;
   const car=document.getElementById('car').value,mile=document.getElementById('mileage').value,reason=document.getElementById('reason').value.trim();
@@ -1381,90 +1249,172 @@ document.getElementById('mainForm').addEventListener('submit',async function(e){
   const name=currentUser.name||currentUser.displayName||'ไม่ระบุ',phone=currentUser.phone||'-';
   _ps={car,mile,reason,rt,name,phone};
   const dm=rt.match(/[\d.]+\s*กม/),tm=rt.match(/\d+\s*นาที/);
-  document.getElementById('confirmSummaryContent').innerHTML=`<div class="conf-row"><span class="conf-l">👤 ชื่อ</span><span class="conf-v">${escapeHtml(name)}</span></div><div class="conf-row"><span class="conf-l">🚗 ทะเบียน</span><span class="conf-v">${escapeHtml(car)}</span></div><div class="conf-row"><span class="conf-l">📍 เลขไมล์</span><span class="conf-v">${escapeHtml(mile)}</span></div><div class="conf-row"><span class="conf-l">📝 ภารกิจ</span><span class="conf-v">${escapeHtml(reason)}</span></div><div class="conf-row"><span class="conf-l">🛣️ ระยะทาง</span><span class="conf-v">${dm?dm[0]:'ไม่ระบุ'}</span></div><div class="conf-row"><span class="conf-l">📸 รูปไมล์</span><span class="conf-v">${cachedPhotoFile?'✅ มีรูปแนบ':'—'}</span></div>`;
+  document.getElementById('confirmSummaryContent').innerHTML=`
+    <div class="conf-row"><span class="conf-l">👤 ชื่อ</span><span class="conf-v">${escapeHtml(name)}</span></div>
+    <div class="conf-row"><span class="conf-l">🚗 ทะเบียน</span><span class="conf-v">${escapeHtml(car)}</span></div>
+    <div class="conf-row"><span class="conf-l">📍 เลขไมล์</span><span class="conf-v">${escapeHtml(mile)}</span></div>
+    <div class="conf-row"><span class="conf-l">📝 ภารกิจ</span><span class="conf-v">${escapeHtml(reason)}</span></div>
+    <div class="conf-row"><span class="conf-l">🛣️ ระยะทาง</span><span class="conf-v">${dm?dm[0]:'ไม่ระบุ'}</span></div>
+    <div class="conf-row"><span class="conf-l">📸 รูปไมล์</span><span class="conf-v">${cachedPhotoFile?'✅ มีรูปแนบ':'—'}</span></div>`;
   document.getElementById('confirmSubmitModal').classList.add('show');
-  vibrate(20);
 });
 function closeConfirmSubmit(){document.getElementById('confirmSubmitModal').classList.remove('show');}
 
 async function doSubmit(){
-  closeConfirmSubmit();if(!_ps)return;
+  closeConfirmSubmit();
+  if(!_ps)return;
   const{car,mile,reason,rt,name,phone}=_ps;_ps=null;
   const message=buildFlexMessage(name,phone,car,mile,reason,markers,rt,!!cachedPhotoBase64);
   const btn=document.getElementById('submitBtn');let ok=false;
-  if(typeof liff!=='undefined'&&liff.isLoggedIn()){try{await liff.shareTargetPicker([message]);ok=true;}catch(err){const m=String(err).toLowerCase();if(m.includes('cancel')||m.includes('closed'))showToast('ยกเลิกการแชร์','warning');else showToast('ไม่สามารถแชร์ได้','error');return;}}else{showToast('[Preview] ข้ามการแชร์','info');ok=true;}
+  if(typeof liff!=='undefined'&&liff.isLoggedIn()){
+    try{await liff.shareTargetPicker([message]);ok=true;}
+    catch(err){const m=String(err).toLowerCase();if(m.includes('cancel')||m.includes('closed'))showToast('ยกเลิกการแชร์','warning');else showToast('ไม่สามารถแชร์ได้','error');return;}
+  }else{showToast('[Preview] ข้ามการแชร์','info');ok=true;}
   if(!ok)return;
   btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
   try{
     const dm=rt.match(/([\d.]+)\s*กม/),tm=rt.match(/(\d+)\s*นาที/);let pk=null;
-    if(cachedPhotoFile){btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลดรูป...';try{const fd=new FormData();fd.append('photo',cachedPhotoFile);const ur=await fetch('/upload-photo',{method:'POST',body:fd}).then(r=>r.json());if(ur.success)pk=ur.key;else showToast('อัปโหลดรูปไม่สำเร็จ','warning');}catch{showToast('อัปโหลดรูปไม่สำเร็จ','warning');}btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';}
+    if(cachedPhotoFile){
+      btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลดรูป...';
+      try{const fd=new FormData();fd.append('photo',cachedPhotoFile);const ur=await fetch('/upload-photo',{method:'POST',body:fd}).then(r=>r.json());if(ur.success)pk=ur.key;else showToast('อัปโหลดรูปไม่สำเร็จ','warning');}catch{showToast('อัปโหลดรูปไม่สำเร็จ','warning');}
+      btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
+    }
     await fetch('/save-record',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:currentUser.userId,name,phone,car,mileage:mile,reason,routeText:rt,totalDistance:dm?parseFloat(dm[1]):0,totalTime:tm?parseInt(tm[1]):0,hasPhoto:!!(pk||cachedPhotoBase64),photoKey:pk,destinations:markers.map((m,i)=>({point:i+1,lat:m.getPosition().lat(),lng:m.getPosition().lng()})),timestamp:new Date().toISOString()})});
     const ud={isUsing:true,carPlate:car,carModel:car.split(':')[0].trim(),startedAt:new Date().toISOString(),userName:name,userId:currentUser.userId,mileage:mile};
-    saveUsage(ud);
-    playSound('success');vibrate([40,20,40,20,80]);
-    launchConfetti();
-    showDynamicIsland('✅','บันทึกสำเร็จ!',`ใช้รถ ${car}`,3500);
-    showCarInUseScreen(ud);
-    updateCarStatus();
-  }catch{playSound('error');showToast('เกิดข้อผิดพลาด กรุณาลองใหม่','error');}
+    saveUsage(ud);showCarInUseScreen(ud);showToast(`✅ บันทึกสำเร็จ! ใช้รถ ${car}`,'success');
+  }catch{showToast('เกิดข้อผิดพลาด กรุณาลองใหม่','error');}
   finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-share-nodes"></i> บันทึก & แชร์ไปกลุ่ม LINE';}
 }
 
-/* ═══════════════════ CAR IN USE ═══════════════════ */
-function showCarInUseScreen(u){if(!u)u=loadUsage();if(!u)return;document.getElementById('infoCarPlate').textContent=u.carPlate||'-';document.getElementById('infoUserName').textContent=u.userName||'-';document.getElementById('infoMileage').textContent=u.mileage?`${u.mileage} กม.`:'-';document.getElementById('infoStartTime').textContent=u.startedAt?new Date(u.startedAt).toLocaleString('th-TH'):'-';returnLocation=null;document.getElementById('returnCarBtn').innerHTML='<i class="fas fa-rotate-left"></i> คืนรถ & แจ้งกลุ่ม LINE';document.getElementById('locationStatus').className='loc-bar';document.getElementById('locationStatus').innerHTML='<i class="fas fa-location-dot"></i> ยังไม่ได้ดึงตำแหน่ง (ไม่บังคับ)';document.getElementById('locationDetail').style.display='none';showScreen('screen-car-in-use');startTimer(u.startedAt);}
-function startTimer(s){clearInterval(timerInterval);const st=new Date(s);const u=()=>{const d=Date.now()-st,h=Math.floor(d/3600000),m=Math.floor((d%3600000)/60000),sc=Math.floor((d%60000)/1000);document.getElementById('timerDisplay').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'00')}:${String(sc).padStart(2,'0')}`;};u();timerInterval=setInterval(u,1000);}
-async function getReturnLocation(){const btn=document.getElementById('getLocationBtn'),st=document.getElementById('locationStatus'),det=document.getElementById('locationDetail');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังดึง...';st.className='loc-bar loading';st.innerHTML='⏳ กำลังรับสัญญาณ GPS...';det.style.display='none';vibrate(20);if(!navigator.geolocation){st.className='loc-bar err';st.innerHTML='❌ ไม่รองรับ GPS';btn.disabled=false;btn.innerHTML='<i class="fas fa-redo"></i> ลองใหม่';return;}const rds=[];await new Promise(res=>{const w=navigator.geolocation.watchPosition(p=>{rds.push({lat:p.coords.latitude,lng:p.coords.longitude,accuracy:p.coords.accuracy});const a=p.coords.accuracy,cl=a<=20?'acc-tag hi':a<=60?'acc-tag mid':'acc-tag lo',lb=a<=20?'🎯 แม่นมาก':a<=60?'👍 พอใช้':'⚠️ อ่อน';st.innerHTML=`⏳ ปรับความแม่นยำ... (${rds.length} pts)<br><span class="${cl}">±${a.toFixed(0)} ม. — ${lb}</span>`;if(a<=15){navigator.geolocation.clearWatch(w);res();}},()=>{navigator.geolocation.clearWatch(w);res();},{enableHighAccuracy:true,timeout:20000,maximumAge:0});setTimeout(()=>{navigator.geolocation.clearWatch(w);res();},8000);});if(!rds.length){st.className='loc-bar err';st.innerHTML='❌ ดึงตำแหน่งไม่ได้';btn.disabled=false;btn.innerHTML='<i class="fas fa-redo"></i> ลองใหม่';return;}const best=rds.reduce((a,b)=>a.accuracy<b.accuracy?a:b);returnLocation=best;const a=best.accuracy,cl=a<=20?'acc-tag hi':a<=60?'acc-tag mid':'acc-tag lo',lb=a<=20?'🎯 แม่นมาก':a<=60?'👍 พอใช้':'⚠️ อ่อน';st.className='loc-bar ok';st.innerHTML=`✅ ได้ตำแหน่งแล้ว (${rds.length} pts)<br><span class="${cl}">±${a.toFixed(0)} ม. — ${lb}</span>`;det.style.display='block';det.innerHTML=`📍 ${best.lat.toFixed(6)}, ${best.lng.toFixed(6)} &nbsp;<a href="https://www.google.com/maps?q=${best.lat},${best.lng}" target="_blank" style="color:var(--blue)"><i class="fas fa-external-link-alt"></i> แผนที่</a>`;btn.innerHTML='<i class="fas fa-check-circle"></i> สำเร็จ';btn.style.background='linear-gradient(135deg,#148543,#25c96e)';playSound('success');vibrate([30,15,60]);showDynamicIsland('📍','ดึงตำแหน่งสำเร็จ',`±${a.toFixed(0)} ม.`);}
-async function handleReturnCar(){const u=loadUsage();if(!u){showToast('ไม่พบข้อมูลการใช้รถ','error');return;}const rt=new Date(),st=new Date(u.startedAt),ms=Math.max(0,rt-st),ts=Math.floor(ms/1000),tm=Math.floor(ts/60),h=Math.floor(tm/60),mn=tm%60,sc=ts%60;let dur=h>0?`${h} ชั่วโมง ${mn} นาที`:tm>0?`${tm} นาที ${sc} วินาที`:`${sc} วินาที`;const msg=buildReturnFlexMessage(u.carPlate,u.userName,rt,dur,returnLocation||{lat:0,lng:0});const btn=document.getElementById('returnCarBtn');let ok=false;if(typeof liff!=='undefined'&&liff.isLoggedIn()){try{await liff.shareTargetPicker([msg]);ok=true;}catch(err){const m=String(err).toLowerCase();if(!m.includes('cancel'))showToast('แชร์ไม่ได้','error');else showToast('ยกเลิกการแชร์','warning');return;}}else ok=true;if(!ok)return;btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> บันทึก...';clearInterval(timerInterval);try{await fetch('/update-return-status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({carPlate:u.carPlate,returnedAt:rt.toISOString(),durationText:dur,returnLocation})});}catch(_){}clearUsage();playSound('success');vibrate([50,20,50,20,100]);launchConfetti();showDynamicIsland('🔑','คืนรถสำเร็จ!',`${u.carPlate} · ${dur}`,3500);showModal('✅','คืนรถสำเร็จ!',`คืนรถ ${u.carPlate} เรียบร้อยแล้ว\nระยะเวลา: ${dur}`);setTimeout(()=>{if(typeof liff!=='undefined'&&liff.isInClient())liff.closeWindow();else location.reload();},2500);}
+/* ─── CAR IN USE ─── */
+function showCarInUseScreen(u){
+  if(!u)u=loadUsage();if(!u)return;
+  document.getElementById('infoCarPlate').textContent=u.carPlate||'-';
+  document.getElementById('infoUserName').textContent=u.userName||'-';
+  document.getElementById('infoMileage').textContent=u.mileage?`${u.mileage} กม.`:'-';
+  document.getElementById('infoStartTime').textContent=u.startedAt?new Date(u.startedAt).toLocaleString('th-TH'):'-';
+  returnLocation=null;
+  document.getElementById('returnCarBtn').innerHTML='<i class="fas fa-rotate-left"></i> คืนรถ & แจ้งกลุ่ม LINE';
+  document.getElementById('locationStatus').className='loc-bar';
+  document.getElementById('locationStatus').innerHTML='<i class="fas fa-location-dot"></i> ยังไม่ได้ดึงตำแหน่ง (ไม่บังคับ)';
+  document.getElementById('locationDetail').style.display='none';
+  showScreen('screen-car-in-use');startTimer(u.startedAt);
+}
+function startTimer(s){
+  clearInterval(timerInterval);const st=new Date(s);
+  const u=()=>{const d=Date.now()-st,h=Math.floor(d/3600000),m=Math.floor((d%3600000)/60000),sc=Math.floor((d%60000)/1000);document.getElementById('timerDisplay').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sc).padStart(2,'0')}`;};
+  u();timerInterval=setInterval(u,1000);
+}
+async function getReturnLocation(){
+  const btn=document.getElementById('getLocationBtn'),st=document.getElementById('locationStatus'),det=document.getElementById('locationDetail');
+  btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังดึงตำแหน่ง...';
+  st.className='loc-bar loading';st.innerHTML='⏳ กำลังรับสัญญาณ GPS...';det.style.display='none';
+  if(!navigator.geolocation){st.className='loc-bar err';st.innerHTML='❌ เบราว์เซอร์ไม่รองรับ GPS';btn.disabled=false;btn.innerHTML='<i class="fas fa-redo"></i> ลองใหม่';return;}
+  const rds=[];
+  await new Promise(res=>{
+    const w=navigator.geolocation.watchPosition(p=>{
+      rds.push({lat:p.coords.latitude,lng:p.coords.longitude,accuracy:p.coords.accuracy});
+      const a=p.coords.accuracy,cl=a<=20?'acc-tag hi':a<=60?'acc-tag mid':'acc-tag lo',lb=a<=20?'🎯 แม่นมาก':a<=60?'👍 พอใช้':'⚠️ อ่อน';
+      st.innerHTML=`⏳ ปรับความแม่นยำ... (${rds.length} pts)<br><span class="${cl}">±${a.toFixed(0)} ม. — ${lb}</span>`;
+      if(a<=15){navigator.geolocation.clearWatch(w);res();}
+    },()=>{navigator.geolocation.clearWatch(w);res();},{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+    setTimeout(()=>{navigator.geolocation.clearWatch(w);res();},8000);
+  });
+  if(!rds.length){st.className='loc-bar err';st.innerHTML='❌ ดึงตำแหน่งไม่ได้ กรุณาอนุญาต GPS';btn.disabled=false;btn.innerHTML='<i class="fas fa-redo"></i> ลองใหม่';return;}
+  const best=rds.reduce((a,b)=>a.accuracy<b.accuracy?a:b);returnLocation=best;
+  const a=best.accuracy,cl=a<=20?'acc-tag hi':a<=60?'acc-tag mid':'acc-tag lo',lb=a<=20?'🎯 แม่นมาก':a<=60?'👍 พอใช้':'⚠️ อ่อน';
+  st.className='loc-bar ok';st.innerHTML=`✅ ได้ตำแหน่งแล้ว (${rds.length} pts)<br><span class="${cl}">±${a.toFixed(0)} ม. — ${lb}</span>`;
+  det.style.display='block';det.innerHTML=`📍 ${best.lat.toFixed(6)}, ${best.lng.toFixed(6)} &nbsp;<a href="https://www.google.com/maps?q=${best.lat},${best.lng}" target="_blank" style="color:var(--blue)"><i class="fas fa-external-link-alt"></i> แผนที่</a>`;
+  btn.innerHTML='<i class="fas fa-check-circle"></i> ดึงตำแหน่งสำเร็จ';btn.style.background='linear-gradient(135deg,#148543,#25c96e)';
+}
+async function handleReturnCar(){
+  const u=loadUsage();if(!u){showToast('ไม่พบข้อมูลการใช้รถ','error');return;}
+  const rt=new Date(),st=new Date(u.startedAt),ms=Math.max(0,rt-st),ts=Math.floor(ms/1000),tm=Math.floor(ts/60),h=Math.floor(tm/60),mn=tm%60,sc=ts%60;
+  let dur=h>0?`${h} ชั่วโมง ${mn} นาที`:tm>0?`${tm} นาที ${sc} วินาที`:`${sc} วินาที`;
+  const msg=buildReturnFlexMessage(u.carPlate,u.userName,rt,dur,returnLocation||{lat:0,lng:0});
+  const btn=document.getElementById('returnCarBtn');let ok=false;
+  if(typeof liff!=='undefined'&&liff.isLoggedIn()){try{await liff.shareTargetPicker([msg]);ok=true;}catch(err){const m=String(err).toLowerCase();if(!m.includes('cancel'))showToast('แชร์ไม่ได้','error');else showToast('ยกเลิกการแชร์','warning');return;}}else ok=true;
+  if(!ok)return;
+  btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> บันทึก...';clearInterval(timerInterval);
+  try{await fetch('/update-return-status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({carPlate:u.carPlate,returnedAt:rt.toISOString(),durationText:dur,returnLocation})});}catch(_){}
+  clearUsage();showToast(`✅ คืนรถ ${u.carPlate} สำเร็จ!`,'success');
+  showModal('✅','คืนรถสำเร็จ!',`คืนรถ ${u.carPlate} เรียบร้อยแล้ว\nระยะเวลา: ${dur}`);
+  setTimeout(()=>{if(typeof liff!=='undefined'&&liff.isInClient())liff.closeWindow();else location.reload();},2500);
+}
 function handleCancelUsage(){if(!confirm('ยืนยันยกเลิกการใช้รถ?'))return;clearUsage();clearInterval(timerInterval);showToast('ยกเลิกการใช้รถแล้ว','info');location.reload();}
 
-/* ═══════════════════ MODAL ═══════════════════ */
-function showModal(ico,h,msg){document.getElementById('modalIcon').textContent=ico;document.getElementById('modalTitle').textContent=h;document.getElementById('modalMessage').innerHTML=msg.replace(/\n/g,'<br>');document.getElementById('successModal').classList.add('show');}
+/* ─── MODAL ─── */
+function showModal(ico,h,msg){
+  document.getElementById('modalIcon').textContent=ico;document.getElementById('modalTitle').textContent=h;
+  document.getElementById('modalMessage').innerHTML=msg.replace(/\n/g,'<br>');document.getElementById('successModal').classList.add('show');
+}
 function closeModal(){document.getElementById('successModal').classList.remove('show');}
 
-/* ═══════════════════ USER UI ═══════════════════ */
+/* ─── USER UI ─── */
 function setUserCard(name,pic,dept){
   const hr=new Date().getHours(),g=hr<12?'อรุณสวัสดิ์':hr<18?'สวัสดีตอนบ่าย':'สวัสดีตอนเย็น';
   document.getElementById('userGreeting').textContent=`${g} คุณ`;
   document.getElementById('userName').textContent=name;
   document.getElementById('userDept').innerHTML=`<i class="fas fa-building" style="font-size:9px"></i> ${escapeHtml(dept||'')}`;
   const av=document.getElementById('userAvatar'),tb=document.getElementById('topbarAvatar');
-  if(pic){const i=document.createElement('img');i.src=pic;i.alt=name;i.addEventListener('error',()=>av.textContent=name.charAt(0));av.innerHTML='';av.appendChild(i);const i2=document.createElement('img');i2.src=pic;i2.alt=name;i2.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';tb.innerHTML='';tb.appendChild(i2);}
-  else{av.textContent=name.charAt(0);tb.textContent=name.charAt(0);tb.style.fontWeight='800';}
+  if(pic){
+    const i=document.createElement('img');i.src=pic;i.alt=name;i.addEventListener('error',()=>av.textContent=name.charAt(0));av.innerHTML='';av.appendChild(i);
+    const i2=document.createElement('img');i2.src=pic;i2.alt=name;i2.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';tb.innerHTML='';tb.appendChild(i2);
+  }else{av.textContent=name.charAt(0);tb.textContent=name.charAt(0);tb.style.fontWeight='700';}
 }
 
-/* ═══════════════════ STATS ═══════════════════ */
-async function loadStats(uid){
-  try{
-    const data=await fetch(`/get-records?userId=${encodeURIComponent(uid)}&limit=100`).then(r=>r.json());
-    const recs=data.records||[];const now=new Date(),month=now.getMonth(),year=now.getFullYear();
-    const thisMonth=recs.filter(r=>{const d=new Date(r.timestamp);return d.getMonth()===month&&d.getFullYear()===year;});
-    const trips=thisMonth.length,km=thisMonth.reduce((s,r)=>s+(r.totalDistance||0),0),returned=recs.filter(r=>r.returnStatus==='returned').length;
-    const setS=(vi,li,val,lbl)=>{const ve=document.getElementById(vi),le=document.getElementById(li);ve.className='stat-val';ve.textContent=val;le.className='stat-lbl';le.textContent=lbl;};
-    setS('statTripsEl','statTripsLbl',trips+' ครั้ง','เดือนนี้');setS('statKmEl','statKmLbl',km.toFixed(1)+' กม.','ระยะรวม');setS('statReturnEl','statReturnLbl',returned+' ครั้ง','คืนแล้ว');
-  }catch{}
-}
-
-/* ═══════════════════ HISTORY ═══════════════════ */
 async function loadUserHistory(uid){
   const el=document.getElementById('userHistorySection');if(!el)return;
   try{
     const data=await fetch(`/get-records?userId=${encodeURIComponent(uid)}&limit=5`).then(r=>r.json());
     const recs=data.records||[];
-    if(!recs.length){el.innerHTML='<div class="hist-empty"><i class="fas fa-inbox" style="font-size:20px;color:var(--p4);display:block;margin-bottom:6px"></i>ยังไม่มีประวัติการใช้รถ</div>';return;}
-    el.innerHTML=recs.map(r=>{const ok=r.returnStatus==='returned';const cs=escapeHtml(r.car||'—'),rs=escapeHtml(r.reason?r.reason.slice(0,30)+(r.reason.length>30?'…':''):'—');const d=r.timestamp?new Date(r.timestamp).toLocaleDateString('th-TH',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'—';return`<div class="hist-row"><div class="hist-pip ${ok?'green':'amber'}"></div><div class="hist-body"><div class="hist-car">🚗 ${cs}</div><div class="hist-meta">${rs} · ${d}</div></div><div class="hist-tail"><div class="hist-tag ${ok?'green':'amber'}">${ok?'✅ คืนแล้ว':'🔑 ใช้อยู่'}</div><div class="hist-km">${r.totalDistance?r.totalDistance.toFixed(1)+' กม.':''}</div></div></div>`;}).join('');
+    if(!recs.length){el.innerHTML='<div class="hist-empty"><i class="fas fa-inbox" style="font-size:20px;color:var(--mint-300);display:block;margin-bottom:6px"></i>ยังไม่มีประวัติการใช้รถ</div>';return;}
+    el.innerHTML=recs.map(r=>{
+      const ok=r.returnStatus==='returned';
+      const cs=escapeHtml(r.car||'—'),rs=escapeHtml(r.reason?r.reason.slice(0,30)+(r.reason.length>30?'…':''):'—');
+      const d=r.timestamp?new Date(r.timestamp).toLocaleDateString('th-TH',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+      return`<div class="hist-row">
+        <div class="hist-pip ${ok?'green':'amber'}"></div>
+        <div class="hist-body"><div class="hist-car">🚗 ${cs}</div><div class="hist-meta">${rs} · ${d}</div></div>
+        <div class="hist-tail"><div class="hist-tag ${ok?'green':'amber'}">${ok?'✅ คืนแล้ว':'🔑 ใช้อยู่'}</div><div class="hist-km">${r.totalDistance?r.totalDistance.toFixed(1)+' กม.':''}</div></div>
+      </div>`;
+    }).join('');
   }catch{el.innerHTML='<div class="hist-empty">โหลดประวัติไม่ได้</div>';}
 }
 
-/* ═══════════════════ REGISTER ═══════════════════ */
-function showRegisterScreen(u){const av=document.getElementById('regAvatar');if(u.pictureUrl){const i=document.createElement('img');i.id='regAvatar';i.src=u.pictureUrl;i.alt=u.displayName||'';i.style.cssText='width:84px;height:84px;border-radius:50%;object-fit:cover;border:2.5px solid var(--p3);margin:0 auto 12px;display:block;box-shadow:0 0 0 6px rgba(34,197,94,.09)';av.replaceWith(i);}else av.textContent=u.displayName?.charAt(0)||'👤';document.getElementById('regName').value=u.displayName||'';showScreen('screen-register');}
+/* ─── REGISTER ─── */
+function showRegisterScreen(u){
+  const av=document.getElementById('regAvatar');
+  if(u.pictureUrl){const i=document.createElement('img');i.id='regAvatar';i.src=u.pictureUrl;i.alt=u.displayName||'';i.style.cssText='width:84px;height:84px;border-radius:50%;object-fit:cover;border:2.5px solid var(--mint-300);margin:0 auto 12px;display:block;box-shadow:0 0 0 6px rgba(37,201,110,.09)';av.replaceWith(i);}
+  else av.textContent=u.displayName?.charAt(0)||'👤';
+  document.getElementById('regName').value=u.displayName||'';
+  showScreen('screen-register');
+}
 document.getElementById('regDept').addEventListener('change',function(){document.getElementById('otherDeptGroup').style.display=this.value==='อื่นๆ'?'block':'none';});
-document.getElementById('regForm').addEventListener('submit',async function(e){e.preventDefault();const btn=document.getElementById('regSubmitBtn');const name=document.getElementById('regName').value.trim(),phone=document.getElementById('regPhone').value.trim(),dept=document.getElementById('regDept').value,od=document.getElementById('regOtherDept').value.trim();let v=true;if(!name){showErr('regName','กรุณากรอกชื่อ-นามสกุล');v=false;}if(!phone||!/^[0-9]{9,10}$/.test(phone)){showErr('regPhone','กรุณากรอกเบอร์โทร 9-10 หลัก');v=false;}if(!dept){showErr('regDept','กรุณาเลือกแผนก');v=false;}if(dept==='อื่นๆ'&&!od){showErr('regOtherDept','กรุณาระบุแผนก');v=false;}if(!v)return;btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...';try{const res=await fetch('/user-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'submit',userId:currentUser.userId,displayName:currentUser.displayName,pictureUrl:currentUser.pictureUrl,formData:{fullName:name,phone,department:dept==='อื่นๆ'?od:dept}})}).then(r=>r.json());if(res.duplicate){showToast('คุณส่งคำขอไปแล้ว','warning');showPendingScreen(currentUser.displayName,true);return;}if(res.success){launchConfetti();playSound('success');vibrate([40,20,80]);showDynamicIsland('📨','ส่งคำขอสำเร็จ!','รอแอดมินยืนยัน',3500);showModal('📨','ส่งคำขอสำเร็จ!',`ขอบคุณคุณ ${name}\nรอแอดมินยืนยันภายใน 24 ชั่วโมง`);setTimeout(()=>{closeModal();showPendingScreen(name,false);},3000);}}catch{showToast('เกิดข้อผิดพลาด','error');playSound('error');}finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> ส่งคำขอสมัคร';}});
-function showPendingScreen(name,had){document.getElementById('pendingTitle').textContent=had?'⏳ รอการอนุมัติ':'📨 ส่งคำขอแล้ว';document.getElementById('pendingMsg').innerHTML=had?`สวัสดีคุณ ${name}<br>กำลังรออนุมัติจากแอดมิน`:`ขอบคุณคุณ ${name}<br>คำขอได้รับแล้ว รอแอดมินยืนยัน`;showScreen('screen-pending');}
+document.getElementById('regForm').addEventListener('submit',async function(e){
+  e.preventDefault();const btn=document.getElementById('regSubmitBtn');
+  const name=document.getElementById('regName').value.trim(),phone=document.getElementById('regPhone').value.trim(),dept=document.getElementById('regDept').value,od=document.getElementById('regOtherDept').value.trim();
+  let v=true;
+  if(!name){showErr('regName','กรุณากรอกชื่อ-นามสกุล');v=false;}
+  if(!phone||!/^[0-9]{9,10}$/.test(phone)){showErr('regPhone','กรุณากรอกเบอร์โทร 9-10 หลัก');v=false;}
+  if(!dept){showErr('regDept','กรุณาเลือกแผนก');v=false;}
+  if(dept==='อื่นๆ'&&!od){showErr('regOtherDept','กรุณาระบุแผนก');v=false;}
+  if(!v)return;
+  btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...';
+  try{
+    const res=await fetch('/user-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'submit',userId:currentUser.userId,displayName:currentUser.displayName,pictureUrl:currentUser.pictureUrl,formData:{fullName:name,phone,department:dept==='อื่นๆ'?od:dept}})}).then(r=>r.json());
+    if(res.duplicate){showToast('คุณส่งคำขอไปแล้ว','warning');showPendingScreen(currentUser.displayName,true);return;}
+    if(res.success){showModal('📨','ส่งคำขอสำเร็จ!',`ขอบคุณคุณ ${name}\nรอแอดมินยืนยันภายใน 24 ชั่วโมง`);setTimeout(()=>{closeModal();showPendingScreen(name,false);},3000);}
+  }catch{showToast('เกิดข้อผิดพลาด','error');}
+  finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> ส่งคำขอสมัคร';}
+});
+function showPendingScreen(name,had){
+  document.getElementById('pendingTitle').textContent=had?'⏳ รอการอนุมัติ':'📨 ส่งคำขอแล้ว';
+  document.getElementById('pendingMsg').innerHTML=had?`สวัสดีคุณ ${name}<br>กำลังรออนุมัติจากแอดมิน`:`ขอบคุณคุณ ${name}<br>คำขอได้รับแล้ว รอแอดมินยืนยัน`;
+  showScreen('screen-pending');
+}
 
-/* Input listeners */
-['mileage','reason'].forEach(id=>document.getElementById(id).addEventListener('input',updateSteps));
-
-/* ═══════════════════ INIT ═══════════════════ */
+/* ─── INIT ─── */
 async function initApp(){
   try{
     const ms=document.createElement('script');ms.src=`https://maps.googleapis.com/maps/api/js?key=${CONFIG.googleMapsKey}&libraries=places&loading=async&callback=initMap`;ms.async=true;document.head.appendChild(ms);
@@ -1477,31 +1427,25 @@ async function initApp(){
     currentUser={userId:profile.userId,displayName:profile.displayName,pictureUrl:profile.pictureUrl,name:db?.name||profile.displayName,phone:db?.phone||'',department:db?.department||'รออนุมัติ',role:db?.role||'pending',status:db?.status||'pending'};
     if(db&&profile.pictureUrl!==db.pictureUrl)fetch('/update-user',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:profile.userId,pictureUrl:profile.pictureUrl})}).catch(()=>{});
     fetch('/log-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:profile.userId})}).catch(()=>{});
-
-    const ld=document.getElementById('appLoading');ld.classList.add('fade');setTimeout(()=>ld.style.display='none',420);
-
+    document.getElementById('appLoading').style.display='none';
     if(usage){showCarInUseScreen(usage);return;}
     const role=currentUser.role,status=currentUser.status;
-    if(role==='inactive'||status==='inactive'||role==='rejected'){const sm=document.getElementById('suspendedMsg');sm.textContent='';const s1=document.createElement('span');s1.textContent=`คุณ ${profile.displayName}`;sm.appendChild(s1);sm.appendChild(document.createElement('br'));sm.appendChild(document.createTextNode('บัญชีถูกระงับการใช้งาน'));sm.appendChild(document.createElement('br'));sm.appendChild(document.createTextNode('กรุณาติดต่อผู้ดูแลระบบ'));showScreen('screen-suspended');}
-    else if(role==='pending'){const cr=await fetch('/user-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'check',userId:profile.userId})}).then(r=>r.json()).catch(()=>({exists:false}));if(cr.exists)showPendingScreen(profile.displayName,true);else showRegisterScreen(currentUser);}
-    else{
+    if(role==='inactive'||status==='inactive'||role==='rejected'){
+      const sm=document.getElementById('suspendedMsg');sm.textContent='';
+      const s1=document.createElement('span');s1.textContent=`คุณ ${profile.displayName}`;sm.appendChild(s1);sm.appendChild(document.createElement('br'));sm.appendChild(document.createTextNode('บัญชีถูกระงับ'));sm.appendChild(document.createElement('br'));sm.appendChild(document.createTextNode('กรุณาติดต่อผู้ดูแลระบบ'));
+      showScreen('screen-suspended');
+    }else if(role==='pending'){
+      const cr=await fetch('/user-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'check',userId:profile.userId})}).then(r=>r.json()).catch(()=>({exists:false}));
+      if(cr.exists)showPendingScreen(profile.displayName,true);else showRegisterScreen(currentUser);
+    }else{
       setUserCard(currentUser.name,profile.pictureUrl,currentUser.department);
-      showScreen('screen-main');
-      updateCarStatus();
-      loadUserHistory(profile.userId);
-      loadStats(profile.userId);
-      fetchWeather();
-      // Welcome Dynamic Island
-      setTimeout(()=>{
-        const hr=new Date().getHours(),g=hr<12?'อรุณสวัสดิ์':hr<18?'สวัสดีตอนบ่าย':'สวัสดีตอนเย็น';
-        showDynamicIsland('👋',`${g}!`,currentUser.name||'ยินดีต้อนรับ',2500);
-      },800);
+      showScreen('screen-main');loadUserHistory(profile.userId);
+      // live step update on input
+      ['mileage','reason'].forEach(id=>document.getElementById(id).addEventListener('input',updateSteps));
     }
   }catch(err){
-    console.error(err);
-    const ld=document.getElementById('appLoading');ld.style.display='none';
-    showToast('เกิดข้อผิดพลาดในการเริ่มต้น','error');
-    showScreen('screen-main');
+    console.error(err);document.getElementById('appLoading').style.display='none';
+    showToast('เกิดข้อผิดพลาดในการเริ่มต้น','error');showScreen('screen-main');
   }
 }
 window.addEventListener('load',initApp);
