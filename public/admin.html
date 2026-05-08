@@ -711,6 +711,18 @@ tbody tr:hover td { background: var(--c-surface2); }
               <label class="modal-label">📐 ระยะทางโดยประมาณ (กม.) — ถ้ามี</label>
               <input class="modal-input" type="number" id="proxyDistance" placeholder="0" min="0" step="0.1">
             </div>
+            <div>
+              <label class="modal-label">📸 รูปถ่ายเลขไมล์</label>
+              <label id="proxyPhotoLabel" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--c-surface2);border:1.5px dashed var(--c-border2);border-radius:8px;cursor:pointer;font-size:13px;color:var(--c-text2);transition:border-color .2s">
+                <i class="fas fa-camera" style="font-size:18px;color:var(--c-green)"></i>
+                <span id="proxyPhotoLabelText">แตะเพื่อเลือกรูป (JPG, PNG, WEBP ไม่เกิน 10MB)</span>
+                <input type="file" id="proxyPhoto" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none" onchange="onProxyPhotoChange(event)">
+              </label>
+              <div id="proxyPhotoPreviewWrap" style="display:none;margin-top:8px;position:relative">
+                <img id="proxyPhotoPreview" src="" alt="preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;border:1px solid var(--c-border2)">
+                <button onclick="clearProxyPhoto()" title="ลบรูป" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">✕</button>
+              </div>
+            </div>
             <button class="btn btn-primary" onclick="proxySubmit()" style="margin-top:4px">
               <i class="fas fa-save"></i> บันทึกการยืมรถ
             </button>
@@ -1497,6 +1509,38 @@ async function deleteRecord(recordId, name) {
 /* ──────────────────────────────────────────
    PROXY: บันทึกแทนพนักงาน
 ────────────────────────────────────────── */
+/* ── PROXY PHOTO ── */
+let _proxyPhotoFile = null;
+function onProxyPhotoChange(e) {
+  const f = e.target.files[0];
+  _proxyPhotoFile = null;
+  if (!f) return;
+  if (!['image/jpeg','image/png','image/gif','image/webp'].includes(f.type)) {
+    showToast('รองรับ JPG, PNG, WEBP เท่านั้น', 'warning');
+    e.target.value = ''; return;
+  }
+  if (f.size > 10 * 1024 * 1024) {
+    showToast('ไฟล์ต้องไม่เกิน 10MB', 'warning');
+    e.target.value = ''; return;
+  }
+  _proxyPhotoFile = f;
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    document.getElementById('proxyPhotoPreview').src = reader.result;
+    document.getElementById('proxyPhotoPreviewWrap').style.display = 'block';
+    document.getElementById('proxyPhotoLabelText').textContent = `✅ ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)`;
+    document.getElementById('proxyPhotoLabel').style.borderColor = 'var(--c-green)';
+  };
+  reader.readAsDataURL(f);
+}
+function clearProxyPhoto() {
+  _proxyPhotoFile = null;
+  document.getElementById('proxyPhoto').value = '';
+  document.getElementById('proxyPhotoPreviewWrap').style.display = 'none';
+  document.getElementById('proxyPhotoLabelText').textContent = 'แตะเพื่อเลือกรูป (JPG, PNG, WEBP ไม่เกิน 10MB)';
+  document.getElementById('proxyPhotoLabel').style.borderColor = '';
+}
+
 function populateProxyUsers() {
   const sel = document.getElementById('proxyUser');
   if (!sel) return;
@@ -1534,24 +1578,40 @@ async function proxySubmit() {
   if (!mileage)      { showToast('กรุณากรอกเลขไมล์', 'warning'); return; }
   if (!reason)       { showToast('กรุณากรอกสาเหตุ', 'warning'); return; }
   const u = allData.userMap[targetUserId];
+  const hasPhoto = !!_proxyPhotoFile;
   showConfirm(
-    `บันทึกการยืมรถ <strong>${esc(car)}</strong><br>แทน <strong>${esc(u?.name || targetUserId)}</strong>?`,
+    `บันทึกการยืมรถ <strong>${esc(car)}</strong><br>แทน <strong>${esc(u?.name || targetUserId)}</strong>${hasPhoto ? '<br><span style="font-size:12px;color:var(--c-green)">📸 มีรูปไมล์แนบ</span>' : ''}?`,
     'ยืนยันบันทึกแทนพนักงาน', '📋', 'btn-primary',
     async () => {
       try {
+        let photoKey = null;
+
+        // อัปโหลดรูปก่อน (ถ้ามี)
+        if (_proxyPhotoFile) {
+          showToast('⏳ กำลังอัปโหลดรูปไมล์...', 'info');
+          try {
+            const fd = new FormData();
+            fd.append('photo', _proxyPhotoFile);
+            const ur = await fetch('/upload-photo', { method: 'POST', body: fd }).then(r => r.json());
+            if (ur.success) { photoKey = ur.key; }
+            else showToast('อัปโหลดรูปไม่สำเร็จ (ดำเนินการต่อโดยไม่มีรูป)', 'warning');
+          } catch { showToast('อัปโหลดรูปไม่สำเร็จ (ดำเนินการต่อโดยไม่มีรูป)', 'warning'); }
+        }
+
         const res = await fetch('/admin-action', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'proxy-save-record', requestingUserId: adminId, targetUserId, car, mileage, reason, totalDistance })
+          body: JSON.stringify({ action: 'proxy-save-record', requestingUserId: adminId, targetUserId, car, mileage, reason, totalDistance, photoKey })
         });
         const d = await res.json();
         if (d.success) {
-          showToast(`✅ บันทึกสำเร็จ! รถ ${car} สำหรับ ${u?.name}`, 'success');
+          showToast(`✅ บันทึกสำเร็จ! รถ ${car} · ${u?.name}${photoKey ? ' 📸' : ''}`, 'success');
           document.getElementById('proxyUser').value = '';
           document.getElementById('proxyCar').value = '';
           document.getElementById('proxyMileage').value = '';
           document.getElementById('proxyReason').value = '';
           document.getElementById('proxyDistance').value = '';
           document.getElementById('proxyUserInfo').style.display = 'none';
+          clearProxyPhoto();
           loadProxyActive();
           await loadAll();
         } else { showToast('เกิดข้อผิดพลาด: ' + (d.error || '?'), 'error'); }
@@ -1616,4 +1676,3 @@ function showToast(msg, type='info') {
 </script>
 </body>
 </html>
-
