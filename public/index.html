@@ -631,6 +631,19 @@ input:focus,select:focus,textarea:focus{
 .modal-h{font-size:19px;font-weight:700;color:var(--text-primary);margin-bottom:7px;}
 .modal-p{color:var(--text-muted);font-size:13.5px;line-height:1.8;margin-bottom:20px;}
 
+/* ── CAR BUSY MODAL ── */
+.busy-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r5);padding:26px 20px;max-width:340px;width:100%;text-align:center;box-shadow:var(--shadow-xl);animation:mPop .25s cubic-bezier(.16,1,.3,1);}
+.busy-ico{font-size:52px;margin-bottom:8px;}
+.busy-h{font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:5px;}
+.busy-sub{font-size:13px;color:var(--text-muted);margin-bottom:16px;}
+.busy-box{background:#fffbeb;border:1px solid #fde68a;border-radius:var(--r3);padding:13px 14px;margin-bottom:16px;text-align:left;}
+.busy-row{display:flex;gap:8px;font-size:13px;margin-bottom:7px;align-items:flex-start;}
+.busy-row:last-child{margin-bottom:0;}
+.busy-lbl{color:var(--text-muted);flex-shrink:0;width:68px;font-size:12px;padding-top:1px;}
+.busy-val{font-weight:600;color:var(--text-primary);word-break:break-word;}
+.car-pill-busy{opacity:.5;pointer-events:none;position:relative;}
+.car-pill-busy::after{content:"ไม่ว่าง";position:absolute;top:4px;right:6px;font-size:9px;font-weight:700;background:#ef4444;color:#fff;border-radius:99px;padding:2px 6px;letter-spacing:.3px;}
+
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    TOAST
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -1087,6 +1100,24 @@ input:focus,select:focus,textarea:focus{
   </div>
 </div>
 
+<!-- Car Busy Modal -->
+<div class="modal-overlay" id="carBusyModal">
+  <div class="busy-card">
+    <div class="busy-ico">🚫</div>
+    <div class="busy-h">รถคันนี้ไม่ว่าง</div>
+    <div class="busy-sub">กำลังถูกใช้งานอยู่ในขณะนี้ กรุณาเลือกรถคันอื่น</div>
+    <div class="busy-box" id="carBusyInfo">
+      <div class="busy-row"><span class="busy-lbl">🚗 ทะเบียน</span><span class="busy-val" id="busyCar">—</span></div>
+      <div class="busy-row"><span class="busy-lbl">👤 ผู้ใช้</span><span class="busy-val" id="busyUser">—</span></div>
+      <div class="busy-row"><span class="busy-lbl">🏢 แผนก</span><span class="busy-val" id="busyDept">—</span></div>
+      <div class="busy-row"><span class="busy-lbl">🕐 เริ่มเมื่อ</span><span class="busy-val" id="busyTime" style="font-size:12px">—</span></div>
+    </div>
+    <button class="btn btn-ghost" onclick="closeCarBusyModal()" style="width:100%;margin-top:2px">
+      <i class="fas fa-arrow-left"></i> กลับไปเลือกรถคันอื่น
+    </button>
+  </div>
+</div>
+
 <!-- Toast -->
 <div id="toast"></div>
 
@@ -1147,10 +1178,58 @@ function updateSteps(){
 }
 
 /* ─── CAR PILLS ─── */
+let _busyCarCache={ts:0,data:{}};
+async function loadBusyCars(){
+  try{
+    const res=await fetch('/get-records?status=pending&limit=50');
+    const d=await res.json();
+    const m={};
+    if(d.records)d.records.forEach(r=>{if(r.car)m[r.car]=r;});
+    _busyCarCache={ts:Date.now(),data:m};
+    return m;
+  }catch{return {};}
+}
+function markBusyPills(busyMap){
+  document.querySelectorAll('.car-pill').forEach(p=>{
+    const v=p.querySelector('input')?.value||'';
+    if(busyMap[v]){p.classList.add('car-pill-busy');}
+    else{p.classList.remove('car-pill-busy');}
+  });
+}
+async function refreshCarStatus(){
+  const m=await loadBusyCars();
+  markBusyPills(m);
+}
 function onCarPick(radio){
-  document.getElementById('car').value=radio.value;
+  const v=radio.value;
+  document.getElementById('car').value=v;
   document.querySelectorAll('.car-pill').forEach(p=>p.classList.toggle('selected',p.querySelector('input')===radio));
   clearErr('car');updateSteps();
+  // Check if this car is busy (use cache if fresh, else fetch)
+  const now=Date.now();
+  const doCheck=()=>{
+    const rec=_busyCarCache.data[v];
+    if(rec){
+      // Deselect pill
+      radio.checked=false;
+      document.getElementById('car').value='';
+      document.querySelectorAll('.car-pill').forEach(p=>p.classList.remove('selected'));
+      updateSteps();
+      showCarBusyModal(rec);
+    }
+  };
+  if(now-_busyCarCache.ts<30000){doCheck();}
+  else{loadBusyCars().then(m=>{_busyCarCache={ts:Date.now(),data:m};markBusyPills(m);doCheck();});}
+}
+function showCarBusyModal(r){
+  document.getElementById('busyCar').textContent=r.car||'—';
+  document.getElementById('busyUser').textContent=r.name||'—';
+  document.getElementById('busyDept').textContent=r.department||'—';
+  document.getElementById('busyTime').textContent=r.timestamp?new Date(r.timestamp).toLocaleString('th-TH'):'—';
+  document.getElementById('carBusyModal').classList.add('show');
+}
+function closeCarBusyModal(){
+  document.getElementById('carBusyModal').classList.remove('show');
 }
 
 /* ─── PHOTO ─── */
@@ -1440,6 +1519,7 @@ async function initApp(){
     }else{
       setUserCard(currentUser.name,profile.pictureUrl,currentUser.department);
       showScreen('screen-main');loadUserHistory(profile.userId);
+      refreshCarStatus(); // โหลดสถานะรถ (ไม่ว่าง/ว่าง)
       // live step update on input
       ['mileage','reason'].forEach(id=>document.getElementById(id).addEventListener('input',updateSteps));
     }
