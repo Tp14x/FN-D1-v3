@@ -111,7 +111,7 @@ export async function onRequestPost(context) {
 
     // ── PROXY: สร้างรายการยืมรถแทนพนักงาน ──
     if (action === 'proxy-save-record') {
-      const { targetUserId, car, mileage, reason, totalDistance } = body;
+      const { targetUserId, car, mileage, reason, totalDistance, photoKey } = body;
       if (!targetUserId || !car) return err('Missing required fields', 400, o);
       const user = await env.DB.prepare('SELECT * FROM users WHERE user_id = ?').bind(targetUserId).first();
       if (!user) return err('User not found', 404, o);
@@ -120,8 +120,8 @@ export async function onRequestPost(context) {
       await env.DB.prepare(`
         INSERT INTO records
           (id, user_id, name, phone, car, mileage, reason, route_text,
-           total_distance, total_time, has_photo, return_status, timestamp)
-        VALUES (?, ?, ?, ?, ?, ?, ?, '', ?, 0, 0, 'pending', ?)
+           total_distance, total_time, has_photo, photo_key, return_status, timestamp)
+        VALUES (?, ?, ?, ?, ?, ?, ?, '', ?, 0, ?, ?, 'pending', ?)
       `).bind(
         id, targetUserId,
         user.name || 'ไม่ระบุ',
@@ -130,6 +130,8 @@ export async function onRequestPost(context) {
         mileage || '0',
         reason || 'บันทึกโดย Admin',
         parseFloat(totalDistance) || 0,
+        photoKey ? 1 : 0,
+        photoKey || null,
         now
       ).run();
       return ok({ success: true, id }, o);
