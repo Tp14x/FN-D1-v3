@@ -398,6 +398,7 @@ tbody tr:hover td { background: var(--c-surface2); }
 /* ─── RESPONSIVE ─── */
 @media (max-width: 900px) {
   .charts-grid { grid-template-columns: 1fr; }
+  #page-proxy > div { grid-template-columns: 1fr !important; }
 }
 @media (max-width: 760px) {
   .sidebar { position: fixed; top: 0; left: 0; height: 100vh; transform: translateX(-100%); }
@@ -468,6 +469,9 @@ tbody tr:hover td { background: var(--c-surface2); }
       </div>
       <div class="nav-item" onclick="switchPage('records')" id="nav-records">
         <i class="fas fa-history"></i> ประวัติการใช้รถ
+      </div>
+      <div class="nav-item" onclick="switchPage('proxy')" id="nav-proxy">
+        <i class="fas fa-user-pen"></i> บันทึกแทนพนักงาน
       </div>
     </div>
 
@@ -661,6 +665,72 @@ tbody tr:hover td { background: var(--c-surface2); }
           </table>
         </div>
         <div class="pagination" id="recPagination" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- ─── PROXY PAGE ─── -->
+    <div class="page" id="page-proxy">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:900px">
+
+        <!-- บันทึกยืมรถแทน -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">
+              <div class="card-title-icon" style="background:var(--c-green-dim);color:var(--c-green)"><i class="fas fa-plus-circle"></i></div>
+              บันทึกการยืมรถแทนพนักงาน
+            </div>
+          </div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div>
+              <label class="modal-label">👤 เลือกพนักงาน</label>
+              <select class="modal-select" id="proxyUser" onchange="onProxyUserChange()">
+                <option value="">— เลือกพนักงาน —</option>
+              </select>
+              <div id="proxyUserInfo" style="display:none;margin-top:8px;padding:10px 12px;background:var(--c-surface2);border-radius:8px;font-size:13px;color:var(--c-text2)"></div>
+            </div>
+            <div>
+              <label class="modal-label">🚗 รถที่ใช้</label>
+              <select class="modal-select" id="proxyCar">
+                <option value="">— เลือกทะเบียน —</option>
+                <option value="Nissan : ผอ 5757">🚙 Nissan — ผอ 5757</option>
+                <option value="Mazda : ยค 3777">🚗 Mazda — ยค 3777</option>
+                <option value="MG : งบ 255">🚗 MG — งบ 255</option>
+                <option value="Click : จงจ 222">🛵 Click — จงจ 222</option>
+                <option value="Fino : งธท 222">🛵 Fino — งธท 222</option>
+              </select>
+            </div>
+            <div>
+              <label class="modal-label">📍 เลขไมล์ (กม.)</label>
+              <input class="modal-input" type="number" id="proxyMileage" placeholder="เช่น 12500" min="0">
+            </div>
+            <div>
+              <label class="modal-label">📝 สาเหตุการใช้รถ</label>
+              <input class="modal-input" type="text" id="proxyReason" placeholder="เช่น ไปส่งเอกสาร, ประชุม...">
+            </div>
+            <div>
+              <label class="modal-label">📐 ระยะทางโดยประมาณ (กม.) — ถ้ามี</label>
+              <input class="modal-input" type="number" id="proxyDistance" placeholder="0" min="0" step="0.1">
+            </div>
+            <button class="btn btn-primary" onclick="proxySubmit()" style="margin-top:4px">
+              <i class="fas fa-save"></i> บันทึกการยืมรถ
+            </button>
+          </div>
+        </div>
+
+        <!-- รถที่ยังไม่คืน -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">
+              <div class="card-title-icon" style="background:var(--c-amber-dim);color:var(--c-amber)"><i class="fas fa-key"></i></div>
+              รถที่ยังไม่ได้คืน
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="loadProxyActive()"><i class="fas fa-rotate"></i> รีเฟรช</button>
+          </div>
+          <div id="proxyActiveList" style="padding:16px">
+            <div class="empty-state"><div class="icon">⏳</div><p>กำลังโหลด...</p></div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -1304,7 +1374,7 @@ function exportCSV() {
 /* ──────────────────────────────────────────
    PAGE SWITCH
 ────────────────────────────────────────── */
-const PAGE_TITLES = { dashboard:'แดชบอร์ด', requests:'คำขอสมัคร', users:'จัดการผู้ใช้', records:'ประวัติการใช้รถ' };
+const PAGE_TITLES = { dashboard:'แดชบอร์ด', requests:'คำขอสมัคร', users:'จัดการผู้ใช้', records:'ประวัติการใช้รถ', proxy:'บันทึกแทนพนักงาน' };
 function switchPage(p) {
   document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -1314,6 +1384,7 @@ function switchPage(p) {
   document.getElementById('crumbPage').textContent = title;
   // show export only on records
   document.getElementById('exportBtn').style.display = (p === 'records' && filteredRec.length > 0) ? 'inline-flex' : 'none';
+  if (p === 'proxy') { populateProxyUsers(); loadProxyActive(); }
   closeSidebar();
 }
 
@@ -1421,6 +1492,116 @@ async function deleteRecord(recordId, name) {
       } catch(e) { showToast('เกิดข้อผิดพลาด: ' + e.message, 'error'); }
     }
   );
+}
+
+/* ──────────────────────────────────────────
+   PROXY: บันทึกแทนพนักงาน
+────────────────────────────────────────── */
+function populateProxyUsers() {
+  const sel = document.getElementById('proxyUser');
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— เลือกพนักงาน —</option>';
+  Object.entries(allData.userMap)
+    .filter(([, u]) => u.status === 'active' && u.role !== 'admin')
+    .sort((a, b) => (a[1].name || '').localeCompare(b[1].name || '', 'th'))
+    .forEach(([id, u]) => {
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = `${u.name || id} ${u.department ? `(${u.department})` : ''}`;
+      sel.appendChild(opt);
+    });
+  if (current) sel.value = current;
+}
+
+function onProxyUserChange() {
+  const uid = document.getElementById('proxyUser').value;
+  const info = document.getElementById('proxyUserInfo');
+  if (!uid || !allData.userMap[uid]) { info.style.display = 'none'; return; }
+  const u = allData.userMap[uid];
+  info.style.display = 'block';
+  info.innerHTML = `📛 ${esc(u.name || '—')} &nbsp;|&nbsp; 📱 ${esc(u.phone || '—')} &nbsp;|&nbsp; 🏢 ${esc(u.department || '—')}`;
+}
+
+async function proxySubmit() {
+  const targetUserId = document.getElementById('proxyUser').value;
+  const car          = document.getElementById('proxyCar').value;
+  const mileage      = document.getElementById('proxyMileage').value.trim();
+  const reason       = document.getElementById('proxyReason').value.trim();
+  const totalDistance = document.getElementById('proxyDistance').value || '0';
+  if (!targetUserId) { showToast('กรุณาเลือกพนักงาน', 'warning'); return; }
+  if (!car)          { showToast('กรุณาเลือกรถ', 'warning'); return; }
+  if (!mileage)      { showToast('กรุณากรอกเลขไมล์', 'warning'); return; }
+  if (!reason)       { showToast('กรุณากรอกสาเหตุ', 'warning'); return; }
+  const u = allData.userMap[targetUserId];
+  showConfirm(
+    `บันทึกการยืมรถ <strong>${esc(car)}</strong><br>แทน <strong>${esc(u?.name || targetUserId)}</strong>?`,
+    'ยืนยันบันทึกแทนพนักงาน', '📋', 'btn-primary',
+    async () => {
+      try {
+        const res = await fetch('/admin-action', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'proxy-save-record', requestingUserId: adminId, targetUserId, car, mileage, reason, totalDistance })
+        });
+        const d = await res.json();
+        if (d.success) {
+          showToast(`✅ บันทึกสำเร็จ! รถ ${car} สำหรับ ${u?.name}`, 'success');
+          document.getElementById('proxyUser').value = '';
+          document.getElementById('proxyCar').value = '';
+          document.getElementById('proxyMileage').value = '';
+          document.getElementById('proxyReason').value = '';
+          document.getElementById('proxyDistance').value = '';
+          document.getElementById('proxyUserInfo').style.display = 'none';
+          loadProxyActive();
+          await loadAll();
+        } else { showToast('เกิดข้อผิดพลาด: ' + (d.error || '?'), 'error'); }
+      } catch { showToast('เกิดข้อผิดพลาด', 'error'); }
+    }
+  );
+}
+
+async function loadProxyActive() {
+  const el = document.getElementById('proxyActiveList');
+  if (!el) return;
+  el.innerHTML = '<div class="empty-state"><div class="icon">⏳</div><p>กำลังโหลด...</p></div>';
+  try {
+    const res = await fetch('/admin-action', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'get-active-records', requestingUserId: adminId })
+    });
+    const d = await res.json();
+    const recs = d.records || [];
+    if (recs.length === 0) {
+      el.innerHTML = '<div class="empty-state"><div class="icon">✅</div><p>ทุกคันกลับแล้ว</p></div>';
+      return;
+    }
+    el.innerHTML = recs.map(r => `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--c-border)">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--c-text)">${esc(r.car || '—')}</div>
+          <div style="font-size:12px;color:var(--c-text2)">${esc(r.name || '—')} ${r.department ? `· ${esc(r.department)}` : ''}</div>
+          <div style="font-size:11px;color:var(--c-text3)">${esc((r.reason || '').slice(0, 40))} · ${fmtDate(r.timestamp)}</div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="proxyReturn('${esc(r.id)}','${esc(r.name||'')}','${esc(r.car||'')}')">
+          <i class="fas fa-rotate-left"></i> คืนรถ
+        </button>
+      </div>
+    `).join('');
+  } catch { el.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><p>โหลดไม่สำเร็จ</p></div>'; }
+}
+
+async function proxyReturn(recordId, name, car) {
+  showConfirm(`คืนรถ <strong>${esc(car)}</strong> แทน <strong>${esc(name)}</strong>?`, 'ยืนยันคืนรถ', '🔑', 'btn-danger', async () => {
+    try {
+      const res = await fetch('/admin-action', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'proxy-return', requestingUserId: adminId, recordId })
+      });
+      const d = await res.json();
+      if (d.success) { showToast(`✅ คืนรถ ${car} สำเร็จ`, 'success'); loadProxyActive(); await loadAll(); }
+      else showToast('เกิดข้อผิดพลาด', 'error');
+    } catch { showToast('เกิดข้อผิดพลาด', 'error'); }
+  });
 }
 
 let toastTimer;
