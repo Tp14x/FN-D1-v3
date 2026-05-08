@@ -109,6 +109,64 @@ export async function onRequestPost(context) {
       return ok({ success: true }, o);
     }
 
+    // ── PROXY: สร้างรายการยืมรถแทนพนักงาน ──
+    if (action === 'proxy-save-record') {
+      const { targetUserId, car, mileage, reason, totalDistance } = body;
+      if (!targetUserId || !car) return err('Missing required fields', 400, o);
+      const user = await env.DB.prepare('SELECT * FROM users WHERE user_id = ?').bind(targetUserId).first();
+      if (!user) return err('User not found', 404, o);
+      const id = `rec_${Date.now()}`;
+      const now = new Date().toISOString();
+      await env.DB.prepare(`
+        INSERT INTO records
+          (id, user_id, name, phone, car, mileage, reason, route_text,
+           total_distance, total_time, has_photo, return_status, timestamp)
+        VALUES (?, ?, ?, ?, ?, ?, ?, '', ?, 0, 0, 'pending', ?)
+      `).bind(
+        id, targetUserId,
+        user.name || 'ไม่ระบุ',
+        user.phone || '-',
+        car,
+        mileage || '0',
+        reason || 'บันทึกโดย Admin',
+        parseFloat(totalDistance) || 0,
+        now
+      ).run();
+      return ok({ success: true, id }, o);
+    }
+
+    // ── PROXY: คืนรถแทนพนักงาน (ระบุ record id หรือ carPlate) ──
+    if (action === 'proxy-return') {
+      const { recordId, carPlate } = body;
+      const now = new Date().toISOString();
+      if (recordId) {
+        await env.DB.prepare(`
+          UPDATE records SET return_status='returned', returned_at=?, duration_text='คืนโดย Admin'
+          WHERE id=?
+        `).bind(now, recordId).run();
+      } else if (carPlate) {
+        await env.DB.prepare(`
+          UPDATE records SET return_status='returned', returned_at=?, duration_text='คืนโดย Admin'
+          WHERE id=(SELECT id FROM records WHERE car=? AND return_status='pending' ORDER BY timestamp DESC LIMIT 1)
+        `).bind(now, carPlate).run();
+      } else {
+        return err('Missing recordId or carPlate', 400, o);
+      }
+      return ok({ success: true }, o);
+    }
+
+    // ── PROXY: ดึงรายการรถที่ pending อยู่ (สำหรับหน้า proxy) ──
+    if (action === 'get-active-records') {
+      const { results } = await env.DB.prepare(`
+        SELECT r.id, r.user_id, r.name, r.car, r.mileage, r.reason, r.timestamp, u.department
+        FROM records r
+        LEFT JOIN users u ON r.user_id = u.user_id
+        WHERE r.return_status = 'pending'
+        ORDER BY r.timestamp DESC
+      `).all();
+      return ok({ records: results }, o);
+    }
+
     return err('Invalid action', 400, o);
   } catch (e) {
     return err(e.message, 500, o);
