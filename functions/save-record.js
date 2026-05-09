@@ -41,21 +41,73 @@ export async function onRequestPost(context) {
     // ── ส่งแจ้งเตือนไปยัง selfbot (LINE Group) ──
     const selfbotUrl = env.SELFBOT_WEBHOOK_URL;
     if (selfbotUrl) {
-      const notifyPayload = {
-        type: 'checkout',
-        record: {
-          id,
-          name: record.name || 'ไม่ระบุชื่อ',
-          phone: record.phone || '-',
-          car: record.car,
-          mileage: record.mileage || '0',
-          reason: record.reason || '',
-          routeText: routeTextToSave,
-          totalDistance: record.totalDistance || 0,
-          timestamp: now
+      // ✅ สร้าง Flex Message ที่ Worker
+      const flex = {
+        type: "bubble",
+        size: "kilo",
+        header: {
+          type: "box",
+          layout: "vertical",
+          backgroundColor: "#2ECC71",
+          paddingAll: "15px",
+          contents: [
+            {
+              type: "text",
+              text: "🚗 บันทึกการใช้รถ",
+              weight: "bold",
+              size: "md",
+              color: "#FFFFFF",
+              align: "center"
+            }
+          ]
+        },
+        body: {
+          type: "box",
+          layout: "vertical",
+          spacing: "sm",
+          paddingAll: "15px",
+          contents: [
+            {
+              type: "text",
+              text: `👤 ชื่อ: ${record.name || 'ไม่ระบุชื่อ'}`,
+              wrap: true,
+              size: "md"
+            },
+            {
+              type: "text",
+              text: `📞 เบอร์โทร: ${record.phone || '-'}`,
+              wrap: true,
+              size: "md"
+            },
+            {
+              type: "text",
+              text: `🚘 ทะเบียนรถ: ${record.car}`,
+              wrap: true,
+              size: "md",
+              weight: "bold"
+            },
+            {
+              type: "text",
+              text: `📍 ไมล์รถ: ${record.mileage || '0'}`,
+              wrap: true,
+              size: "md"
+            },
+            {
+              type: "text",
+              text: `📝 สาเหตุ: ${record.reason || '-'}`,
+              wrap: true,
+              size: "md"
+            }
+          ]
         }
       };
-      // fire-and-forget ไม่รอ response เพื่อไม่ให้ช้า
+
+      const notifyPayload = {
+        type: 'checkout',
+        altText: `🚗 ${(record.name || 'ไม่ระบุชื่อ').slice(0, 30)} ยืม ${record.car.slice(0, 30)}`,
+        flex: flex
+      };
+
       context.waitUntil(
         fetch(selfbotUrl, {
           method: 'POST',
