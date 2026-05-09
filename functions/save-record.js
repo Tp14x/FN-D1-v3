@@ -41,70 +41,45 @@ export async function onRequestPost(context) {
     // ── ส่งแจ้งเตือนไปยัง selfbot (LINE Group) ──
     const selfbotUrl = env.SELFBOT_WEBHOOK_URL;
     if (selfbotUrl) {
-      // ✅ สร้าง Flex Message ที่ Worker
+      // ✅ Flex แบบ COMPACT — เล็กลงมาก
+      const name = (record.name || 'ไม่ระบุชื่อ').slice(0, 20);
+      const car = (record.car || '-').slice(0, 20);
+      
       const flex = {
         type: "bubble",
-        size: "kilo",
+        size: "compact",
         header: {
           type: "box",
           layout: "vertical",
           backgroundColor: "#2ECC71",
-          paddingAll: "15px",
-          contents: [
-            {
-              type: "text",
-              text: "🚗 บันทึกการใช้รถ",
-              weight: "bold",
-              size: "md",
-              color: "#FFFFFF",
-              align: "center"
-            }
-          ]
+          paddingAll: "10px",
+          contents: [{
+            type: "text",
+            text: "🚗 บันทึกการใช้รถ",
+            weight: "bold",
+            size: "sm",
+            color: "#FFFFFF",
+            align: "center"
+          }]
         },
         body: {
           type: "box",
           layout: "vertical",
-          spacing: "sm",
-          paddingAll: "15px",
+          spacing: "xs",
+          paddingAll: "10px",
           contents: [
-            {
-              type: "text",
-              text: `👤 ชื่อ: ${record.name || 'ไม่ระบุชื่อ'}`,
-              wrap: true,
-              size: "md"
-            },
-            {
-              type: "text",
-              text: `📞 เบอร์โทร: ${record.phone || '-'}`,
-              wrap: true,
-              size: "md"
-            },
-            {
-              type: "text",
-              text: `🚘 ทะเบียนรถ: ${record.car}`,
-              wrap: true,
-              size: "md",
-              weight: "bold"
-            },
-            {
-              type: "text",
-              text: `📍 ไมล์รถ: ${record.mileage || '0'}`,
-              wrap: true,
-              size: "md"
-            },
-            {
-              type: "text",
-              text: `📝 สาเหตุ: ${record.reason || '-'}`,
-              wrap: true,
-              size: "md"
-            }
+            { type: "text", text: `👤 ${name}`, wrap: true, size: "sm" },
+            { type: "text", text: `📞 ${record.phone || '-'}`, wrap: true, size: "sm" },
+            { type: "text", text: `🚘 ${car}`, wrap: true, size: "sm", weight: "bold" },
+            { type: "text", text: `📍 ไมล์: ${record.mileage || '0'}`, wrap: true, size: "sm" },
+            { type: "text", text: `📝 ${(record.reason || '-').slice(0, 30)}`, wrap: true, size: "xs", color: "#666666" }
           ]
         }
       };
 
       const notifyPayload = {
         type: 'checkout',
-        altText: `🚗 ${(record.name || 'ไม่ระบุชื่อ').slice(0, 30)} ยืม ${record.car.slice(0, 30)}`,
+        altText: `🚗 ${name} ยืม ${car}`,
         flex: flex
       };
 
@@ -116,7 +91,7 @@ export async function onRequestPost(context) {
             'X-Selfbot-Secret': env.SELFBOT_SECRET || ''
           },
           body: JSON.stringify(notifyPayload)
-        }).catch(() => {})
+        }).then(r => r.json()).then(console.log).catch(() => {})
       );
     }
 
