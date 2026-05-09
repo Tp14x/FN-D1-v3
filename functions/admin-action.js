@@ -169,6 +169,29 @@ export async function onRequestPost(context) {
       return ok({ records: results }, o);
     }
 
+
+    // ── UNBLOCK: ปลดบล็อคผู้ใช้ที่ถูก block (เรียกจาก selfbot หรือ admin panel) ──
+    if (action === 'unblock') {
+      const { userId, name } = body;
+      const now = new Date().toISOString();
+      if (userId) {
+        await env.DB.prepare(
+          `UPDATE users SET status='active', updated_at=? WHERE user_id=? AND status='blocked'`
+        ).bind(now, userId).run();
+        return ok({ success: true }, o);
+      } else if (name) {
+        const user = await env.DB.prepare(
+          `SELECT user_id, name FROM users WHERE name LIKE ? AND status='blocked' LIMIT 1`
+        ).bind('%' + name + '%').first();
+        if (!user) return ok({ success: false, message: 'ไม่พบผู้ใช้ที่ถูกบล็อค' }, o);
+        await env.DB.prepare(
+          `UPDATE users SET status='active', updated_at=? WHERE user_id=?`
+        ).bind(now, user.user_id).run();
+        return ok({ success: true, userId: user.user_id, name: user.name }, o);
+      }
+      return err('Missing userId or name', 400, o);
+    }
+
     return err('Invalid action', 400, o);
   } catch (e) {
     return err(e.message, 500, o);
