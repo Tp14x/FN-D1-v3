@@ -10,6 +10,7 @@ export async function onRequestPost(context) {
     if (!record.userId || !record.car) return err('Missing required fields', 400, o);
 
     const id = `rec_${Date.now()}`;
+    const now = new Date().toISOString();
 
     // ✅ บันทึก destinations เป็น JSON ลง route_text
     const routeTextToSave = record.destinations && record.destinations.length > 0
@@ -34,8 +35,38 @@ export async function onRequestPost(context) {
       record.totalTime || 0,
       record.photoKey ? 1 : (record.hasPhoto ? 1 : 0),
       record.photoKey || null,
-      new Date().toISOString()
+      now
     ).run();
+
+    // ── ส่งแจ้งเตือนไปยัง selfbot (LINE Group) ──
+    const selfbotUrl = env.SELFBOT_WEBHOOK_URL;
+    if (selfbotUrl) {
+      const notifyPayload = {
+        type: 'checkout',
+        record: {
+          id,
+          name: record.name || 'ไม่ระบุชื่อ',
+          phone: record.phone || '-',
+          car: record.car,
+          mileage: record.mileage || '0',
+          reason: record.reason || '',
+          routeText: routeTextToSave,
+          totalDistance: record.totalDistance || 0,
+          timestamp: now
+        }
+      };
+      // fire-and-forget ไม่รอ response เพื่อไม่ให้ช้า
+      context.waitUntil(
+        fetch(selfbotUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Selfbot-Secret': env.SELFBOT_SECRET || ''
+          },
+          body: JSON.stringify(notifyPayload)
+        }).catch(() => {})
+      );
+    }
 
     return ok({ success: true, id }, o);
   } catch (e) {
