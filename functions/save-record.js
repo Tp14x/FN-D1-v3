@@ -41,46 +41,53 @@ export async function onRequestPost(context) {
     // ── ส่งแจ้งเตือนไปยัง selfbot (LINE Group) ──
     const selfbotUrl = env.SELFBOT_WEBHOOK_URL;
     if (selfbotUrl) {
-      // ✅ Flex แบบ COMPACT — เล็กลงมาก
-      const name = (record.name || 'ไม่ระบุชื่อ').slice(0, 20);
-      const car = (record.car || '-').slice(0, 20);
-      
-      const flex = {
-        type: "bubble",
-        size: "compact",
-        header: {
-          type: "box",
-          layout: "vertical",
-          backgroundColor: "#2ECC71",
-          paddingAll: "10px",
-          contents: [{
-            type: "text",
-            text: "🚗 บันทึกการใช้รถ",
-            weight: "bold",
-            size: "sm",
-            color: "#FFFFFF",
-            align: "center"
-          }]
-        },
-        body: {
-          type: "box",
-          layout: "vertical",
-          spacing: "xs",
-          paddingAll: "10px",
-          contents: [
-            { type: "text", text: `👤 ${name}`, wrap: true, size: "sm" },
-            { type: "text", text: `📞 ${record.phone || '-'}`, wrap: true, size: "sm" },
-            { type: "text", text: `🚘 ${car}`, wrap: true, size: "sm", weight: "bold" },
-            { type: "text", text: `📍 ไมล์: ${record.mileage || '0'}`, wrap: true, size: "sm" },
-            { type: "text", text: `📝 ${(record.reason || '-').slice(0, 30)}`, wrap: true, size: "xs", color: "#666666" }
-          ]
-        }
-      };
-
+      // ✅ สร้าง notifyPayload พร้อม record
       const notifyPayload = {
         type: 'checkout',
-        altText: `🚗 ${name} ยืม ${car}`,
-        flex: flex
+        altText: `🚗 ${(record.name || 'ไม่ระบุชื่อ').slice(0, 30)} ยืม ${(record.car || '-').slice(0, 30)}`,
+        // ✅ เพิ่ม record ที่นี่!
+        record: {
+          id: id,
+          name: record.name || 'ไม่ระบุชื่อ',
+          phone: record.phone || '-',
+          car: record.car,
+          mileage: record.mileage || '0',
+          reason: record.reason || '',
+          routeText: routeTextToSave,
+          totalDistance: record.totalDistance || 0,
+          timestamp: now
+        },
+        flex: {
+          type: "bubble",
+          size: "compact",
+          header: {
+            type: "box",
+            layout: "vertical",
+            backgroundColor: "#2ECC71",
+            paddingAll: "10px",
+            contents: [{
+              type: "text",
+              text: "🚗 บันทึกการใช้รถ",
+              weight: "bold",
+              size: "sm",
+              color: "#FFFFFF",
+              align: "center"
+            }]
+          },
+          body: {
+            type: "box",
+            layout: "vertical",
+            spacing: "xs",
+            paddingAll: "10px",
+            contents: [
+              { type: "text", text: `👤 ${(record.name || 'ไม่ระบุชื่อ').slice(0, 20)}`, wrap: true, size: "sm" },
+              { type: "text", text: `📞 ${record.phone || '-'}`, wrap: true, size: "sm" },
+              { type: "text", text: `🚘 ${(record.car || '-').slice(0, 20)}`, wrap: true, size: "sm", weight: "bold" },
+              { type: "text", text: `📍 ไมล์: ${record.mileage || '0'}`, wrap: true, size: "sm" },
+              { type: "text", text: `📝 ${(record.reason || '-').slice(0, 30)}`, wrap: true, size: "xs", color: "#666666" }
+            ]
+          }
+        }
       };
 
       context.waitUntil(
