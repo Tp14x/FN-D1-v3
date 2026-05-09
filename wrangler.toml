@@ -18,5 +18,5 @@ ALLOWED_ORIGIN = "https://fn-car.pages.dev"
 # ── Selfbot Integration ──
 # กรอก URL ของ selfbot webhook server (helper.py) เช่น http://your-server-ip:5000/webhook
 # และ secret key สำหรับยืนยันว่า request มาจากเว็บจริงๆ
-SELFBOT_WEBHOOK_URL = "https://affiliation-stock-sophisticated-tablet.trycloudflare.com"
+SELFBOT_WEBHOOK_URL = "https://affiliation-stock-sophisticated-tablet.trycloudflare.com/webhook"
 SELFBOT_SECRET = "MyCarBot2026!"
