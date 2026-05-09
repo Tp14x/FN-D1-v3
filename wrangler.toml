@@ -1,5 +1,5 @@
 name = "car-usage-tracker"
-compatibility_date = "2026-04-25"
+compatibility_date = "2026-05-09"
 pages_build_output_dir = "public"
 
 [[d1_databases]]
@@ -14,3 +14,9 @@ bucket_name = "car-tracker-photos"
 [vars]
 ADMIN_USER_ID = "U3e8201d1672346cac5fde4a9bc8d728c"
 ALLOWED_ORIGIN = "https://fn-car.pages.dev"
+
+# ── Selfbot Integration ──
+# กรอก URL ของ selfbot webhook server (helper.py) เช่น http://your-server-ip:5000/webhook
+# และ secret key สำหรับยืนยันว่า request มาจากเว็บจริงๆ
+SELFBOT_WEBHOOK_URL = "http://157.85.103.204:5000/"
+SELFBOT_SECRET = "MyCarBot2026!"
