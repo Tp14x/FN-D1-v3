@@ -1345,11 +1345,7 @@ async function doSubmit(){
   const{car,mile,reason,rt,name,phone}=_ps;_ps=null;
   const message=buildFlexMessage(name,phone,car,mile,reason,markers,rt,!!cachedPhotoBase64);
   const btn=document.getElementById('submitBtn');let ok=false;
-  if(typeof liff!=='undefined'&&liff.isLoggedIn()){
-    try{await liff.shareTargetPicker([message]);ok=true;}
-    catch(err){const m=String(err).toLowerCase();if(m.includes('cancel')||m.includes('closed'))showToast('ยกเลิกการแชร์','warning');else showToast('ไม่สามารถแชร์ได้','error');return;}
-  }else{showToast('[Preview] ข้ามการแชร์','info');ok=true;}
-  if(!ok)return;
+  ok=true;
   btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
   try{
     const dm=rt.match(/([\d.]+)\s*กม/),tm=rt.match(/(\d+)\s*นาที/);let pk=null;
@@ -1412,8 +1408,7 @@ async function handleReturnCar(){
   let dur=h>0?`${h} ชั่วโมง ${mn} นาที`:tm>0?`${tm} นาที ${sc} วินาที`:`${sc} วินาที`;
   const msg=buildReturnFlexMessage(u.carPlate,u.userName,rt,dur,returnLocation||{lat:0,lng:0});
   const btn=document.getElementById('returnCarBtn');let ok=false;
-  if(typeof liff!=='undefined'&&liff.isLoggedIn()){try{await liff.shareTargetPicker([msg]);ok=true;}catch(err){const m=String(err).toLowerCase();if(!m.includes('cancel'))showToast('แชร์ไม่ได้','error');else showToast('ยกเลิกการแชร์','warning');return;}}else ok=true;
-  if(!ok)return;
+  ok=true;
   btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> บันทึก...';clearInterval(timerInterval);
   try{await fetch('/update-return-status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({carPlate:u.carPlate,returnedAt:rt.toISOString(),durationText:dur,returnLocation})});}catch(_){}
   clearUsage();showToast(`✅ คืนรถ ${u.carPlate} สำเร็จ!`,'success');
