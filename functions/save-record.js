@@ -9,10 +9,18 @@ export async function onRequestPost(context) {
     const record = await request.json();
     if (!record.userId || !record.car) return err('Missing required fields', 400, o);
 
+    // ✅ เช็ค status ของ user ก่อนบันทึก
+    const user = await env.DB.prepare(
+      'SELECT status FROM users WHERE user_id = ?'
+    ).bind(record.userId).first();
+
+    if (!user) return err('ไม่พบบัญชีผู้ใช้', 404, o);
+    if (user.status === 'blocked') return err('ถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ', 403, o);
+    if (user.status !== 'active') return err('บัญชีของคุณยังไม่ได้รับการอนุมัติ', 403, o);
+
     const id = `rec_${Date.now()}`;
     const now = new Date().toISOString();
 
-    // ✅ บันทึก destinations เป็น JSON ลง route_text
     const routeTextToSave = record.destinations && record.destinations.length > 0
       ? JSON.stringify(record.destinations)
       : (record.routeText || '');
@@ -38,14 +46,11 @@ export async function onRequestPost(context) {
       now
     ).run();
 
-    // ── ส่งแจ้งเตือนไปยัง selfbot (LINE Group) ──
     const selfbotUrl = env.SELFBOT_WEBHOOK_URL;
     if (selfbotUrl) {
-      // ✅ สร้าง notifyPayload พร้อม record
       const notifyPayload = {
         type: 'checkout',
         altText: `🚗 ${(record.name || 'ไม่ระบุชื่อ').slice(0, 30)} ยืม ${(record.car || '-').slice(0, 30)}`,
-        // ✅ เพิ่ม record ที่นี่!
         record: {
           id: id,
           name: record.name || 'ไม่ระบุชื่อ',
@@ -61,24 +66,16 @@ export async function onRequestPost(context) {
           type: "bubble",
           size: "compact",
           header: {
-            type: "box",
-            layout: "vertical",
-            backgroundColor: "#2ECC71",
-            paddingAll: "10px",
+            type: "box", layout: "vertical",
+            backgroundColor: "#2ECC71", paddingAll: "10px",
             contents: [{
-              type: "text",
-              text: "🚗 บันทึกการใช้รถ",
-              weight: "bold",
-              size: "sm",
-              color: "#FFFFFF",
-              align: "center"
+              type: "text", text: "🚗 บันทึกการใช้รถ",
+              weight: "bold", size: "sm", color: "#FFFFFF", align: "center"
             }]
           },
           body: {
-            type: "box",
-            layout: "vertical",
-            spacing: "xs",
-            paddingAll: "10px",
+            type: "box", layout: "vertical",
+            spacing: "xs", paddingAll: "10px",
             contents: [
               { type: "text", text: `👤 ${(record.name || 'ไม่ระบุชื่อ').slice(0, 20)}`, wrap: true, size: "sm" },
               { type: "text", text: `📞 ${record.phone || '-'}`, wrap: true, size: "sm" },
