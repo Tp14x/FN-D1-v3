@@ -1419,7 +1419,15 @@ async function handleReturnCar(){
   const btn=document.getElementById('returnCarBtn');let ok=false;
   ok=true;
   btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> บันทึก...';clearInterval(timerInterval);
-  try{await fetch('/update-return-status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({carPlate:u.carPlate,returnedAt:rt.toISOString(),durationText:dur,returnLocation})});}catch(_){}
+  try{
+    const retRes=await fetch('/update-return-status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({carPlate:u.carPlate,returnedAt:rt.toISOString(),durationText:dur,returnLocation,userId:u.userId})});
+    if(!retRes.ok){
+      const retData=await retRes.json();
+      btn.disabled=false;btn.innerHTML='<i class="fas fa-rotate-left"></i> คืนรถ & แจ้งกลุ่ม LINE';
+      showModal('🚫','ไม่สามารถคืนรถได้',retData.error||'บัญชีถูกระงับเนื่องจากลืมคืนรถภายใน 24 ชั่วโมง กรุณาติดต่อ พี่เอ๋/พี่เอ็ม/พี่หน่อย');
+      return;
+    }
+  }catch(_){}
   clearUsage();showToast(`✅ คืนรถ ${u.carPlate} สำเร็จ!`,'success');
   showModal('✅','คืนรถสำเร็จ!',`คืนรถ ${u.carPlate} เรียบร้อยแล้ว\nระยะเวลา: ${dur}`);
   setTimeout(()=>{if(typeof liff!=='undefined'&&liff.isInClient())liff.closeWindow();else location.reload();},2500);
