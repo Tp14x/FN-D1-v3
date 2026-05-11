@@ -1,17 +1,23 @@
 import { cors, ok, err, preflight } from './_shared.js';
-
 export async function onRequestOptions() { return preflight(); }
-
 export async function onRequestPost(context) {
   const { request, env } = context;
   const o = env.ALLOWED_ORIGIN;
   try {
-    const { carPlate, returnedAt, durationText, returnLocation } = await request.json();
+    const { carPlate, returnedAt, durationText, returnLocation, userId } = await request.json();
     if (!carPlate) return err('Missing carPlate', 400, o);
 
-    const now = returnedAt || new Date().toISOString();
+    // ✅ เช็ค status ของ user ก่อนคืนรถ
+    if (userId) {
+      const user = await env.DB.prepare(
+        'SELECT status FROM users WHERE user_id = ?'
+      ).bind(userId).first();
+      if (user && user.status === 'blocked') {
+        return err('บัญชีของคุณถูกระงับการใช้งาน ไม่สามารถคืนรถได้\nกรุณาติดต่อผู้ดูแลระบบ', 403, o);
+      }
+    }
 
-    // ใช้ subquery แทน ORDER BY + LIMIT ใน UPDATE (รองรับ D1 ดีกว่า)
+    const now = returnedAt || new Date().toISOString();
     await env.DB.prepare(`
       UPDATE records
       SET return_status = 'returned',
@@ -31,7 +37,6 @@ export async function onRequestPost(context) {
       carPlate
     ).run();
 
-    // ดึงข้อมูล record ที่เพิ่งคืน เพื่อแจ้ง selfbot
     const returned = await env.DB.prepare(`
       SELECT r.id, r.name, r.phone, r.car, r.mileage, r.reason,
              r.timestamp, r.route_text, r.total_distance
@@ -40,7 +45,6 @@ export async function onRequestPost(context) {
       ORDER BY r.returned_at DESC LIMIT 1
     `).bind(carPlate).first();
 
-    // ── ส่งแจ้งเตือน "คืนรถ" ไปยัง selfbot ──
     const selfbotUrl = env.SELFBOT_WEBHOOK_URL;
     if (selfbotUrl && returned) {
       const notifyPayload = {
@@ -69,7 +73,6 @@ export async function onRequestPost(context) {
         }).catch(() => {})
       );
     }
-
     return ok({ success: true }, o);
   } catch (e) {
     return err(e.message, 500, o);
