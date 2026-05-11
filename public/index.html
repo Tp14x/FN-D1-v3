@@ -1354,7 +1354,16 @@ async function doSubmit(){
       try{const fd=new FormData();fd.append('photo',cachedPhotoFile);const ur=await fetch('/upload-photo',{method:'POST',body:fd}).then(r=>r.json());if(ur.success)pk=ur.key;else showToast('อัปโหลดรูปไม่สำเร็จ','warning');}catch{showToast('อัปโหลดรูปไม่สำเร็จ','warning');}
       btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
     }
-    await fetch('/save-record',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:currentUser.userId,name,phone,car,mileage:mile,reason,routeText:rt,totalDistance:dm?parseFloat(dm[1]):0,totalTime:tm?parseInt(tm[1]):0,hasPhoto:!!(pk||cachedPhotoBase64),photoKey:pk,destinations:markers.map((m,i)=>({point:i+1,lat:m.getPosition().lat(),lng:m.getPosition().lng()})),timestamp:new Date().toISOString()})});
+    const saveRes=await fetch('/save-record',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:currentUser.userId,name,phone,car,mileage:mile,reason,routeText:rt,totalDistance:dm?parseFloat(dm[1]):0,totalTime:tm?parseInt(tm[1]):0,hasPhoto:!!(pk||cachedPhotoBase64),photoKey:pk,destinations:markers.map((m,i)=>({point:i+1,lat:m.getPosition().lat(),lng:m.getPosition().lng()})),timestamp:new Date().toISOString()})});
+    const saveData=await saveRes.json();
+    if(!saveRes.ok){
+      if(saveRes.status===403){
+        showModal('🚫','ไม่สามารถบันทึกได้',saveData.error||'บัญชีของคุณถูกระงับการใช้งาน\nกรุณาติดต่อผู้ดูแลระบบ');
+      }else{
+        showToast(saveData.error||'เกิดข้อผิดพลาด กรุณาลองใหม่','error');
+      }
+      return;
+    }
     const ud={isUsing:true,carPlate:car,carModel:car.split(':')[0].trim(),startedAt:new Date().toISOString(),userName:name,userId:currentUser.userId,mileage:mile};
     saveUsage(ud);showCarInUseScreen(ud);showToast(`✅ บันทึกสำเร็จ! ใช้รถ ${car}`,'success');
   }catch{showToast('เกิดข้อผิดพลาด กรุณาลองใหม่','error');}
