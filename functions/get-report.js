@@ -11,11 +11,11 @@ export async function onRequestGet(context) {
     if (secret !== env.SELFBOT_SECRET) return err('Unauthorized', 403, o);
 
     let dateFilter = '';
-    if (period === 'weekly') {
-      // จันทร์-เสาร์สัปดาห์นี้
-      dateFilter = `AND r.timestamp >= datetime('now', '-7 days')`;
+    if (period === 'daily') {
+      dateFilter = `AND date(r.timestamp, '+7 hours') = date('now', '+7 hours')`;
+    } else if (period === 'weekly') {
+      dateFilter = `AND r.timestamp >= datetime('now', '-6 days')`;
     } else if (period === 'monthly') {
-      // เดือนที่แล้ว
       dateFilter = `AND strftime('%Y-%m', r.timestamp) = strftime('%Y-%m', 'now', '-1 month')`;
     } else {
       return err('Invalid period', 400, o);
