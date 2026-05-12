@@ -54,7 +54,8 @@ export async function onRequestGet(context) {
       .slice(0, 3)
       .map(([name, count]) => ({ name, count }));
 
-    return ok({ total, returned, pending, totalDist, topCars, topUsers }, o);
+    const overdue_count = results.filter(r => r.return_status === 'pending').length;
+    return ok({ total, returned, pending, totalDist, topCars, topUsers, overdue_count }, o);
   } catch (e) {
     return err(e.message, 500, o);
   }
