@@ -7,7 +7,7 @@ export async function onRequestPost(context) {
     const { carPlate, returnedAt, durationText, returnLocation, userId } = await request.json();
     if (!carPlate) return err('Missing carPlate', 400, o);
 
-    // ✅ เช็ค status ของ user ก่อนคืนรถ
+    // เช็ค status ของ user ก่อนคืนรถ
     if (userId) {
       const user = await env.DB.prepare(
         'SELECT status FROM users WHERE user_id = ?'
@@ -18,7 +18,12 @@ export async function onRequestPost(context) {
     }
 
     const now = returnedAt || new Date().toISOString();
-    await env.DB.prepare(`
+
+    // log ค่าที่รับมา ดูได้จาก Cloudflare Workers Logs
+    console.log('[update-return-status] carPlate:', carPlate);
+    console.log('[update-return-status] returnLocation:', JSON.stringify(returnLocation));
+
+    const result = await env.DB.prepare(`
       UPDATE records
       SET return_status = 'returned',
           returned_at   = ?,
@@ -36,6 +41,12 @@ export async function onRequestPost(context) {
       returnLocation ? JSON.stringify(returnLocation) : null,
       carPlate
     ).run();
+
+    // เช็คว่า UPDATE กระทบ row จริงไหม
+    console.log('[update-return-status] rows changed:', result.meta?.changes);
+    if (!result.meta?.changes || result.meta.changes === 0) {
+      return err('ไม่พบรายการการใช้รถที่ค้างอยู่สำหรับรถคันนี้', 404, o);
+    }
 
     const returned = await env.DB.prepare(`
       SELECT r.id, r.name, r.phone, r.car, r.mileage, r.reason,
@@ -59,7 +70,8 @@ export async function onRequestPost(context) {
           totalDistance: returned.total_distance,
           checkoutTime: returned.timestamp,
           returnedAt: now,
-          durationText: durationText || ''
+          durationText: durationText || '',
+          returnLocation: returnLocation || null
         }
       };
       context.waitUntil(
