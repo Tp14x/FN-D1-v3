@@ -1413,6 +1413,14 @@ async function getReturnLocation(){
 }
 async function handleReturnCar(){
   const u=loadUsage();if(!u){showToast('ไม่พบข้อมูลการใช้รถ','error');return;}
+
+  // ตรวจสอบว่าดึงตำแหน่งแล้วหรือยัง
+  if(!returnLocation){
+    showToast('⚠️ กรุณากดดึงตำแหน่ง GPS ก่อนคืนรถ','warning');
+    document.getElementById('getLocationBtn').style.animation='pulse 0.5s ease 3';
+    return;
+  }
+
   const rt=new Date(),st=new Date(u.startedAt),ms=Math.max(0,rt-st),ts=Math.floor(ms/1000),tm=Math.floor(ts/60),h=Math.floor(tm/60),mn=tm%60,sc=ts%60;
   let dur=h>0?`${h} ชั่วโมง ${mn} นาที`:tm>0?`${tm} นาที ${sc} วินาที`:`${sc} วินาที`;
   const msg=buildReturnFlexMessage(u.carPlate,u.userName,rt,dur,returnLocation||{lat:0,lng:0});
@@ -1421,13 +1429,17 @@ async function handleReturnCar(){
   btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> บันทึก...';clearInterval(timerInterval);
   try{
     const retRes=await fetch('/update-return-status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({carPlate:u.carPlate,returnedAt:rt.toISOString(),durationText:dur,returnLocation,userId:u.userId})});
+    const retData=await retRes.json();
     if(!retRes.ok){
-      const retData=await retRes.json();
       btn.disabled=false;btn.innerHTML='<i class="fas fa-rotate-left"></i> คืนรถ & แจ้งกลุ่ม LINE';
       showModal('🚫','ไม่สามารถคืนรถได้',retData.error||'บัญชีถูกระงับเนื่องจากลืมคืนรถภายใน 24 ชั่วโมง กรุณาติดต่อ พี่เอ๋/พี่เอ็ม/พี่หน่อย');
       return;
     }
-  }catch(_){}
+  }catch(e){
+    btn.disabled=false;btn.innerHTML='<i class="fas fa-rotate-left"></i> คืนรถ & แจ้งกลุ่ม LINE';
+    showToast('❌ เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่','error');
+    return;
+  }
   clearUsage();showToast(`✅ คืนรถ ${u.carPlate} สำเร็จ!`,'success');
   showModal('✅','คืนรถสำเร็จ!',`คืนรถ ${u.carPlate} เรียบร้อยแล้ว\nระยะเวลา: ${dur}`);
   setTimeout(()=>{if(typeof liff!=='undefined'&&liff.isInClient())liff.closeWindow();else location.reload();},2500);
