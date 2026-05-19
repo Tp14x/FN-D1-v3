@@ -16,7 +16,9 @@ ADMIN_USER_ID = "U3e8201d1672346cac5fde4a9bc8d728c"
 ALLOWED_ORIGIN = "https://fn-car.pages.dev"
 
 # ── Selfbot Integration ──
-# กรอก URL ของ selfbot webhook server (helper.py) เช่น http://****.trycloudflare.com/webhook (ย้ำหากใส่ลิ้งค์ใหม่ต้องมีคำว่า /webhook ต่อท้าย ถ้าไม่มี เมื่อกดบันทึกการใช้งานรถหรือคืนรถ flex จะไม่แจ้งเตือนเข้าไลน์กลุ่ม)
+
+# คำสั่งรันเพื่อหาลิ้งค์ cloudflared tunnel --url http://localhost:5000
+# กรอก URL ที่ได้มาจาก cloudflared tunnel เช่น http://****.trycloudflare.com/webhook (ย้ำหากใส่ลิ้งค์ใหม่ต้องมีคำว่า /webhook ต่อท้าย ถ้าไม่มี เมื่อกดบันทึกการใช้งานรถหรือคืนรถ flex จะไม่แจ้งเตือนเข้าไลน์กลุ่ม)
 # และ secret key สำหรับยืนยันว่า request มาจากเว็บจริงๆ
 SELFBOT_WEBHOOK_URL = "https://appreciate-clock-luxury-similar.trycloudflare.com/webhook"
 SELFBOT_SECRET = "MyCarBot2026!"
