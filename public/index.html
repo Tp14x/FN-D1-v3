@@ -1351,7 +1351,19 @@ async function doSubmit(){
     const dm=rt.match(/([\d.]+)\s*กม/),tm=rt.match(/(\d+)\s*นาที/);let pk=null;
     if(cachedPhotoFile){
       btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลดรูป...';
-      try{const fd=new FormData();fd.append('photo',cachedPhotoFile);const ur=await fetch('/upload-photo',{method:'POST',body:fd}).then(r=>r.json());if(ur.success)pk=ur.key;else showToast('อัปโหลดรูปไม่สำเร็จ','warning');}catch{showToast('อัปโหลดรูปไม่สำเร็จ','warning');}
+      try{
+        const fd=new FormData();fd.append('photo',cachedPhotoFile);
+        const ur=await fetch('/upload-photo',{method:'POST',body:fd}).then(r=>r.json());
+        if(ur.success){
+          pk=ur.key;
+        }else{
+          btn.disabled=false;btn.innerHTML='<i class="fas fa-share-nodes"></i> ยืนยัน';
+          showToast('❌ อัปโหลดรูปไม่สำเร็จ กรุณาลองใหม่','error');return;
+        }
+      }catch{
+        btn.disabled=false;btn.innerHTML='<i class="fas fa-share-nodes"></i> ยืนยัน';
+        showToast('❌ อัปโหลดรูปไม่สำเร็จ กรุณาลองใหม่','error');return;
+      }
       btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
     }
     const saveRes=await fetch('/save-record',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:currentUser.userId,name,phone,car,mileage:mile,reason,routeText:rt,totalDistance:dm?parseFloat(dm[1]):0,totalTime:tm?parseInt(tm[1]):0,hasPhoto:!!(pk||cachedPhotoBase64),photoKey:pk,destinations:markers.map((m,i)=>({point:i+1,lat:m.getPosition().lat(),lng:m.getPosition().lng()})),timestamp:new Date().toISOString()})});
