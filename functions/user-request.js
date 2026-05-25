@@ -33,19 +33,19 @@ export async function onRequestPost(context) {
 
       // เพิ่มใน requests
       await env.DB.prepare(`
-        INSERT INTO requests (id, user_id, display_name, picture_url, full_name, phone, department, status, submitted_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+        INSERT INTO requests (id, user_id, display_name, picture_url, full_name, nickname, phone, department, status, submitted_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
       `).bind(id, userId, displayName || null, pictureUrl || null,
-        formData.fullName, formData.phone, formData.department, now).run();
+        formData.fullName, formData.nickname||null, formData.phone, formData.department, now).run();
 
       // เพิ่มใน users ด้วย role=pending
       const userExists = await env.DB.prepare('SELECT user_id FROM users WHERE user_id = ?')
         .bind(userId).first();
       if (!userExists) {
         await env.DB.prepare(`
-          INSERT INTO users (user_id, name, phone, department, role, status, picture_url, created_at, updated_at)
-          VALUES (?, ?, ?, ?, 'pending', 'pending', ?, ?, ?)
-        `).bind(userId, formData.fullName, formData.phone, formData.department,
+          INSERT INTO users (user_id, name, nickname, phone, department, role, status, picture_url, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, 'pending', 'pending', ?, ?, ?)
+        `).bind(userId, formData.fullName, formData.nickname||null, formData.phone, formData.department,
           pictureUrl || null, now, now).run();
       }
 
