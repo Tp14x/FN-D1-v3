@@ -1538,7 +1538,15 @@ async function initApp(){
     if(db&&profile.pictureUrl!==db.pictureUrl)fetch('/update-user',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:profile.userId,pictureUrl:profile.pictureUrl})}).catch(()=>{});
     fetch('/log-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:profile.userId})}).catch(()=>{});
     document.getElementById('appLoading').style.display='none';
-    if(usage){showCarInUseScreen(usage);return;}
+    // ✅ เช็ค pending record จาก DB ทุกครั้ง ไม่พึ่งแค่ localStorage
+    const pendingRes=await fetch('/get-pending-record?userId='+encodeURIComponent(profile.userId)).then(r=>r.json()).catch(()=>({}));
+    if(pendingRes.record){
+      const rec=pendingRes.record;
+      if(!usage){saveUsage({isUsing:true,carPlate:rec.car,carModel:rec.car.split(':')[0].trim(),startedAt:rec.timestamp,userName:rec.name,userId:profile.userId,mileage:rec.mileage});}
+      showCarInUseScreen(loadUsage());
+      return;
+    }
+    if(usage){clearUsage();}
     const role=currentUser.role,status=currentUser.status;
     if(role==='inactive'||status==='inactive'||status==='blocked'||role==='rejected'){
       const sm=document.getElementById('suspendedMsg');sm.textContent='';
