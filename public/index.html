@@ -1512,7 +1512,7 @@ document.getElementById('regForm').addEventListener('submit',async function(e){
   if(!v)return;
   btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...';
   try{
-    const res=await fetch('/user-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'submit',userId:currentUser.userId,displayName:currentUser.displayName,pictureUrl:currentUser.pictureUrl,formData:{fullName:name,nickname,phone,department:dept===อื่นๆ'?od:dept}})}).then(r=>r.json());
+    const res=await fetch('/user-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'submit',userId:currentUser.userId,displayName:currentUser.displayName,pictureUrl:currentUser.pictureUrl,formData:{fullName:name,nickname,phone,department:dept==='อื่นๆ'?od:dept}})}).then(r=>r.json());
     if(res.duplicate){showToast('คุณส่งคำขอไปแล้ว','warning');showPendingScreen(currentUser.displayName,true);return;}
     if(res.success){showModal('📨','ส่งคำขอสำเร็จ!',`ขอบคุณคุณ ${name}\nรอแอดมินยืนยันภายใน 24 ชั่วโมง`);setTimeout(()=>{closeModal();showPendingScreen(name,false);},3000);}
   }catch{showToast('เกิดข้อผิดพลาด','error');}
