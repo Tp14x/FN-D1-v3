@@ -990,6 +990,13 @@ input:focus,select:focus,textarea:focus{
           <div class="ferr" id="regName-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
         </div>
         <div class="frow">
+          <label class="flabel">ชื่อเล่น</label>
+          <div class="fwrap">
+            <i class="fas fa-smile ficon"></i>
+            <input type="text" id="regNickname" placeholder="ชื่อเล่น (ใช้สำหรับค้นหาเมื่อ !unblock)">
+          </div>
+        </div>
+        <div class="frow">
           <label class="flabel">เบอร์โทรศัพท์ <span class="req">*</span></label>
           <div class="fwrap">
             <i class="fas fa-phone ficon"></i>
@@ -1351,19 +1358,7 @@ async function doSubmit(){
     const dm=rt.match(/([\d.]+)\s*กม/),tm=rt.match(/(\d+)\s*นาที/);let pk=null;
     if(cachedPhotoFile){
       btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลดรูป...';
-      try{
-        const fd=new FormData();fd.append('photo',cachedPhotoFile);
-        const ur=await fetch('/upload-photo',{method:'POST',body:fd}).then(r=>r.json());
-        if(ur.success){
-          pk=ur.key;
-        }else{
-          btn.disabled=false;btn.innerHTML='<i class="fas fa-share-nodes"></i> ยืนยัน';
-          showToast('❌ อัปโหลดรูปไม่สำเร็จ กรุณาลองใหม่','error');return;
-        }
-      }catch{
-        btn.disabled=false;btn.innerHTML='<i class="fas fa-share-nodes"></i> ยืนยัน';
-        showToast('❌ อัปโหลดรูปไม่สำเร็จ กรุณาลองใหม่','error');return;
-      }
+      try{const fd=new FormData();fd.append('photo',cachedPhotoFile);const ur=await fetch('/upload-photo',{method:'POST',body:fd}).then(r=>r.json());if(ur.success)pk=ur.key;else showToast('อัปโหลดรูปไม่สำเร็จ','warning');}catch{showToast('อัปโหลดรูปไม่สำเร็จ','warning');}
       btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
     }
     const saveRes=await fetch('/save-record',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:currentUser.userId,name,phone,car,mileage:mile,reason,routeText:rt,totalDistance:dm?parseFloat(dm[1]):0,totalTime:tm?parseInt(tm[1]):0,hasPhoto:!!(pk||cachedPhotoBase64),photoKey:pk,destinations:markers.map((m,i)=>({point:i+1,lat:m.getPosition().lat(),lng:m.getPosition().lng()})),timestamp:new Date().toISOString()})});
@@ -1508,7 +1503,7 @@ function showRegisterScreen(u){
 document.getElementById('regDept').addEventListener('change',function(){document.getElementById('otherDeptGroup').style.display=this.value==='อื่นๆ'?'block':'none';});
 document.getElementById('regForm').addEventListener('submit',async function(e){
   e.preventDefault();const btn=document.getElementById('regSubmitBtn');
-  const name=document.getElementById('regName').value.trim(),phone=document.getElementById('regPhone').value.trim(),dept=document.getElementById('regDept').value,od=document.getElementById('regOtherDept').value.trim();
+  const name=document.getElementById('regName').value.trim(),nickname=document.getElementById('regNickname')?.value.trim()||'',phone=document.getElementById('regPhone').value.trim(),dept=document.getElementById('regDept').value,od=document.getElementById('regOtherDept').value.trim();
   let v=true;
   if(!name){showErr('regName','กรุณากรอกชื่อ-นามสกุล');v=false;}
   if(!phone||!/^[0-9]{9,10}$/.test(phone)){showErr('regPhone','กรุณากรอกเบอร์โทร 9-10 หลัก');v=false;}
@@ -1517,7 +1512,7 @@ document.getElementById('regForm').addEventListener('submit',async function(e){
   if(!v)return;
   btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...';
   try{
-    const res=await fetch('/user-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'submit',userId:currentUser.userId,displayName:currentUser.displayName,pictureUrl:currentUser.pictureUrl,formData:{fullName:name,phone,department:dept==='อื่นๆ'?od:dept}})}).then(r=>r.json());
+    const res=await fetch('/user-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'submit',userId:currentUser.userId,displayName:currentUser.displayName,pictureUrl:currentUser.pictureUrl,formData:{fullName:name,nickname,phone,department:dept===อื่นๆ'?od:dept}})}).then(r=>r.json());
     if(res.duplicate){showToast('คุณส่งคำขอไปแล้ว','warning');showPendingScreen(currentUser.displayName,true);return;}
     if(res.success){showModal('📨','ส่งคำขอสำเร็จ!',`ขอบคุณคุณ ${name}\nรอแอดมินยืนยันภายใน 24 ชั่วโมง`);setTimeout(()=>{closeModal();showPendingScreen(name,false);},3000);}
   }catch{showToast('เกิดข้อผิดพลาด','error');}
