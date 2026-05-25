@@ -763,6 +763,10 @@ tbody tr:hover td { background: var(--c-surface2); }
         <label class="modal-label">ชื่อ-นามสกุล</label>
         <input class="modal-input" type="text" id="editName" placeholder="ชื่อ-นามสกุล">
       </div>
+      <div class="modal-field" style="grid-column:1/-1">
+        <label class="modal-label">ชื่อเล่น <span style="color:#9ca3af;font-weight:400">(ใช้สำหรับ !unblock)</span></label>
+        <input class="modal-input" type="text" id="editNickname" placeholder="ชื่อเล่น">
+      </div>
       <div class="modal-field">
         <label class="modal-label">เบอร์โทร</label>
         <input class="modal-input" type="text" id="editPhone" placeholder="0XX-XXX-XXXX">
@@ -1210,6 +1214,7 @@ function openEditModal(uid) {
   if (!u) return;
   document.getElementById('editUserId').value = uid;
   document.getElementById('editName').value   = u.name || '';
+  document.getElementById('editNickname').value = u.nickname || '';
   document.getElementById('editPhone').value  = u.phone || '';
   document.getElementById('editDept').value   = u.department || '';
   document.getElementById('editRole').value   = u.role || 'user';
@@ -1221,6 +1226,7 @@ async function saveUserEdit() {
   const uid      = document.getElementById('editUserId').value;
   const userData = {
     name:       document.getElementById('editName').value,
+    nickname:   document.getElementById('editNickname').value.trim() || null,
     phone:      document.getElementById('editPhone').value,
     department: document.getElementById('editDept').value,
     role:       document.getElementById('editRole').value,
