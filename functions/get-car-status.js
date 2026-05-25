@@ -13,7 +13,7 @@ export async function onRequestGet(context) {
     const secret = url.searchParams.get('secret');
     if (secret !== env.SELFBOT_SECRET) return err('Unauthorized', 403, o);
     const { results } = await env.DB.prepare(`
-      SELECT r.id, r.name, r.car, r.mileage, r.reason, r.timestamp,
+      SELECT r.id, r.user_id, r.name, r.phone, r.car, r.mileage, r.reason, r.timestamp,
              u.department, u.status as user_status,
              ROUND((julianday('now') - julianday(r.timestamp)) * 24, 1) AS hours_elapsed
       FROM records r
