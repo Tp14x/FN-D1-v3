@@ -9,7 +9,8 @@ export async function onRequestPost(context) {
     const body = await request.json();
     const { action, requestingUserId } = body;
 
-    if (requestingUserId !== env.ADMIN_USER_ID) {
+    const allowedIds = [env.ADMIN_USER_ID, env.SELFBOT_MID].filter(Boolean);
+    if (!allowedIds.includes(requestingUserId)) {
       return err('Unauthorized', 403, o);
     }
 
