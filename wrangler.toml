@@ -13,7 +13,7 @@ bucket_name = "car-tracker-photos"
 
 [vars]
 ADMIN_USER_ID = "U3e8201d1672346cac5fde4a9bc8d728c"
-SELFBOT_MID = u5f6dffe042698b52ada1c8e7d7869855
+SELFBOT_MID = "u5f6dffe042698b52ada1c8e7d7869855"
 ALLOWED_ORIGIN = "https://fn-car.pages.dev"
 
 # ── Selfbot Integration ──
