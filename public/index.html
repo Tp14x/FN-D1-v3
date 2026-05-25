@@ -1540,7 +1540,7 @@ async function initApp(){
     document.getElementById('appLoading').style.display='none';
     if(usage){showCarInUseScreen(usage);return;}
     const role=currentUser.role,status=currentUser.status;
-    if(role==='inactive'||status==='inactive'||role==='rejected'){
+    if(role==='inactive'||status==='inactive'||status==='blocked'||role==='rejected'){
       const sm=document.getElementById('suspendedMsg');sm.textContent='';
       const s1=document.createElement('span');s1.textContent=`คุณ ${profile.displayName}`;sm.appendChild(s1);sm.appendChild(document.createElement('br'));sm.appendChild(document.createTextNode('บัญชีถูกระงับ'));sm.appendChild(document.createElement('br'));sm.appendChild(document.createTextNode('กรุณาติดต่อผู้ดูแลระบบ'));
       showScreen('screen-suspended');
