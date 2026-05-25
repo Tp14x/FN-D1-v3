@@ -53,8 +53,8 @@ export async function onRequestPost(context) {
 
     if (action === 'save') {
       const { userId, userData } = body;
-      await env.DB.prepare(`UPDATE users SET name=?, phone=?, department=?, role=?, status=?, updated_at=? WHERE user_id=?`)
-        .bind(userData.name, userData.phone, userData.department, userData.role, userData.status, new Date().toISOString(), userId).run();
+      await env.DB.prepare(`UPDATE users SET name=?, nickname=?, phone=?, department=?, role=?, status=?, updated_at=? WHERE user_id=?`)
+        .bind(userData.name, userData.nickname||null, userData.phone, userData.department, userData.role, userData.status, new Date().toISOString(), userId).run();
       return ok({ success: true }, o);
     }
 
@@ -181,8 +181,8 @@ export async function onRequestPost(context) {
         return ok({ success: true }, o);
       } else if (name) {
         const user = await env.DB.prepare(
-          `SELECT user_id, name FROM users WHERE name LIKE ? AND status='blocked' LIMIT 1`
-        ).bind('%' + name + '%').first();
+          `SELECT user_id, name, nickname FROM users WHERE (nickname LIKE ? OR name LIKE ?) AND status='blocked' LIMIT 1`
+        ).bind('%' + name + '%', '%' + name + '%').first();
         if (!user) return ok({ success: false, message: 'ไม่พบผู้ใช้ที่ถูกบล็อค' }, o);
         await env.DB.prepare(
           `UPDATE users SET status='active', updated_at=? WHERE user_id=?`
