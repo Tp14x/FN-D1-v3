@@ -11,7 +11,7 @@ export async function onRequestPost(context) {
 
     // ✅ เช็ค status ของ user ก่อนบันทึก
     const user = await env.DB.prepare(
-      'SELECT status FROM users WHERE user_id = ?'
+      'SELECT status, picture_url FROM users WHERE user_id = ?'
     ).bind(record.userId).first();
 
     if (!user) return err('ไม่พบบัญชีผู้ใช้', 404, o);
@@ -48,6 +48,34 @@ export async function onRequestPost(context) {
 
     const selfbotUrl = env.SELFBOT_WEBHOOK_URL;
     if (selfbotUrl) {
+      const pictureUrl = user?.picture_url || null;
+
+      // สร้าง header contents — ถ้ามีรูปโปรไฟล์ให้แสดงพร้อมชื่อ
+      const headerContents = pictureUrl
+        ? [
+            {
+              type: "box", layout: "horizontal", spacing: "sm",
+              contents: [
+                {
+                  type: "image", url: pictureUrl,
+                  size: "xxs", aspectMode: "cover",
+                  aspectRatio: "1:1", flex: 0
+                },
+                {
+                  type: "text", text: "🚗 บันทึกการใช้รถ",
+                  weight: "bold", size: "sm", color: "#FFFFFF",
+                  gravity: "center", flex: 1
+                }
+              ]
+            }
+          ]
+        : [
+            {
+              type: "text", text: "🚗 บันทึกการใช้รถ",
+              weight: "bold", size: "sm", color: "#FFFFFF", align: "center"
+            }
+          ];
+
       const notifyPayload = {
         type: 'checkout',
         altText: `🚗 ${(record.name || 'ไม่ระบุชื่อ').slice(0, 30)} ยืม ${(record.car || '-').slice(0, 30)}`,
@@ -60,7 +88,8 @@ export async function onRequestPost(context) {
           reason: record.reason || '',
           routeText: routeTextToSave,
           totalDistance: record.totalDistance || 0,
-          timestamp: now
+          timestamp: now,
+          pictureUrl: pictureUrl
         },
         flex: {
           type: "bubble",
@@ -68,10 +97,7 @@ export async function onRequestPost(context) {
           header: {
             type: "box", layout: "vertical",
             backgroundColor: "#2ECC71", paddingAll: "10px",
-            contents: [{
-              type: "text", text: "🚗 บันทึกการใช้รถ",
-              weight: "bold", size: "sm", color: "#FFFFFF", align: "center"
-            }]
+            contents: headerContents
           },
           body: {
             type: "box", layout: "vertical",
