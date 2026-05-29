@@ -50,8 +50,10 @@ export async function onRequestPost(context) {
 
     const returned = await env.DB.prepare(`
       SELECT r.id, r.name, r.phone, r.car, r.mileage, r.reason,
-             r.timestamp, r.route_text, r.total_distance
+             r.timestamp, r.route_text, r.total_distance, r.user_id,
+             u.picture_url
       FROM records r
+      LEFT JOIN users u ON r.user_id = u.user_id
       WHERE r.car = ? AND r.return_status = 'returned'
       ORDER BY r.returned_at DESC LIMIT 1
     `).bind(carPlate).first();
@@ -71,7 +73,8 @@ export async function onRequestPost(context) {
           checkoutTime: returned.timestamp,
           returnedAt: now,
           durationText: durationText || '',
-          returnLocation: returnLocation || null
+          returnLocation: returnLocation || null,
+          pictureUrl: returned.picture_url || null
         }
       };
       context.waitUntil(
