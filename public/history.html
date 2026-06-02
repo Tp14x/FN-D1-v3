@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAw5sDr5qXKIpun2dp4jpu8NerbXy6Hfew&libraries=places&loading=async"></script>
 <style>
 :root {
   --g50:  #f0fdf4; --g100: #dcfce7; --g200: #bbf7d0;
@@ -337,60 +336,8 @@ tbody tr:hover td{background:var(--g50)}
 .toast.error{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
 @keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
 
-/* ─── DATE RANGE ─── */
-.date-range{display:flex;align-items:center;gap:6px;flex:1;min-width:240px;}
-.date-range span{font-size:12px;color:var(--muted);white-space:nowrap;}
-
-/* ─── SORTABLE HEADER ─── */
-th.sortable{cursor:pointer;user-select:none;white-space:nowrap;}
-th.sortable:hover{background:var(--g100);}
-th.sortable .sort-icon{margin-left:4px;opacity:.4;font-size:10px;}
-th.sortable.asc .sort-icon::after{content:'▲';opacity:1;}
-th.sortable.desc .sort-icon::after{content:'▼';opacity:1;}
-th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅';}
-
-/* ─── TOP CARDS ─── */
-.top-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;}
-.top-card{background:var(--card);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm);border:1px solid var(--border);padding:16px 18px;}
-.top-card-title{font-size:12px;font-weight:700;color:var(--g700);margin-bottom:12px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px;}
-.top-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--g50);}
-.top-row:last-child{border-bottom:none;}
-.top-rank{width:22px;height:22px;border-radius:50%;background:var(--g100);color:var(--g700);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.top-rank.gold{background:#fef3c7;color:#b45309;}
-.top-rank.silver{background:#f1f5f9;color:#475569;}
-.top-rank.bronze{background:#fef3c7;color:#92400e;}
-.top-av{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;}
-.top-av-txt{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--g600),var(--g400));display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0;}
-.top-name{font-size:12px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.top-count{font-size:11px;font-weight:700;color:var(--g600);flex-shrink:0;}
-
-/* ─── SPARKLINE STAT ─── */
-.stat-spark{margin-top:6px;}
-.sparkline-canvas{display:block;}
-
-/* ─── ROW HOVER ACTIONS ─── */
-.row-actions{display:none;gap:5px;align-items:center;justify-content:center;}
-tbody tr:hover .row-actions{display:flex;}
-tbody tr:hover .btn-eye{display:none;}
-.btn-copy{width:32px;height:32px;border:1.5px solid var(--g200);border-radius:8px;background:var(--g50);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--g600);font-size:12px;transition:all .2s;}
-.btn-copy:hover{background:var(--g600);color:#fff;border-color:var(--g600);}
-
-/* ─── TIMELINE IN MODAL ─── */
-.m-timeline{display:flex;align-items:center;gap:0;margin-bottom:20px;padding:14px;background:var(--g50);border-radius:12px;border:1px solid var(--border);}
-.tl-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;}
-.tl-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;position:relative;z-index:1;}
-.tl-dot.start{background:var(--g100);border:2px solid var(--g400);}
-.tl-dot.end{background:#fee2e2;border:2px solid #fca5a5;}
-.tl-dot.pending{background:#fef3c7;border:2px solid #fde68a;}
-.tl-label{font-size:10px;font-weight:700;color:var(--muted);}
-.tl-val{font-size:11px;font-weight:600;color:var(--text);}
-.tl-line{flex:1;height:2px;background:var(--g200);margin:0 -4px;margin-bottom:22px;}
-
-/* ─── MINI MAP IN MODAL ─── */
-#detailMapWrap{width:100%;height:200px;border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:12px;}
-
-@media(max-width:600px){
-  .top-grid{grid-template-columns:1fr;}
+@media(max-width:900px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:600px){
   .stats-grid{grid-template-columns:repeat(2,1fr)}
@@ -479,11 +426,6 @@ tbody tr:hover .btn-eye{display:none;}
   </div>
 </div>
 
-<!-- ─── TOP USERS & CARS ─── -->
-<div class="section" style="margin-top:-8px;" id="topSection">
-  <div class="top-grid" id="topGrid"></div>
-</div>
-
 <!-- ─── FILTER ─── -->
 <div class="section">
   <div class="filter-card">
@@ -501,14 +443,9 @@ tbody tr:hover .btn-eye{display:none;}
       <option value="pending">กำลังใช้อยู่</option>
       <option value="returned">คืนรถแล้ว</option>
     </select>
-    <div class="date-range">
-      <input class="f-input" type="date" id="filterDateFrom" style="min-width:140px;flex:1;">
-      <span>ถึง</span>
-      <input class="f-input" type="date" id="filterDateTo" style="min-width:140px;flex:1;">
-    </div>
+    <input class="f-input" type="date" id="filterDate" style="flex:0 0 auto;min-width:150px">
     <button class="btn-green" onclick="applyFilter()"><i class="fas fa-filter"></i> กรอง</button>
     <button class="btn-outline" onclick="resetFilter()">รีเซ็ต</button>
-    <button class="btn-csv" onclick="exportCSV()"><i class="fas fa-download"></i> CSV</button>
   </div>
 
   <!-- TABLE -->
@@ -529,11 +466,11 @@ tbody tr:hover .btn-eye{display:none;}
         <thead>
           <tr>
             <th>ผู้ใช้</th>
-            <th class="sortable" data-col="car" onclick="sortBy('car')">ทะเบียนรถ<span class="sort-icon"></span></th>
+            <th>ทะเบียนรถ</th>
             <th>สาเหตุ</th>
-            <th class="sortable" data-col="timestamp" onclick="sortBy('timestamp')">🟢 เริ่มใช้รถ<span class="sort-icon"></span></th>
+            <th>🟢 เริ่มใช้รถ</th>
             <th>สถานะ</th>
-            <th class="sortable" data-col="returnedAt" onclick="sortBy('returnedAt')">🔴 คืนรถเมื่อ<span class="sort-icon"></span></th>
+            <th>🔴 คืนรถเมื่อ</th>
             <th style="text-align:center">รายละเอียด</th>
           </tr>
         </thead>
@@ -559,9 +496,7 @@ tbody tr:hover .btn-eye{display:none;}
       <h3><i class="fas fa-eye" style="color:var(--g600)"></i> รายละเอียดการใช้รถ</h3>
       <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
     </div>
-    <div class="modal-bd" id="modalBd">
-      <div id="detailMapWrap" style="display:none;"></div>
-    </div>
+    <div class="modal-bd" id="modalBd"></div>
   </div>
 </div>
 
@@ -571,332 +506,6 @@ tbody tr:hover .btn-eye{display:none;}
 let allRecords = [], filteredRecords = [], currentPage = 1;
 const PAGE = 20;
 let chartInstance = null;
-let sortCol = 'timestamp', sortDir = 'desc';
-
-// ─── ANIMATED COUNTER ───
-function animateCount(el, target, suffix='', decimals=0) {
-  const start = 0, duration = 800;
-  const step = ts => {
-    if (!step.startTime) step.startTime = ts;
-    const progress = Math.min((ts - step.startTime) / duration, 1);
-    const val = start + (target - start) * (1 - Math.pow(1 - progress, 3));
-    el.textContent = decimals ? val.toFixed(decimals) + suffix : Math.round(val) + suffix;
-    if (progress < 1) requestAnimationFrame(step);
-    else el.textContent = decimals ? target.toFixed(decimals) + suffix : target + suffix;
-  };
-  requestAnimationFrame(step);
-}
-
-// ─── FETCH ───
-async function loadData() {
-  try {
-    const res = await fetch('/get-records');
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    allRecords = data.records || [];
-    calcStats(allRecords);
-    buildChart(allRecords);
-    buildTopCards(allRecords);
-    filteredRecords = [...allRecords];
-    filteredRecords.sort((a,b) => sortDir==='desc'
-      ? new Date(b[sortCol]||0)-new Date(a[sortCol]||0)
-      : new Date(a[sortCol]||0)-new Date(b[sortCol]||0));
-    renderTable();
-    document.getElementById('loadState').style.display = 'none';
-  } catch(e) {
-    document.getElementById('loadState').innerHTML = `
-      <span style="font-size:36px;display:block;margin-bottom:8px">⚠️</span>
-      <div style="color:var(--muted)">โหลดไม่สำเร็จ: ${e.message}</div>
-      <button onclick="loadData()" style="margin-top:12px;padding:8px 18px;background:var(--g600);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:Kanit,sans-serif">ลองอีกครั้ง</button>
-    `;
-  }
-}
-
-// ─── CALC STATS ───
-function calcStats(records) {
-  const now  = new Date();
-  const thisY = now.getFullYear();
-  const thisM = now.getMonth();
-  const monthly = records.filter(r => {
-    if (!r.timestamp) return false;
-    const d = new Date(r.timestamp);
-    return d.getFullYear() === thisY && d.getMonth() === thisM;
-  });
-  const km = monthly.reduce((s,r) => s + (r.totalDistance||0), 0);
-  animateCount(document.getElementById('sKm'), parseFloat(km.toFixed(0)));
-  document.getElementById('sKmSub').textContent = `${monthly.length} เที่ยวเดือนนี้`;
-  const active = records.filter(r => r.returnStatus === 'pending').length;
-  animateCount(document.getElementById('sActive'), active);
-  document.getElementById('sActiveSub').className = `stat-sub ${active > 0 ? 'warn' : 'up'}`;
-  document.getElementById('sActiveSub').textContent = active > 0 ? '⚠️ ยังไม่คืนรถ' : '✅ ทุกคันกลับแล้ว';
-  const returned = monthly.filter(r => r.returnStatus === 'returned').length;
-  animateCount(document.getElementById('sReturned'), returned);
-  document.getElementById('sReturnedSub').textContent = `จาก ${monthly.length} เที่ยว`;
-  const users = new Set(monthly.map(r => r.userId)).size;
-  animateCount(document.getElementById('sUsers'), users);
-  document.getElementById('sUsersSub').textContent = `คน (ใช้รถเดือนนี้)`;
-}
-
-// ─── TOP CARDS ───
-function buildTopCards(records) {
-  // top cars
-  const carMap = {};
-  records.forEach(r => { if(r.car) carMap[r.car] = (carMap[r.car]||0)+1; });
-  const topCars = Object.entries(carMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
-  // top users
-  const userMap = {};
-  records.forEach(r => { if(r.userId) { if(!userMap[r.userId]) userMap[r.userId]={name:r.name||'-',pic:r.pictureUrl||null,count:0}; userMap[r.userId].count++; }});
-  const topUsers = Object.values(userMap).sort((a,b)=>b.count-a.count).slice(0,3);
-  const ranks = ['gold','silver','bronze'];
-  const rankLabels = ['🥇','🥈','🥉'];
-  const carsHtml = topCars.map((c,i)=>`
-    <div class="top-row">
-      <div class="top-rank ${ranks[i]||''}">${rankLabels[i]||i+1}</div>
-      <div class="top-av-txt">🚗</div>
-      <div class="top-name">${esc(c[0])}</div>
-      <div class="top-count">${c[1]} เที่ยว</div>
-    </div>`).join('') || '<div style="color:var(--muted);font-size:12px;padding:8px 0;">ยังไม่มีข้อมูล</div>';
-  const usersHtml = topUsers.map((u,i)=>{
-    const av = u.pic ? `<img class="top-av" src="${u.pic}" onerror="this.style.display='none'">` : `<div class="top-av-txt">${(u.name||'?').charAt(0)}</div>`;
-    return `<div class="top-row">
-      <div class="top-rank ${ranks[i]||''}">${rankLabels[i]||i+1}</div>
-      ${av}
-      <div class="top-name">${esc(u.name)}</div>
-      <div class="top-count">${u.count} เที่ยว</div>
-    </div>`;
-  }).join('') || '<div style="color:var(--muted);font-size:12px;padding:8px 0;">ยังไม่มีข้อมูล</div>';
-  document.getElementById('topGrid').innerHTML = `
-    <div class="top-card"><div class="top-card-title"><i class="fas fa-car" style="color:var(--g600)"></i>รถที่ใช้บ่อยสุด</div>${carsHtml}</div>
-    <div class="top-card"><div class="top-card-title"><i class="fas fa-user" style="color:var(--g600)"></i>พนักงานที่ใช้บ่อยสุด</div>${usersHtml}</div>`;
-}
-
-// ─── BUILD CHART ───
-function buildChart(records) {
-  const now = new Date();
-  const curYear = now.getFullYear();
-  const tripsData=[], kmData=[], labels=[];
-  for (let m = 0; m <= 11; m++) {
-    const d = new Date(curYear, m, 1);
-    labels.push(d.toLocaleDateString('th-TH', { month: 'short', year: '2-digit' }));
-    const recs = records.filter(r => { if (!r.timestamp) return false; const dd=new Date(r.timestamp); return dd.getFullYear()===curYear&&dd.getMonth()===m; });
-    tripsData.push(recs.length);
-    kmData.push(parseFloat(recs.reduce((s,r)=>s+(r.totalDistance||0),0).toFixed(1)));
-  }
-  document.getElementById('chartSub').textContent = `รวม ${records.length} เที่ยว · ${records.reduce((s,r)=>s+(r.totalDistance||0),0).toFixed(0)} กม. ตลอดเวลา`;
-  if (chartInstance) chartInstance.destroy();
-  const ctx = document.getElementById('monthChart').getContext('2d');
-  chartInstance = new Chart(ctx, {
-    type:'bar',data:{labels,datasets:[
-      {label:'จำนวนเที่ยว',data:tripsData,backgroundColor:'rgba(22,163,74,0.75)',borderColor:'rgba(22,163,74,1)',borderWidth:2,borderRadius:8,borderSkipped:false,yAxisID:'y'},
-      {label:'ระยะทาง (กม.)',data:kmData,type:'line',borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.08)',pointBackgroundColor:'#f59e0b',pointRadius:4,pointHoverRadius:6,borderWidth:2.5,tension:0.4,fill:true,yAxisID:'y1'}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{position:'top',labels:{font:{family:'Kanit',size:12},padding:16,usePointStyle:true}},
-        tooltip:{backgroundColor:'rgba(20,83,45,0.92)',titleFont:{family:'Kanit',size:13},bodyFont:{family:'Kanit',size:12},padding:12,cornerRadius:10,
-          callbacks:{label:ctx=>ctx.datasetIndex===0?` ${ctx.parsed.y} เที่ยว`:` ${ctx.parsed.y} กม.`}}},
-      scales:{x:{grid:{display:false},ticks:{font:{family:'Kanit',size:11}}},
-        y:{position:'left',beginAtZero:true,grid:{color:'rgba(22,163,74,0.08)'},ticks:{font:{family:'Kanit',size:11},precision:0},title:{display:true,text:'จำนวนเที่ยว',font:{family:'Kanit',size:11},color:'#16a34a'}},
-        y1:{position:'right',beginAtZero:true,grid:{drawOnChartArea:false},ticks:{font:{family:'Kanit',size:11}},title:{display:true,text:'กม.',font:{family:'Kanit',size:11},color:'#f59e0b'}}}}
-  });
-}
-
-// ─── SORT ───
-function sortBy(col) {
-  if (sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-  else { sortCol = col; sortDir = 'desc'; }
-  document.querySelectorAll('th.sortable').forEach(th => {
-    th.classList.remove('asc','desc');
-    if (th.dataset.col === col) th.classList.add(sortDir);
-  });
-  filteredRecords.sort((a,b) => {
-    const va = a[col]||'', vb = b[col]||'';
-    return sortDir==='desc' ? vb.localeCompare(va) : va.localeCompare(vb);
-  });
-  currentPage=1; renderTable();
-}
-
-// ─── PARSE COORDS ───
-function parseRouteCoords(routeText) {
-  if (!routeText) return [];
-  try { const arr=JSON.parse(routeText); if(Array.isArray(arr)&&arr.length&&arr[0].lat!==undefined) return arr.map(p=>({lat:parseFloat(p.lat),lng:parseFloat(p.lng)})); } catch(_) {}
-  const re=/จุดที่\s*\d+[^:]*:\s*([-\d.]+),\s*([-\d.]+)/g; const out=[]; let m;
-  while((m=re.exec(routeText))!==null) out.push({lat:parseFloat(m[1]),lng:parseFloat(m[2])});
-  return out;
-}
-
-// ─── RENDER TABLE ───
-function renderTable() {
-  const total = filteredRecords.length;
-  const start = (currentPage-1)*PAGE;
-  const page  = filteredRecords.slice(start, start+PAGE);
-  document.getElementById('recCount').textContent = `${total} รายการ`;
-  if (total===0) {
-    document.getElementById('tblWrap').style.display='none';
-    document.getElementById('emptyState').style.display='block';
-    document.getElementById('pagination').style.display='none';
-    return;
-  }
-  document.getElementById('emptyState').style.display='none';
-  document.getElementById('tblWrap').style.display='block';
-  document.getElementById('tblBody').innerHTML = page.map((r,i) => {
-    const gi=start+i;
-    const av=r.pictureUrl?`<img src="${r.pictureUrl}" alt="" style="width:38px;height:38px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'">`:`<div class="u-av">${(r.name||'?').charAt(0)}</div>`;
-    const statusBadge=r.returnStatus==='returned'?'<span class="badge b-green"><i class="fas fa-check"></i> คืนแล้ว</span>':'<span class="badge b-yellow"><i class="fas fa-clock"></i> ใช้อยู่</span>';
-    return `<tr>
-      <td><div class="u-cell">${av}<div><div class="u-name">${esc(r.name||'-')}</div><div class="u-dept">${esc(r.department||'')}${r.phone?' · '+r.phone:''}</div></div></div></td>
-      <td><span class="car-badge">🚗 ${esc(r.car||'-')}</span></td>
-      <td><span class="reason-cell" title="${esc(r.reason||'-')}">${esc(r.reason||'-')}</span></td>
-      <td class="date-start">${fmtDate(r.timestamp)}</td>
-      <td>${statusBadge}</td>
-      <td class="date-end">${r.returnedAt?fmtDate(r.returnedAt):'-'}</td>
-      <td style="text-align:center">
-        <button class="btn-eye" onclick="openDetail(${gi})" title="ดูรายละเอียด"><i class="fas fa-eye"></i></button>
-        <div class="row-actions">
-          <button class="btn-eye" onclick="openDetail(${gi})" title="ดูรายละเอียด"><i class="fas fa-eye"></i></button>
-          <button class="btn-copy" onclick="copyRow(${gi})" title="คัดลอก"><i class="fas fa-copy"></i></button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
-  renderPagination(total);
-}
-
-// ─── COPY ROW ───
-function copyRow(idx) {
-  const r=filteredRecords[idx];if(!r)return;
-  const txt=`ชื่อ: ${r.name||'-'}\nทะเบียน: ${r.car||'-'}\nเลขไมล์: ${r.mileage||'-'}\nสาเหตุ: ${r.reason||'-'}\nออกเมื่อ: ${fmtDate(r.timestamp)}\nสถานะ: ${r.returnStatus==='returned'?'คืนแล้ว':'กำลังใช้'}${r.returnedAt?'\nคืนเมื่อ: '+fmtDate(r.returnedAt):''}`;
-  navigator.clipboard.writeText(txt).then(()=>showToast('คัดลอกแล้ว ✅','success')).catch(()=>showToast('คัดลอกไม่ได้','error'));
-}
-
-// ─── DETAIL MODAL ───
-let detailMapInstance=null;
-function openDetail(idx) {
-  const r=filteredRecords[idx];if(!r)return;
-  const coords=parseRouteCoords(r.routeText);
-  const retLoc=r.returnLocation;
-  const av=r.pictureUrl?`<img src="${r.pictureUrl}" alt="" onerror="this.style.display='none'">`:`<div class="m-uav">${(r.name||'?').charAt(0)}</div>`;
-  const statusBadge=r.returnStatus==='returned'?'<span class="badge b-green">✅ คืนรถแล้ว</span>':'<span class="badge b-yellow">🔑 กำลังใช้อยู่</span>';
-  const destHtml=coords.length===0
-    ?'<div class="no-loc">📍 ไม่มีข้อมูลปลายทาง</div>'
-    :coords.map((c,i)=>`<div class="loc-card"><div><div class="lc-lbl">📍 จุดที่ ${i+1}</div><div class="lc-coord">${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}</div></div><a href="https://www.google.com/maps?q=${c.lat},${c.lng}" target="_blank" class="btn-map"><i class="fas fa-map-marker-alt"></i> เปิดแผนที่</a></div>`).join('');
-  const retLocHtml=(!retLoc||!retLoc.lat)
-    ?'<div class="no-loc">🚩 ไม่มีข้อมูลตำแหน่งคืนรถ</div>'
-    :`<div class="loc-card"><div><div class="lc-lbl">🚩 ตำแหน่งที่คืนรถ</div><div class="lc-coord">${retLoc.lat.toFixed(6)}, ${retLoc.lng.toFixed(6)}</div>${retLoc.accuracy?`<div class="lc-acc">ความแม่นยำ ±${Math.round(retLoc.accuracy)} เมตร</div>`:''}</div><a href="https://www.google.com/maps?q=${retLoc.lat},${retLoc.lng}" target="_blank" class="btn-map red"><i class="fas fa-flag"></i> เปิดแผนที่</a></div>`;
-  // timeline
-  const tlEnd = r.returnStatus==='returned'
-    ? `<div class="tl-dot end">🏁</div><div class="tl-label">คืนรถ</div><div class="tl-val">${fmtDate(r.returnedAt)}</div>`
-    : `<div class="tl-dot pending">🔑</div><div class="tl-label">กำลังใช้</div><div class="tl-val">—</div>`;
-  const timeline=`<div class="m-timeline">
-    <div class="tl-step"><div class="tl-dot start">🟢</div><div class="tl-label">ออกรถ</div><div class="tl-val">${fmtDate(r.timestamp)}</div></div>
-    <div class="tl-line"></div>
-    <div class="tl-step">${tlEnd}</div>
-  </div>`;
-
-  document.getElementById('modalBd').innerHTML = `
-    ${timeline}
-    <div class="m-user">${av}<div><div class="m-uname">${esc(r.name||'-')}</div><div class="m-usub">${esc(r.department||'')}${r.phone?' · '+r.phone:''}</div><div style="margin-top:8px">${statusBadge}</div></div></div>
-    <div class="m-sec"><div class="m-sec-title"><i class="fas fa-car"></i> ข้อมูลการใช้รถ</div>
-      <div class="m-grid">
-        <div class="m-item"><div class="m-lbl">ทะเบียนรถ</div><div class="m-val">🚗 ${esc(r.car||'-')}</div></div>
-        <div class="m-item"><div class="m-lbl">เลขไมล์เริ่มต้น</div><div class="m-val">${esc(r.mileage||'-')}</div></div>
-        <div class="m-item"><div class="m-lbl">ระยะทางรวม</div><div class="m-val green">${r.totalDistance?r.totalDistance.toFixed(2)+' กม.':'-'}</div></div>
-        <div class="m-item"><div class="m-lbl">ระยะเวลาใช้งาน</div><div class="m-val green">⏱ ${esc(r.durationText||'-')}</div></div>
-        <div class="m-item full"><div class="m-lbl">สาเหตุการใช้รถ</div><div class="m-val">${esc(r.reason||'-')}</div></div>
-        <div class="m-item full"><div class="m-lbl">รูปเลขไมล์</div><div class="m-val">${
-          r.photoKey?`<div style="margin-top:6px"><img src="/get-photo?key=${encodeURIComponent(r.photoKey)}" alt="รูปเลขไมล์" loading="lazy" onclick="this.classList.toggle('photo-zoom')" style="max-width:100%;max-height:220px;border-radius:8px;border:1px solid #e2e8f0;cursor:zoom-in;display:block"></div><div style="font-size:11px;color:#64748b;margin-top:4px">📸 แตะรูปเพื่อขยาย</div>`:r.hasPhoto?'📸 มีรูปแนบ (อัปโหลดก่อนเปิดใช้ R2)':'—'
-        }</div></div>
-      </div>
-    </div>
-    <div class="m-sec"><div class="m-sec-title"><i class="fas fa-map-marked-alt"></i> เส้นทาง & ปลายทาง</div>
-      <div id="detailMapWrap" style="display:none;margin-bottom:12px;width:100%;height:200px;border-radius:12px;overflow:hidden;border:1px solid var(--border);"></div>
-      ${destHtml}
-    </div>
-    <div class="m-sec"><div class="m-sec-title"><i class="fas fa-flag-checkered"></i> ตำแหน่งคืนรถ</div>${retLocHtml}</div>`;
-
-  document.getElementById('detailOverlay').classList.add('show');
-  document.body.style.overflow='hidden';
-
-  // embed mini map
-  if(coords.length>0 && window.google){
-    const mapWrap=document.getElementById('detailMapWrap');
-    mapWrap.style.display='block';
-    setTimeout(()=>{
-      const m=new google.maps.Map(mapWrap,{zoom:13,mapTypeControl:false,streetViewControl:false,fullscreenControl:false,zoomControl:true,center:{lat:coords[0].lat,lng:coords[0].lng}});
-      const bounds=new google.maps.LatLngBounds();
-      coords.forEach((c,i)=>{
-        const pos={lat:c.lat,lng:c.lng};
-        new google.maps.Marker({position:pos,map:m,label:{text:String(i+1),color:'#fff',fontSize:'11px',fontWeight:'bold'}});
-        bounds.extend(pos);
-      });
-      if(retLoc&&retLoc.lat){const rp={lat:retLoc.lat,lng:retLoc.lng};new google.maps.Marker({position:rp,map:m,icon:{url:'https://maps.google.com/mapfiles/ms/icons/red-dot.png',scaledSize:new google.maps.Size(28,28)}});bounds.extend(rp);}
-      m.fitBounds(bounds,{top:20,right:20,bottom:20,left:20});
-    },150);
-  }
-}
-
-function closeModal(){document.getElementById('detailOverlay').classList.remove('show');document.body.style.overflow='';}
-function handleOverlay(e){if(e.target===e.currentTarget)closeModal();}
-
-// ─── FILTER ───
-function applyFilter(){
-  const s=document.getElementById('searchInput').value.toLowerCase().trim();
-  const c=document.getElementById('filterCar').value.toLowerCase();
-  const st=document.getElementById('filterStatus').value;
-  const df=document.getElementById('filterDateFrom').value;
-  const dt=document.getElementById('filterDateTo').value;
-  filteredRecords=allRecords.filter(r=>{
-    if(s&&!`${r.name} ${r.car} ${r.reason} ${r.phone}`.toLowerCase().includes(s))return false;
-    if(c&&!r.car?.toLowerCase().includes(c))return false;
-    if(st&&r.returnStatus!==st)return false;
-    if(df&&r.timestamp&&r.timestamp<df)return false;
-    if(dt&&r.timestamp&&r.timestamp.slice(0,10)>dt)return false;
-    return true;
-  });
-  // re-apply sort
-  filteredRecords.sort((a,b)=>sortDir==='desc'?(b[sortCol]||'').localeCompare(a[sortCol]||''):(a[sortCol]||'').localeCompare(b[sortCol]||''));
-  currentPage=1;renderTable();
-}
-function resetFilter(){
-  ['searchInput','filterCar','filterStatus','filterDateFrom','filterDateTo'].forEach(id=>document.getElementById(id).value='');
-  filteredRecords=[...allRecords];currentPage=1;renderTable();
-}
-document.getElementById('searchInput').addEventListener('input',applyFilter);
-
-// ─── PAGINATION ───
-function renderPagination(total){
-  const pages=Math.ceil(total/PAGE);const pag=document.getElementById('pagination');
-  if(pages<=1){pag.style.display='none';return;}
-  pag.style.display='flex';
-  let h=`<button class="pg-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
-  for(let i=1;i<=pages;i++){
-    if(i===1||i===pages||(i>=currentPage-1&&i<=currentPage+1))h+=`<button class="pg-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
-    else if(i===currentPage-2||i===currentPage+2)h+=`<span class="pg-info">...</span>`;
-  }
-  h+=`<button class="pg-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>›</button>`;
-  h+=`<span class="pg-info">${currentPage}/${pages}</span>`;
-  pag.innerHTML=h;
-}
-function goPage(p){const pages=Math.ceil(filteredRecords.length/PAGE);if(p<1||p>pages)return;currentPage=p;renderTable();window.scrollTo({top:0,behavior:'smooth'});}
-
-// ─── CSV ───
-function exportCSV(){
-  const data=filteredRecords.length?filteredRecords:allRecords;
-  const headers=['ชื่อ','เบอร์โทร','แผนก','ทะเบียนรถ','ไมล์','สาเหตุ','ระยะทาง(กม)','เริ่มใช้','สถานะ','คืนเมื่อ','ระยะเวลา'];
-  const rows=data.map(r=>[r.name||'',r.phone||'',r.department||'',r.car||'',r.mileage||'',r.reason||'',r.totalDistance||0,r.timestamp||'',r.returnStatus==='returned'?'คืนแล้ว':'กำลังใช้',r.returnedAt||'',r.durationText||'']);
-  const csv='\uFEFF'+[headers,...rows].map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=`car-history-${new Date().toISOString().slice(0,10)}.csv`;a.click();
-}
-
-// ─── HELPERS ───
-function fmtDate(iso){if(!iso)return'-';try{return new Date(iso).toLocaleString('th-TH',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return iso;}}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function showToast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast show ${type}`;setTimeout(()=>t.classList.remove('show'),3000);}
-
-// ─── INIT ───
-loadData();
-setInterval(loadData,120000);
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
-</script>
 
 // ─── FETCH ───
 async function loadData() {
