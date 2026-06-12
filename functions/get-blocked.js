@@ -1,6 +1,3 @@
-// functions/get-blocked.js — debug version
-// เปลี่ยนกลับเป็น production หลังเช็คเสร็จ
-
 import { ok, err, preflight } from './_shared.js';
 
 export async function onRequestOptions() { return preflight(); }
@@ -13,24 +10,23 @@ export async function onRequestGet(context) {
     const secret = url.searchParams.get('secret');
     if (secret !== env.SELFBOT_SECRET) return err('Unauthorized', 403, o);
 
-    // ── DEBUG: ดึง users ทุกคนพร้อม status ──
+    // ดึงเฉพาะ users ที่ status = 'blocked' พร้อม nickname
     const { results } = await env.DB.prepare(`
-      SELECT user_id, name, status, updated_at
+      SELECT user_id, name, nickname, phone, status, updated_at
       FROM users
+      WHERE status = 'blocked'
       ORDER BY updated_at DESC
-      LIMIT 20
     `).all();
 
-    // แสดง status ทั้งหมดที่มีในระบบ
-    const statusSummary = {};
-    for (const u of results) {
-      statusSummary[u.status] = (statusSummary[u.status] || 0) + 1;
-    }
-
     return ok({
-      debug: true,
-      statusSummary,   // เช็คว่า status ที่ใช้จริงคืออะไร
-      users: results   // รายการทั้งหมด
+      users: results.map(u => ({
+        user_id: u.user_id,
+        name: u.name,           // ชื่อจริงที่ใช้แสดง
+        nickname: u.nickname,   // ชื่อเล่นที่ admin ตั้ง (ใช้ค้นหาปลดบล็อค)
+        phone: u.phone,
+        status: u.status,
+        updated_at: u.updated_at
+      }))
     }, o);
 
   } catch (e) {
