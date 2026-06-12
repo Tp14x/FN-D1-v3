@@ -7,10 +7,13 @@ export async function onRequestPost(context) {
   const o = env.ALLOWED_ORIGIN;
   try {
     const body = await request.json();
-    const { action, requestingUserId } = body;
+    const { action, requestingUserId, secret } = body;
 
-    const allowedIds = [env.ADMIN_USER_ID, env.SELFBOT_MID].filter(Boolean);
-    if (!allowedIds.includes(requestingUserId)) {
+    // ✅ แก้ไข: รองรับทั้ง secret และ requestingUserId
+    const isAuthorized = (secret === env.SELFBOT_SECRET) || 
+                         [env.ADMIN_USER_ID, env.SELFBOT_MID].filter(Boolean).includes(requestingUserId);
+    
+    if (!isAuthorized) {
       return err('Unauthorized', 403, o);
     }
 
