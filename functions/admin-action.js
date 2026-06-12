@@ -173,6 +173,20 @@ export async function onRequestPost(context) {
       return ok({ records: results }, o);
     }
 
+    // ── RESET LIFF: รีเซ็ต session LIFF ──
+    if (action === 'reset-liff') {
+      const { userId } = body;
+      if (!userId) return err('Missing userId', 400, o);
+      
+      // อัปเดต updated_at เพื่อให้ LIFF โหลดข้อมูลใหม่
+      const now = new Date().toISOString();
+      await env.DB.prepare(
+        `UPDATE users SET updated_at = ? WHERE user_id = ?`
+      ).bind(now, userId).run();
+      
+      return ok({ success: true, message: 'รีเซ็ต LIFF เรียบร้อยแล้ว' }, o);
+    }
+
     // ── UNBLOCK: ปลดบล็อคผู้ใช้ที่ถูก block (เรียกจาก selfbot หรือ admin panel) ──
     if (action === 'unblock') {
       const { userId, name, nickname } = body;
