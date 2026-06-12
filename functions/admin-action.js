@@ -170,27 +170,47 @@ export async function onRequestPost(context) {
       return ok({ records: results }, o);
     }
 
-
     // ── UNBLOCK: ปลดบล็อคผู้ใช้ที่ถูก block (เรียกจาก selfbot หรือ admin panel) ──
     if (action === 'unblock') {
-      const { userId, name } = body;
+      const { userId, name, nickname } = body;
       const now = new Date().toISOString();
+      
       if (userId) {
         await env.DB.prepare(
           `UPDATE users SET status='active', updated_at=? WHERE user_id=? AND status='blocked'`
         ).bind(now, userId).run();
         return ok({ success: true }, o);
-      } else if (name) {
-        const user = await env.DB.prepare(
-          `SELECT user_id, name, nickname FROM users WHERE (nickname LIKE ? OR name LIKE ?) AND status='blocked' LIMIT 1`
-        ).bind('%' + name + '%', '%' + name + '%').first();
-        if (!user) return ok({ success: false, message: 'ไม่พบผู้ใช้ที่ถูกบล็อค' }, o);
-        await env.DB.prepare(
-          `UPDATE users SET status='active', updated_at=? WHERE user_id=?`
-        ).bind(now, user.user_id).run();
-        return ok({ success: true, userId: user.user_id, name: user.name }, o);
       }
-      return err('Missing userId or name', 400, o);
+      
+      // ค้นหาจาก nickname ก่อน (ตรงตัว)
+      if (nickname) {
+        const user = await env.DB.prepare(
+          `SELECT user_id, name, nickname FROM users WHERE nickname = ? AND status='blocked' LIMIT 1`
+        ).bind(nickname).first();
+        
+        if (user) {
+          await env.DB.prepare(
+            `UPDATE users SET status='active', updated_at=? WHERE user_id=?`
+          ).bind(now, user.user_id).run();
+          return ok({ success: true, userId: user.user_id, name: user.name, nickname: user.nickname }, o);
+        }
+      }
+      
+      // ถ้าไม่เจอ nickname ให้ค้นหาจาก name หรือ nickname แบบ LIKE (ใช้ name ที่ส่งมา)
+      if (name) {
+        const user = await env.DB.prepare(
+          `SELECT user_id, name, nickname FROM users WHERE (name LIKE ? OR nickname LIKE ?) AND status='blocked' LIMIT 1`
+        ).bind('%' + name + '%', '%' + name + '%').first();
+        
+        if (user) {
+          await env.DB.prepare(
+            `UPDATE users SET status='active', updated_at=? WHERE user_id=?`
+          ).bind(now, user.user_id).run();
+          return ok({ success: true, userId: user.user_id, name: user.name, nickname: user.nickname }, o);
+        }
+      }
+      
+      return ok({ success: false, message: 'ไม่พบผู้ใช้ที่ถูกบล็อค' }, o);
     }
 
     return err('Invalid action', 400, o);
