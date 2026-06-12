@@ -10,7 +10,7 @@ export async function onRequestGet(context) {
     const secret = url.searchParams.get('secret');
     if (secret !== env.SELFBOT_SECRET) return err('Unauthorized', 403, o);
 
-    // ดึงเฉพาะ users ที่ status = 'blocked' พร้อม nickname
+    // ✅ แก้ไข: ดึง nickname และ phone ด้วย
     const { results } = await env.DB.prepare(`
       SELECT user_id, name, nickname, phone, status, updated_at
       FROM users
@@ -21,8 +21,8 @@ export async function onRequestGet(context) {
     return ok({
       users: results.map(u => ({
         user_id: u.user_id,
-        name: u.name,           // ชื่อจริงที่ใช้แสดง
-        nickname: u.nickname,   // ชื่อเล่นที่ admin ตั้ง (ใช้ค้นหาปลดบล็อค)
+        name: u.name,
+        nickname: u.nickname,      // ✅ ส่ง nickname กลับไป
         phone: u.phone,
         status: u.status,
         updated_at: u.updated_at
