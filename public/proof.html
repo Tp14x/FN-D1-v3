@@ -40,24 +40,45 @@
         .proof-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: center;
             border-bottom: 3px solid #1f8b4c;
             padding-bottom: 10px;
             margin-bottom: 22px;
         }
+        .proof-header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+            min-width: 0;
+        }
+        .proof-logo {
+            height: 75px;
+            width: auto;
+            max-width: 220px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
         .proof-title {
-            font-size: 34px;
+            font-size: 30px;
             font-weight: 700;
             color: #1f8b4c;
             letter-spacing: 3px;
             font-family: 'Prompt', sans-serif;
+            white-space: nowrap;
         }
         .proof-title small {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 400;
             color: #4a5a6e;
             letter-spacing: 0;
             margin-left: 8px;
+        }
+        .proof-header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
         }
         .proof-badge {
             font-size: 13px;
@@ -69,6 +90,7 @@
             border: 1.5px solid #1f8b4c;
             font-family: 'Prompt', sans-serif;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
         /* ===== รายละเอียด ===== */
@@ -165,7 +187,7 @@
             font-family: 'Prompt', sans-serif;
         }
 
-        /* สไตล์พิเศษสำหรับวันที่สั่งงานและวันที่ผลิต (อ่านอย่างเดียว) */
+        /* สไตล์พิเศษสำหรับวันที่สั่งงาน (อ่านอย่างเดียว) */
         .value .readonly-date {
             padding: 4px 6px;
             color: #1a1f36;
@@ -381,8 +403,11 @@
             .proof-paper { padding: 20px 18px; }
             .detail-grid { grid-template-columns: 1fr; gap: 4px; }
             .detail-item .label { min-width: 90px; font-size: 13px; }
-            .proof-title { font-size: 26px; }
-            .proof-title small { font-size: 15px; }
+            .proof-title { font-size: 22px; }
+            .proof-title small { font-size: 13px; display: block; margin-left: 0; }
+            .proof-logo { height: 50px; max-width: 140px; }
+            .proof-header { flex-wrap: wrap; gap: 8px; }
+            .proof-header-right { margin-left: auto; }
             .sig-item { min-width: 140px; }
             .sig-item .sig-line { width: 70px; }
             .detail-item .value .flatpickr-input { min-width: 100px; }
@@ -458,12 +483,16 @@
                 font-size: 15px;
                 padding: 10px 14px;
             }
+            .proof-logo {
+                height: 65px;
+                max-width: 180px;
+            }
             .proof-title {
-                font-size: 30px;
+                font-size: 26px;
                 color: #1f8b4c;
             }
             .proof-title small {
-                font-size: 16px;
+                font-size: 14px;
                 color: #4a5a6e;
             }
             .proof-badge {
@@ -526,10 +555,15 @@
 
     <!-- ===== HEADER ===== -->
     <div class="proof-header">
-        <div class="proof-title">
-            PROOF <small>ปรู๊บสั่งงาน</small>
+        <div class="proof-header-left">
+            <img src="https://i.ibb.co/mrWnz21c/logo-FN-01.png" alt="FirstNews Logo" class="proof-logo">
+            <div class="proof-title">
+                PROOF <small>ปรู๊บสั่งงาน</small>
+            </div>
         </div>
-        <div class="proof-badge">#firstnews</div>
+        <div class="proof-header-right">
+            <div class="proof-badge">#firstnews</div>
+        </div>
     </div>
 
     <!-- ===== รายละเอียด ===== -->
@@ -544,7 +578,7 @@
         </div>
         <div class="detail-item">
             <span class="label">วันที่ผลิต</span>
-            <span class="value"><span class="readonly-date" id="prodDateDisplay"></span></span>
+            <span class="value"><input type="text" id="prodDate" class="flatpickr-input" placeholder="วัน/เดือน/ปี" style="min-width:140px;"></span>
         </div>
         <div class="detail-item">
             <span class="label">ชุดติดตั้ง</span>
@@ -683,7 +717,6 @@
         const today = new Date();
         const todayDMY = formatDateToDMY(today);
         document.getElementById('orderDateDisplay').textContent = todayDMY;
-        document.getElementById('prodDateDisplay').textContent = todayDMY;
 
         // ---- ชุดติดตั้ง: ถ้าว่างให้เป็น "FirstNews" ----
         const batchInput = document.getElementById('batch');
@@ -693,6 +726,26 @@
             }
         });
         batchInput.placeholder = 'FirstNews';
+
+        // ---- Flatpickr สำหรับ วันที่ผลิต (รูปแบบ dd/mm/yyyy) ----
+        const prodDateInput = document.getElementById('prodDate');
+        flatpickr(prodDateInput, {
+            dateFormat: 'd/m/Y',
+            allowInput: true,
+            placeholder: 'วัน/เดือน/ปี',
+            defaultDate: today,
+            locale: {
+                firstDayOfWeek: 1,
+                weekdays: {
+                    shorthand: ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'],
+                    longhand: ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์']
+                },
+                months: {
+                    shorthand: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
+                    longhand: ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม']
+                }
+            }
+        });
 
         // ---- Flatpickr สำหรับ วันที่ติดตั้ง/ส่งงาน (รูปแบบ dd/mm/yyyy) ----
         const installDateInput = document.getElementById('installDate');
