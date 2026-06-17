@@ -27,13 +27,13 @@
         }
 
         .proof-paper {
-            max-width: 820px;
+            max-width: 860px;
             width: 100%;
             background: #ffffff;
-            padding: 30px 40px 30px 40px;
-            border-radius: 8px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.10);
-            border: 1px solid #dce1e9;
+            padding: 30px 35px 30px 35px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
         }
 
         /* ===== HEADER ===== */
@@ -43,7 +43,7 @@
             align-items: center;
             border-bottom: 3px solid #1f8b4c;
             padding-bottom: 10px;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
         .proof-header-left {
             display: flex;
@@ -93,29 +93,41 @@
             white-space: nowrap;
         }
 
-        /* ===== รายละเอียด ===== */
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px 30px;
-            margin-bottom: 14px;
+        /* ===== การ์ดข้อมูลหลัก (รวมทั้งหมด) ===== */
+        .main-card {
+            background: #fafcff;
+            border: 1.5px solid #e2e9f3;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            transition: 0.25s;
         }
-        .detail-item {
+        .main-card:hover {
+            border-color: #1f8b4c;
+            box-shadow: 0 2px 12px rgba(31, 139, 76, 0.08);
+        }
+
+        .main-card .info-row {
             display: flex;
             align-items: baseline;
-            padding: 5px 0;
+            padding: 4px 0;
             border-bottom: 1px solid #eef1f6;
         }
-        .detail-item .label {
+        .main-card .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .main-card .info-row .label {
             font-weight: 600;
-            color: #2d3a4f;
-            font-size: 16px;
+            color: #6b7d99;
+            font-size: 14px;
             min-width: 120px;
             flex-shrink: 0;
             font-family: 'Prompt', sans-serif;
         }
-        .detail-item .value {
-            font-size: 16px;
+
+        .main-card .info-row .value {
+            font-size: 15px;
             color: #1a1f36;
             padding: 4px 0;
             flex: 1;
@@ -123,26 +135,30 @@
             align-items: center;
             gap: 6px;
             flex-wrap: wrap;
+            font-family: 'Prompt', sans-serif;
         }
-        .detail-item .value input,
-        .detail-item .value select {
+
+        .main-card .info-row .value input,
+        .main-card .info-row .value select {
             border: none;
-            border-bottom: 1.5px solid #d0d7e2;
-            padding: 4px 6px;
-            font-size: 16px;
+            border-bottom: 1.5px solid #dce3ed;
+            padding: 3px 4px;
+            font-size: 15px;
             background: transparent;
             font-family: 'Prompt', sans-serif;
             color: #1a1f36;
             outline: none;
-            transition: 0.2s;
+            transition: 0.25s;
             width: 100%;
         }
-        .detail-item .value input:focus,
-        .detail-item .value select:focus {
+
+        .main-card .info-row .value input:focus,
+        .main-card .info-row .value select:focus {
             border-bottom-color: #1f8b4c;
-            border-bottom-width: 2.5px;
+            border-bottom-width: 2px;
         }
-        .detail-item .value select {
+
+        .main-card .info-row .value select {
             cursor: pointer;
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7a93' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
@@ -150,123 +166,195 @@
             background-position: right 6px center;
             padding-right: 28px;
         }
-        .detail-item .value select option[disabled] {
+
+        .main-card .info-row .value select option[disabled] {
             color: #999;
         }
-        .detail-item .value .inline-text {
-            padding: 4px 2px;
+
+        .main-card .info-row .value .readonly-text {
+            padding: 3px 4px;
+            color: #1a1f36;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .main-card .info-row .value .inline-text {
             color: #7a8aa8;
-            font-size: 15px;
+            font-size: 14px;
             font-family: 'Prompt', sans-serif;
         }
-        .detail-item .value .hint-text {
+
+        .main-card .info-row .value .hint-text {
             color: #aab5c9;
-            font-size: 14px;
+            font-size: 13px;
             font-family: 'Prompt', sans-serif;
             white-space: nowrap;
         }
-        .detail-item .value .flatpickr-input {
-            min-width: 140px;
+
+        .main-card .info-row .value .flatpickr-input {
             cursor: pointer;
             background: transparent;
             font-family: 'Prompt', sans-serif;
-            font-size: 16px;
-        }
-        .detail-item .value .flatpickr-input::placeholder {
-            color: #b0becf;
-            font-family: 'Prompt', sans-serif;
-        }
-        .detail-item .value .flatpickr-time-input {
-            min-width: 100px;
-            cursor: pointer;
-            background: transparent;
-            font-family: 'Prompt', sans-serif;
-            font-size: 16px;
-        }
-        .detail-item .value .flatpickr-time-input::placeholder {
-            color: #b0becf;
-            font-family: 'Prompt', sans-serif;
-        }
-        .value .readonly-date {
-            padding: 4px 6px;
-            color: #1a1f36;
-            font-weight: 500;
-            font-family: 'Prompt', sans-serif;
-            font-size: 16px;
+            font-size: 15px;
+            border: none;
+            border-bottom: 1.5px solid #dce3ed;
+            padding: 3px 4px;
+            width: 100%;
+            outline: none;
+            transition: 0.25s;
         }
 
-        .full-row {
-            grid-column: 1 / -1;
+        .main-card .info-row .value .flatpickr-input:focus {
+            border-bottom-color: #1f8b4c;
+            border-bottom-width: 2px;
+        }
+
+        .main-card .info-row .value .flatpickr-input::placeholder {
+            color: #b0becf;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .main-card .info-row .value .flatpickr-time-input {
+            cursor: pointer;
+            background: transparent;
+            font-family: 'Prompt', sans-serif;
+            font-size: 15px;
+            border: none;
+            border-bottom: 1.5px solid #dce3ed;
+            padding: 3px 4px;
+            width: 100%;
+            outline: none;
+            transition: 0.25s;
+        }
+
+        .main-card .info-row .value .flatpickr-time-input:focus {
+            border-bottom-color: #1f8b4c;
+            border-bottom-width: 2px;
+        }
+
+        .main-card .info-row .value .flatpickr-time-input::placeholder {
+            color: #b0becf;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .main-card .info-row .value.flex-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .main-card .info-row .value.flex-row input {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .main-card .info-row .value.flex-row .flatpickr-input {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .main-card .info-row .value.flex-row .flatpickr-time-input {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        /* แยกซ้าย-ขวา */
+        .main-card .row-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 30px;
+        }
+        .main-card .row-split .info-row {
+            border-bottom: 1px solid #eef1f6;
+        }
+        .main-card .row-split .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .main-card .row-split .info-row .label {
+            min-width: 100px;
         }
 
         /* ===== ตารางวัสดุ ===== */
         .table-section {
             margin: 16px 0 14px 0;
-            border: 1.5px solid #e2e7ef;
-            border-radius: 8px;
+            border: 1.5px solid #e2e9f3;
+            border-radius: 10px;
             overflow: hidden;
+            transition: 0.25s;
         }
+        .table-section:hover {
+            border-color: #1f8b4c;
+        }
+
         .table-section table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 16px;
+            font-size: 15px;
             font-family: 'Prompt', sans-serif;
         }
+
         .table-section th {
-            background: #f5f8fc;
+            background: #f5f9ff;
             color: #1f2a41;
             font-weight: 600;
             padding: 10px 16px;
             text-align: left;
-            border-bottom: 2px solid #dce3ec;
-            font-size: 16px;
+            border-bottom: 1.5px solid #dce3ed;
+            font-size: 15px;
             font-family: 'Prompt', sans-serif;
         }
+
         .table-section td {
             padding: 6px 16px;
             border-bottom: 1px solid #eef1f6;
         }
+
         .table-section td input {
             width: 100%;
             border: none;
-            border-bottom: 1.5px solid #d0d7e2;
+            border-bottom: 1.5px solid #dce3ed;
             padding: 6px 4px;
-            font-size: 16px;
+            font-size: 15px;
             background: transparent;
             font-family: 'Prompt', sans-serif;
             outline: none;
-            transition: 0.2s;
+            transition: 0.25s;
         }
+
         .table-section td input:focus {
             border-bottom-color: #1f8b4c;
-            border-bottom-width: 2.5px;
+            border-bottom-width: 2px;
         }
+
         .table-section .add-row-btn {
-            margin: 12px 0 12px 16px;
+            margin: 10px 0 10px 16px;
             background: transparent;
             border: 1.5px dashed #8a9bb5;
-            padding: 6px 22px;
+            padding: 6px 20px;
             border-radius: 30px;
             font-weight: 600;
             font-size: 14px;
             color: #2d4a6b;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.25s;
             font-family: 'Prompt', sans-serif;
         }
+
         .table-section .add-row-btn:hover {
             border-color: #1f8b4c;
             color: #1f8b4c;
             background: #f0f9f4;
         }
 
-        /* ===== พื้นที่รูปภาพ (ใส่ได้ภาพเดียว อยู่ตรงกลาง) ===== */
+        /* ===== พื้นที่รูปภาพ ===== */
         .image-area {
-            border: 2px dashed #c5d0df;
+            border: 1.5px dashed #c5d0df;
             border-radius: 10px;
             padding: 15px;
             margin: 14px 0 12px 0;
-            background: #fafbfd;
+            background: #fafcff;
             text-align: center;
             min-height: 280px;
             display: flex;
@@ -274,28 +362,31 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.25s;
             position: relative;
         }
+
         .image-area:hover {
             border-color: #1f8b4c;
             background: #f6fcf9;
         }
+
         .image-area .placeholder-text {
             color: #7a8aa8;
             font-size: 18px;
             font-family: 'Prompt', sans-serif;
         }
+
         .image-area .placeholder-text strong {
             color: #2d4a6b;
         }
+
         .image-area .placeholder-text .sub-text {
             font-size: 14px;
             color: #8a9bb5;
             font-family: 'Prompt', sans-serif;
         }
 
-        /* รูปภาพที่แสดง */
         .image-area .preview-image-container {
             width: 100%;
             height: 100%;
@@ -305,6 +396,7 @@
             justify-content: center;
             position: relative;
         }
+
         .image-area .preview-image-container img {
             max-width: 100%;
             max-height: 350px;
@@ -314,7 +406,6 @@
             border-radius: 6px;
         }
 
-        /* ปุ่มลบรูป */
         .image-area .remove-image-btn {
             position: absolute;
             top: 8px;
@@ -330,9 +421,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: 0.2s;
+            transition: 0.25s;
             z-index: 10;
         }
+
         .image-area .remove-image-btn:hover {
             background: red;
             transform: scale(1.1);
@@ -346,6 +438,7 @@
         .comment-section {
             margin: 12px 0 16px 0;
         }
+
         .comment-section label {
             font-weight: 600;
             font-size: 16px;
@@ -354,25 +447,28 @@
             margin-bottom: 4px;
             font-family: 'Prompt', sans-serif;
         }
+
         .comment-section textarea {
             width: 100%;
             padding: 12px 16px;
-            border: 1.5px solid #d0d7e2;
-            border-radius: 8px;
+            border: 1.5px solid #dce3ed;
+            border-radius: 10px;
             font-size: 18px;
             font-family: 'Prompt', sans-serif;
-            background: #fafbfc;
-            transition: 0.2s;
+            background: #fafcff;
+            transition: 0.25s;
             resize: vertical;
             min-height: 80px;
             line-height: 1.7;
         }
+
         .comment-section textarea:focus {
             border-color: #1f8b4c;
             outline: none;
-            box-shadow: 0 0 0 4px rgba(31,139,76,0.10);
+            box-shadow: 0 0 0 3px rgba(31, 139, 76, 0.10);
             background: white;
         }
+
         .comment-section textarea::placeholder {
             color: #aab5c9;
             font-size: 17px;
@@ -386,9 +482,10 @@
             justify-content: space-between;
             margin-top: 20px;
             padding-top: 16px;
-            border-top: 2px solid #e2e7ef;
+            border-top: 1.5px solid #e2e9f3;
             gap: 8px 15px;
         }
+
         .sig-item {
             display: flex;
             align-items: center;
@@ -400,6 +497,7 @@
             font-family: 'Prompt', sans-serif;
             line-height: 1.4;
         }
+
         .sig-item .sig-label {
             font-weight: 600;
             white-space: nowrap;
@@ -408,6 +506,7 @@
             line-height: 1.4;
             padding-bottom: 2px;
         }
+
         .sig-item .sig-line {
             display: inline-block;
             width: 140px;
@@ -429,22 +528,23 @@
             font-size: 20px;
             margin-top: 20px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.25s;
             width: 100%;
             letter-spacing: 0.8px;
             font-family: 'Prompt', sans-serif;
         }
+
         .btn-print:hover {
             background: #15703d;
             transform: scale(1.01);
-            box-shadow: 0 6px 24px rgba(31,139,76,0.35);
+            box-shadow: 0 6px 20px rgba(31, 139, 76, 0.30);
         }
 
         /* ===== Responsive ===== */
         @media (max-width: 680px) {
             .proof-paper { padding: 16px 14px; }
-            .detail-grid { grid-template-columns: 1fr; gap: 4px; }
-            .detail-item .label { min-width: 90px; font-size: 14px; }
+            .main-card .row-split { grid-template-columns: 1fr; gap: 0; }
+            .main-card .info-row .label { min-width: 90px; font-size: 13px; }
             .proof-title { font-size: 20px; }
             .proof-title small { font-size: 12px; display: block; margin-left: 0; }
             .proof-logo { height: 40px; max-width: 110px; }
@@ -452,17 +552,16 @@
             .proof-header-right { margin-left: auto; }
             .sig-item { min-width: 150px; font-size: 14px; }
             .sig-item .sig-line { width: 90px; }
-            .detail-item .value .flatpickr-input { min-width: 100px; }
-            .detail-item .value .flatpickr-time-input { min-width: 80px; }
             .image-area { min-height: 200px; }
             .image-area .preview-image-container img { max-height: 250px; }
+            .main-card { padding: 12px 14px; }
         }
 
         /* ===== CSS สำหรับการพิมพ์ A4 ===== */
         @media print {
             @page {
                 size: A4;
-                margin: 12mm 14mm;
+                margin: 10mm 12mm;
             }
 
             body {
@@ -470,6 +569,7 @@
                 padding: 0;
                 margin: 0;
             }
+
             .proof-paper {
                 box-shadow: none;
                 border: none;
@@ -477,9 +577,23 @@
                 border-radius: 0;
                 max-width: 100%;
             }
+
             .btn-print { display: none !important; }
             .add-row-btn { display: none !important; }
             .image-area .remove-image-btn { display: none !important; }
+
+            .main-card:hover {
+                border-color: #e2e9f3;
+                box-shadow: none;
+            }
+            .main-card {
+                border: 1px solid #e5e9f0;
+                padding: 10px 14px;
+            }
+            .main-card .info-row {
+                border-bottom: 1px solid #e5e9f0;
+                padding: 3px 0;
+            }
 
             .comment-section textarea::placeholder {
                 color: transparent !important;
@@ -503,7 +617,7 @@
 
             .image-area {
                 border: 1.5px solid #ccc;
-                min-height: 120px;
+                min-height: 100px;
                 background: white;
                 cursor: default;
                 padding: 10px;
@@ -519,14 +633,37 @@
                 max-height: 280px;
             }
 
-            .detail-item {
-                border-bottom: 1px solid #e5e9f0;
-                padding: 3px 0;
+            .main-card .info-row .label {
+                font-size: 13px;
+                min-width: 100px;
+                color: #555;
             }
-            .detail-item .value input,
-            .detail-item .value select {
-                border-bottom: 1.5px solid #999;
+            .main-card .info-row .value {
                 font-size: 14px;
+            }
+            .main-card .info-row .value input,
+            .main-card .info-row .value select {
+                font-size: 14px;
+                border-bottom: 1.5px solid #999;
+            }
+            .main-card .info-row .value .flatpickr-input {
+                font-size: 14px;
+                border-bottom: 1.5px solid #999;
+            }
+            .main-card .info-row .value .flatpickr-time-input {
+                font-size: 14px;
+                border-bottom: 1.5px solid #999;
+            }
+            .main-card .info-row .value .hint-text {
+                display: none;
+            }
+
+            .table-section {
+                border: 1px solid #d0d7e2;
+                border-radius: 6px;
+            }
+            .table-section:hover {
+                border-color: #d0d7e2;
             }
             .table-section td input {
                 border-bottom: 1.5px solid #999;
@@ -540,6 +677,7 @@
             .table-section td {
                 padding: 4px 12px;
             }
+
             .comment-section textarea {
                 border: 1.5px solid #999;
                 background: white;
@@ -547,6 +685,7 @@
                 font-size: 16px;
                 padding: 8px 12px;
             }
+
             .proof-logo {
                 height: 55px;
                 max-width: 160px;
@@ -571,39 +710,14 @@
                 padding-bottom: 6px;
                 margin-bottom: 12px;
             }
-            .detail-item .label {
-                font-size: 14px;
-                min-width: 110px;
-            }
-            .detail-item .value {
-                font-size: 14px;
-            }
-            .detail-item .value .hint-text {
-                display: none;
-            }
-            .table-section {
-                border-color: #d0d7e2;
-                border-radius: 6px;
-            }
-            .flatpickr-input,
-            .flatpickr-time-input {
-                color: #1a1f36 !important;
-                font-size: 14px !important;
-            }
-            .detail-grid {
-                gap: 2px 20px;
-            }
             .comment-section label {
                 font-size: 14px;
             }
             .signature-row {
                 margin-top: 14px;
                 padding-top: 12px;
-                border-top: 2px solid #dce1e9;
+                border-top: 1.5px solid #dce1e9;
                 gap: 6px 12px;
-            }
-            .value .readonly-date {
-                font-size: 14px !important;
             }
             .table-section table {
                 font-size: 14px;
@@ -614,16 +728,7 @@
             .table-section td input {
                 font-size: 14px;
             }
-            .detail-item .value .flatpickr-input {
-                font-size: 14px;
-            }
-            .detail-item .value .flatpickr-time-input {
-                font-size: 14px;
-            }
-            .detail-item .value input {
-                font-size: 14px;
-            }
-            .detail-item .value select {
+            .main-card .info-row .value .readonly-text {
                 font-size: 14px;
             }
         }
@@ -646,73 +751,98 @@
         </div>
     </div>
 
-    <!-- ===== รายละเอียด ===== -->
-    <div class="detail-grid">
-        <div class="detail-item">
-            <span class="label">ชื่องาน</span>
-            <span class="value"><input type="text" id="jobName" placeholder=""></span>
+    <!-- ===== การ์ดข้อมูลหลัก (รวมทั้งหมด) ===== -->
+    <div class="main-card">
+
+        <!-- แถวที่ 1: ชื่องาน + วันที่สั่งงาน -->
+        <div class="row-split">
+            <div class="info-row">
+                <span class="label">ชื่องาน</span>
+                <span class="value"><input type="text" id="jobName" placeholder=""></span>
+            </div>
+            <div class="info-row">
+                <span class="label">วันที่สั่งงาน</span>
+                <span class="value"><span class="readonly-text" id="orderDateDisplay"></span></span>
+            </div>
         </div>
-        <div class="detail-item">
-            <span class="label">วันที่สั่งงาน</span>
-            <span class="value"><span class="readonly-date" id="orderDateDisplay"></span></span>
+
+        <!-- แถวที่ 2: วันที่ผลิต + ชุดติดตั้ง -->
+        <div class="row-split">
+            <div class="info-row">
+                <span class="label">วันที่ผลิต</span>
+                <span class="value"><input type="text" id="prodDate" class="flatpickr-input" placeholder="วัน/เดือน/ปี"></span>
+            </div>
+            <div class="info-row">
+                <span class="label">ชุดติดตั้ง</span>
+                <span class="value"><input type="text" id="batch" placeholder="FirstNews"></span>
+            </div>
         </div>
-        <div class="detail-item">
-            <span class="label">วันที่ผลิต</span>
-            <span class="value"><input type="text" id="prodDate" class="flatpickr-input" placeholder="วัน/เดือน/ปี" style="min-width:140px;"></span>
+
+        <!-- แถวที่ 3: ลูกค้า + AE -->
+        <div class="row-split">
+            <div class="info-row">
+                <span class="label">ลูกค้า</span>
+                <span class="value"><input type="text" id="customer" placeholder=""></span>
+            </div>
+            <div class="info-row">
+                <span class="label">AE</span>
+                <span class="value">
+                    <select id="ae">
+                        <option value="" disabled selected>-- เลือก AE --</option>
+                        <option value="พิมพ์">พิมพ์</option>
+                        <option value="เหมียว">เหมียว</option>
+                    </select>
+                </span>
+            </div>
         </div>
-        <div class="detail-item">
-            <span class="label">ชุดติดตั้ง</span>
-            <span class="value"><input type="text" id="batch" placeholder="FirstNews"></span>
+
+        <!-- แถวที่ 4: ใบเสนอราคาเลขที่ + กราฟฟิก -->
+        <div class="row-split">
+            <div class="info-row">
+                <span class="label">ใบเสนอราคาเลขที่</span>
+                <span class="value"><input type="text" id="quotation" placeholder=""></span>
+            </div>
+            <div class="info-row">
+                <span class="label">กราฟฟิก</span>
+                <span class="value">
+                    <select id="graphic">
+                        <option value="" disabled selected>-- เลือกกราฟฟิก --</option>
+                        <option value="แต๊งค์">แต๊งค์</option>
+                        <option value="ยอด">ยอด</option>
+                    </select>
+                </span>
+            </div>
         </div>
-        <div class="detail-item">
-            <span class="label">ลูกค้า</span>
-            <span class="value"><input type="text" id="customer" placeholder=""></span>
-        </div>
-        <div class="detail-item">
-            <span class="label">AE</span>
-            <span class="value">
-                <select id="ae">
-                    <option value="" disabled selected>-- เลือก AE --</option>
-                    <option value="พิมพ์">พิมพ์</option>
-                    <option value="เหมียว">เหมียว</option>
-                </select>
-            </span>
-        </div>
-        <div class="detail-item">
-            <span class="label">ใบเสนอราคาเลขที่</span>
-            <span class="value"><input type="text" id="quotation" placeholder=""></span>
-        </div>
-        <div class="detail-item">
-            <span class="label">กราฟฟิก</span>
-            <span class="value">
-                <select id="graphic">
-                    <option value="" disabled selected>-- เลือกกราฟฟิก --</option>
-                    <option value="แต๊งค์">แต๊งค์</option>
-                    <option value="ยอด">ยอด</option>
-                </select>
-            </span>
-        </div>
-        <div class="detail-item full-row">
+
+        <!-- แถวที่ 5: สถานที่ส่ง/ติดตั้ง (เต็มแถว) -->
+        <div class="info-row">
             <span class="label">สถานที่ส่ง/ติดตั้ง</span>
             <span class="value"><input type="text" id="location" placeholder=""></span>
         </div>
-        <div class="detail-item">
-            <span class="label">วันที่ติดตั้ง/ส่งงาน</span>
-            <span class="value"><input type="text" id="installDate" class="flatpickr-input" placeholder="วัน/เดือน/ปี" style="min-width:140px;"></span>
+
+        <!-- แถวที่ 6: วันที่ติดตั้ง/ส่งงาน + เวลาติดตั้ง/ส่งงาน -->
+        <div class="row-split">
+            <div class="info-row">
+                <span class="label">วันที่ติดตั้ง/ส่งงาน</span>
+                <span class="value"><input type="text" id="installDate" class="flatpickr-input" placeholder="วัน/เดือน/ปี"></span>
+            </div>
+            <div class="info-row">
+                <span class="label">เวลาติดตั้ง/ส่งงาน</span>
+                <span class="value"><input type="text" id="installTime" class="flatpickr-time-input" placeholder="HH:MM"></span>
+            </div>
         </div>
-        <div class="detail-item">
-            <span class="label">เวลาติดตั้ง/ส่งงาน</span>
-            <span class="value"><input type="text" id="installTime" class="flatpickr-time-input" placeholder="HH:MM" style="min-width:100px;"></span>
-        </div>
-        <div class="detail-item full-row" style="border-bottom: 1px solid #eef1f6;">
-            <span class="label" style="min-width:120px;">วัน/เวลารื้อถอน</span>
-            <span class="value" style="display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
-                <input type="text" id="dismantleDate" class="flatpickr-input" placeholder="วัน/เดือน/ปี" style="min-width:130px; width:auto; flex:0 1 auto;">
+
+        <!-- แถวที่ 7: วัน/เวลารื้อถอน (เต็มแถว) -->
+        <div class="info-row">
+            <span class="label">วัน/เวลารื้อถอน</span>
+            <span class="value flex-row">
+                <input type="text" id="dismantleDate" class="flatpickr-input" placeholder="วัน/เดือน/ปี" style="flex:1; min-width:100px;">
                 <span class="inline-text">เวลา</span>
-                <input type="text" id="dismantleTime" class="flatpickr-time-input" placeholder="HH:MM" style="min-width:90px; width:auto; flex:0 1 auto;">
+                <input type="text" id="dismantleTime" class="flatpickr-time-input" placeholder="HH:MM" style="flex:1; min-width:80px;">
                 <span class="hint-text">(ไม่ต้องกรอกก็ได้)</span>
             </span>
         </div>
+
     </div>
 
     <!-- ===== ตารางวัสดุ ===== -->
@@ -736,7 +866,7 @@
         <button class="add-row-btn" id="addRowBtn">+ เพิ่มวัสดุ</button>
     </div>
 
-    <!-- ===== พื้นที่รูปภาพ (ใส่ได้ภาพเดียว อยู่ตรงกลาง ขนาดเต็มช่อง) ===== -->
+    <!-- ===== พื้นที่รูปภาพ ===== -->
     <div class="image-area" id="imageDropArea">
         <div id="imagePlaceholder" class="placeholder-text">
             <strong>📸 คลิกเพื่อเพิ่มภาพตัวอย่าง</strong><br>
@@ -890,7 +1020,7 @@
             defaultMinute: 0
         });
 
-        // ---- จัดการรูปภาพ (ใส่ได้ภาพเดียว อยู่ตรงกลาง ขนาดเต็ม) ----
+        // ---- จัดการรูปภาพ ----
         const dropArea = document.getElementById('imageDropArea');
         const fileInput = document.getElementById('fileInput');
         const placeholder = document.getElementById('imagePlaceholder');
@@ -898,14 +1028,12 @@
         const previewImage = document.getElementById('previewImage');
         const removeBtn = document.getElementById('removeImageBtn');
 
-        // แสดงรูป
         function showImage(src) {
             previewImage.src = src;
             previewContainer.style.display = 'flex';
             placeholder.style.display = 'none';
         }
 
-        // ซ่อนรูป (กลับไปที่ placeholder)
         function hideImage() {
             previewContainer.style.display = 'none';
             placeholder.style.display = 'block';
@@ -913,19 +1041,16 @@
             fileInput.value = '';
         }
 
-        // ลบรูป
         removeBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             hideImage();
         });
 
-        // คลิกที่ area -> เลือกไฟล์
         dropArea.addEventListener('click', function(e) {
             if (e.target.closest('.remove-image-btn')) return;
             fileInput.click();
         });
 
-        // เลือกไฟล์แล้ว
         fileInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file && file.type.startsWith('image/')) {
@@ -941,7 +1066,6 @@
             this.value = '';
         });
 
-        // Drag and Drop
         dropArea.addEventListener('dragover', function(e) {
             e.preventDefault();
             dropArea.style.borderColor = '#1f8b4c';
@@ -950,12 +1074,12 @@
         dropArea.addEventListener('dragleave', function(e) {
             e.preventDefault();
             dropArea.style.borderColor = '#c5d0df';
-            dropArea.style.background = '#fafbfd';
+            dropArea.style.background = '#fafcff';
         });
         dropArea.addEventListener('drop', function(e) {
             e.preventDefault();
             dropArea.style.borderColor = '#c5d0df';
-            dropArea.style.background = '#fafbfd';
+            dropArea.style.background = '#fafcff';
             const file = e.dataTransfer.files[0];
             if (file && file.type.startsWith('image/')) {
                 const reader = new FileReader();
