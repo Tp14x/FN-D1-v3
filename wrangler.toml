@@ -21,5 +21,5 @@ ALLOWED_ORIGIN = "https://fn-car.pages.dev"
 # คำสั่งรันเพื่อหาลิ้งค์ cloudflared tunnel --url http://localhost:5000
 # กรอก URL ที่ได้มาจาก cloudflared tunnel เช่น http://****.trycloudflare.com (ย้ำ!! หากรันใหม่ลิ้งที่ได้มาจะไม่มี---> /webhook ต่อท้าย <--- ต้องเขียนต่อท้ายเองเท่านั้น *ถ้าไม่มี เมื่อกดบันทึกการใช้งานรถหรือคืนรถ flex จะไม่แจ้งเตือนเข้าไลน์กลุ่ม*)
 # และ secret key สำหรับยืนยันว่า request มาจากเว็บจริงๆ
-SELFBOT_WEBHOOK_URL = "https://ready-photograph-announced-wrapping.trycloudflare.com /webhook" #<------- เอาลิ้งค์ที่ได้มาใส่ตรงนี้ พร้อมกับเติมคำว่า /webhook
+SELFBOT_WEBHOOK_URL = "https://ready-photograph-announced-wrapping.trycloudflare.com/webhook" #<------- เอาลิ้งค์ที่ได้มาใส่ตรงนี้ พร้อมกับเติมคำว่า /webhook
 SELFBOT_SECRET = "MyCarBot2026!"
