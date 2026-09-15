@@ -7,357 +7,720 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-/* ══════════════════════════════════════════════════════════════════
-   DESIGN CONCEPT — "Guided Check-out"
-   Minimal black / white / gray. The booking form reads like a short
-   guided conversation: a question bubble, then an answer card, then
-   a "next" nudge — instead of one long stacked form. Calm, low on
-   decoration, high on clarity.
-══════════════════════════════════════════════════════════════════ */
-
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TOKENS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 :root{
-  --bg:#f7faf7; --surface:#ffffff; --surface-2:#eef6f0; --surface-3:#e1eee4;
-  --border:rgba(63,107,82,.14); --border-strong:rgba(63,107,82,.24); --hair:rgba(95,174,124,.4);
-  --text-primary:#1f2e24; --text-secondary:#55665b; --text-muted:#8a978c;
+  --mint-50:#f0fdf6; --mint-100:#dcfcec; --mint-200:#b8f5d4;
+  --mint-300:#82edb3; --mint-400:#4ddd8e; --mint-500:#25c96e;
+  --mint-600:#18a857; --mint-700:#148543; --mint-800:#116637;
 
-  --gold-dark:#3f7a58; --gold:#5fae7c; --gold-light:#d9f0e0; --gold-glow:rgba(95,174,124,.28);
-  --mint-300:#bfe6cc; --mint-400:#5fae7c; --mint-600:#3f7a58; --forest-500:#5fae7c; --forest-600:#3f7a58;
+  --sage-50:#f5faf6; --sage-100:#eaf4ed; --sage-200:#d4e9d9;
+  --sage-400:#88b894; --sage-600:#4d7a59;
 
-  --ok:#2e7d46; --ok-l:rgba(46,125,70,.1);
-  --amber:#a97a12; --amber-l:rgba(169,122,18,.1);
-  --red:#c23b34; --red-l:rgba(194,59,52,.09);
-  --blue:#3568b0; --blue-l:rgba(53,104,176,.09);
+  --neutral-0:#ffffff; --neutral-50:#f9fbfa;
+  --neutral-100:#f2f6f3; --neutral-200:#e5ede7;
+  --neutral-300:#cddacf; --neutral-400:#a3b9a6;
+  --neutral-500:#6e8872; --neutral-600:#4a6050;
+  --neutral-700:#2d3d30; --neutral-800:#1a2b1d;
 
-  --primary:var(--gold);
-  --primary-light:var(--gold-glow);
+  --red:#ef4444; --red-l:#fef2f2;
+  --amber:#f59e0b; --amber-l:#fffbeb;
+  --blue:#3b82f6; --blue-l:#eff6ff;
+  --blue-d:#1d4ed8;
 
-  --r1:6px; --r2:10px; --r3:13px; --r4:16px; --r5:20px; --r6:26px; --rFull:999px;
-  --shadow-xs:0 1px 2px rgba(0,0,0,.04);
-  --shadow-sm:0 2px 8px rgba(0,0,0,.06);
-  --shadow-md:0 6px 18px rgba(0,0,0,.08);
-  --shadow-lg:0 14px 36px rgba(0,0,0,.12);
-  --shadow-xl:0 22px 54px rgba(0,0,0,.18);
-  --ease:cubic-bezier(.22,1,.36,1);
+  --bg:var(--mint-50);
+  --surface:var(--neutral-0);
+  --surface-raised:var(--neutral-0);
+  --border:var(--neutral-200);
+  --border-soft:var(--neutral-100);
+  --text-primary:var(--neutral-800);
+  --text-secondary:var(--neutral-600);
+  --text-muted:var(--neutral-500);
+  --primary:var(--mint-600);
+  --primary-hover:var(--mint-700);
+  --primary-light:var(--mint-100);
+
+  --r1:6px; --r2:10px; --r3:14px; --r4:18px; --r5:24px; --r6:32px; --rFull:999px;
+  --shadow-xs:0 1px 2px rgba(0,50,20,.06);
+  --shadow-sm:0 2px 6px rgba(0,50,20,.08);
+  --shadow-md:0 4px 16px rgba(0,50,20,.10);
+  --shadow-lg:0 8px 32px rgba(0,50,20,.13);
+  --shadow-xl:0 16px 48px rgba(0,50,20,.16);
 }
 
-*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   RESET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+*{box-sizing:border-box;margin:0;padding:0;}
 html{-webkit-text-size-adjust:100%;height:100%;}
 body{
   font-family:'IBM Plex Sans Thai',sans-serif;
   background:var(--bg);color:var(--text-primary);
   min-height:100%;line-height:1.55;
   -webkit-tap-highlight-color:transparent;
-  overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
 }
-:focus-visible{outline:2px solid var(--gold-dark);outline-offset:2px;}
-@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;}}
-button,input,select,textarea{font-family:inherit;}
-.eyebrow{text-transform:uppercase;letter-spacing:1.2px;font-size:10.5px;font-weight:600;color:var(--text-muted);}
 
-/* ── LOADING ── */
-#appLoading{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#fff;}
-.ld-ring{width:80px;height:80px;border-radius:50%;border:1px solid var(--hair);display:flex;align-items:center;justify-content:center;position:relative;}
-.ld-ring::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:2px solid transparent;border-top-color:var(--gold-dark);animation:ldSpin 1s linear infinite;}
-@keyframes ldSpin{to{transform:rotate(360deg);}}
-.ld-car{font-size:26px;color:var(--gold-dark);}
-.ld-text{font-size:17px;font-weight:700;color:var(--text-primary);letter-spacing:-.2px;}
-.ld-sub{font-size:12px;color:var(--text-muted);}
-.ld-track{width:80px;height:2px;background:var(--border-strong);overflow:hidden;}
-.ld-track-fill{height:100%;background:linear-gradient(90deg,var(--gold-dark),var(--gold));animation:ldFill 1.4s ease-in-out infinite;}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   LOADING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#appLoading{
+  position:fixed;inset:0;z-index:9999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  background:linear-gradient(145deg,#e8f8ee 0%,#f4fcf7 40%,#daf5e8 100%);
+}
+.ld-car{
+  font-size:52px;
+  animation:ldBounce 1.4s cubic-bezier(.36,.07,.19,.97) infinite;
+}
+@keyframes ldBounce{
+  0%,100%{transform:translateY(0) scaleX(1);}
+  40%{transform:translateY(-18px) scaleX(1.06);}
+  60%{transform:translateY(-10px) scaleX(.97);}
+}
+.ld-track{
+  width:64px;height:5px;border-radius:99px;
+  background:var(--mint-200);overflow:hidden;
+}
+.ld-track-fill{
+  height:100%;background:linear-gradient(90deg,var(--mint-500),var(--mint-400));
+  border-radius:99px;animation:ldFill 1.4s ease-in-out infinite;
+}
 @keyframes ldFill{0%{width:0;transform:translateX(0)}70%{width:100%}100%{width:100%;transform:translateX(100%);opacity:0}}
+.ld-text{font-size:17px;font-weight:600;color:var(--mint-700);letter-spacing:-.2px;}
+.ld-sub{font-size:13px;color:var(--neutral-500);}
 
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SCREENS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .screen{display:none!important;}
 .screen.active{display:block!important;}
 #screen-pending.active,#screen-suspended.active,#screen-car-in-use.active{display:flex!important;}
 
-/* ── TOP BAR ── */
-.topbar{position:sticky;top:0;z-index:300;height:54px;padding:0 16px;display:flex;align-items:center;gap:11px;background:rgba(250,250,250,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
-.tb-mark{width:28px;height:28px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--gold-dark),var(--gold));display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;}
-.tb-word{font-size:15px;font-weight:700;color:var(--text-primary);letter-spacing:-.2px;flex:1;}
-.tb-hist{font-size:11.5px;font-weight:600;color:var(--text-secondary);background:var(--surface-2);border:1px solid var(--border);padding:7px 13px;border-radius:var(--rFull);text-decoration:none;display:flex;align-items:center;gap:6px;white-space:nowrap;}
-.tb-hist:active{border-color:var(--gold);color:var(--gold-dark);}
-.tb-av{width:28px;height:28px;border-radius:50%;flex-shrink:0;cursor:pointer;background:var(--surface-2);border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-primary);overflow:hidden;}
-.tb-av img{width:100%;height:100%;object-fit:cover;}
-
-.page-wrap{max-width:520px;margin:0 auto;padding:16px 14px 132px;}
-
-/* ── USER PANEL ── */
-.pass{position:relative;background:linear-gradient(135deg,var(--gold-dark),var(--gold));border-radius:var(--r4);padding:19px 20px;color:#fff;box-shadow:0 10px 24px rgba(95,174,124,.22);}
-.pass-row{display:flex;align-items:center;gap:12px;}
-.pass-avatar{width:48px;height:48px;border-radius:50%;flex-shrink:0;overflow:hidden;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:18px;}
-.pass-avatar img{width:100%;height:100%;object-fit:cover;}
-.pass-id{flex:1;min-width:0;}
-.pass-greet{font-size:11px;color:rgba(255,255,255,.55);}
-.pass-name{font-size:18px;font-weight:700;letter-spacing:-.2px;margin-top:1px;}
-.pass-dept{margin-top:6px;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:3px 10px;font-size:10.5px;font-weight:600;}
-.pass-tag{flex-shrink:0;text-align:right;}
-.pass-tag .dot{width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block;margin-right:5px;}
-.pass-tag .lbl{font-size:9.5px;color:rgba(255,255,255,.6);}
-.pass-perf{margin-top:14px;border-top:1px solid rgba(255,255,255,.14);}
-.pass-foot{display:flex;justify-content:space-between;padding-top:11px;font-size:10px;color:rgba(255,255,255,.5);}
-.pass-foot b{color:#fff;font-weight:700;}
-
-/* ── SECTION HEAD ── */
-.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:24px 3px 11px;}
-.sec-head h2{font-size:12.5px;font-weight:700;color:var(--text-primary);text-transform:uppercase;letter-spacing:1.2px;}
-.sec-head h2 i{color:var(--gold);margin-right:7px;font-size:11px;}
-.sec-head span{font-size:11px;color:var(--text-muted);background:var(--surface-2);border-radius:99px;padding:2px 9px;}
-
-/* ── HISTORY RAIL ── */
-#userHistorySection{display:flex;gap:9px;overflow-x:auto;padding:2px 2px 10px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;
-  mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 14px),transparent 100%);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 14px),transparent 100%);}
-#userHistorySection::-webkit-scrollbar{display:none;}
-.hist-empty{flex:1;padding:24px 12px;text-align:center;color:var(--text-muted);font-size:13px;background:var(--surface);border:1px dashed var(--border-strong);border-radius:var(--r4);}
-.hist-row{scroll-snap-align:start;flex:0 0 auto;width:172px;display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);padding:12px 13px;position:relative;}
-.hist-pip{width:6px;height:6px;border-radius:50%;position:absolute;top:13px;right:13px;}
-.hist-pip.green{background:var(--ok);}
-.hist-pip.amber{background:var(--amber);}
-.hist-body{padding-right:12px;}
-.hist-car{font-size:13px;font-weight:700;color:var(--text-primary);}
-.hist-meta{font-size:10.5px;color:var(--text-muted);margin-top:3px;line-height:1.5;white-space:normal;}
-.hist-tail{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:8px;}
-.hist-tag{font-size:10px;font-weight:700;}
-.hist-tag.green{color:var(--ok);}
-.hist-tag.amber{color:var(--amber);}
-.hist-km{font-size:10px;color:var(--text-muted);}
-
-/* ══════════════════════════════════════════════════════════════════
-   CHAT-WIZARD THREAD
-   Each block = bot question bubble + answer card + next nudge.
-   Dimming/focus is purely cosmetic (opacity/filter), so hidden
-   fields are never display:none / zero-sized — safe for Google
-   Maps and native form flow.
-══════════════════════════════════════════════════════════════════ */
-.journey{position:relative;margin-top:4px;}
-.journey-line{display:none;}
-.wz-block{animation:fadeUp .4s var(--ease) both;}
-.wz-block.wz-hidden{display:none;}
-.wz-bubble{
-  display:flex;align-items:flex-start;gap:9px;margin-bottom:10px;max-width:90%;
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STICKY HEADER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.site-header{
+  position:sticky;top:0;z-index:300;
+  height:56px;padding:0 14px;
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  box-shadow:var(--shadow-xs);
 }
-.wz-bot{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;margin-top:1px;}
-.wz-msg{background:var(--surface-2);border-radius:4px 14px 14px 14px;padding:10px 14px;font-size:13.5px;color:var(--text-primary);line-height:1.5;}
-.wz-msg b{font-weight:700;}
-.step{position:relative;margin-bottom:10px;}
-.step-dot{display:none;}
-.step-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r4);overflow:hidden;margin-left:33px;box-shadow:var(--shadow-xs);}
-.step.active .step-card{border-color:var(--hair);}
-.step-hd{padding:13px 15px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.step-ico{width:28px;height:28px;border-radius:var(--r2);background:var(--surface-2);color:var(--text-primary);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
-.step-ttl{font-size:13.5px;font-weight:700;color:var(--text-primary);}
-.step-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
-.step-bd{padding:14px 15px;}
-.wz-next{display:flex;align-items:center;gap:7px;margin:9px 0 4px 33px;background:transparent;border:none;color:var(--text-secondary);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;}
-.wz-next i{font-size:10px;transition:transform .2s var(--ease);}
-.wz-next:active i{transform:translateY(3px);}
-.journey-end{margin-bottom:0;}
-.journey-end .flag-lbl{font-size:12px;color:var(--text-muted);margin-left:33px;}
+.hdr-brand{display:flex;align-items:center;gap:8px;flex:1;}
+.hdr-logo{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--mint-700),var(--mint-500));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:15px;
+  box-shadow:0 2px 6px rgba(20,133,67,.35);
+  flex-shrink:0;
+}
+.hdr-name{font-size:15px;font-weight:700;color:var(--neutral-800);letter-spacing:-.3px;}
+.hdr-tagline{font-size:11px;color:var(--neutral-500);margin-top:-2px;}
+.hdr-av{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--mint-100);border:1.5px solid var(--mint-300);
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:var(--mint-700);
+  flex-shrink:0;cursor:pointer;
+}
+.hdr-av img{width:100%;height:100%;object-fit:cover;}
+.hdr-hist{
+  font-size:12px;font-weight:600;color:var(--neutral-600);
+  background:var(--neutral-100);border:1px solid var(--border);
+  padding:6px 11px;border-radius:var(--rFull);
+  text-decoration:none;display:flex;align-items:center;gap:5px;
+  touch-action:manipulation;white-space:nowrap;
+}
+.hdr-hist:active{background:var(--mint-100);border-color:var(--mint-300);}
 
-/* ── FORM ELEMENTS ── */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   USER BANNER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.user-banner{
+  background:linear-gradient(130deg,var(--mint-700) 0%,var(--mint-600) 60%,var(--mint-500) 100%);
+  padding:18px 16px 58px;
+  position:relative;overflow:hidden;
+}
+.user-banner::before{
+  content:'';position:absolute;
+  width:160px;height:160px;border-radius:50%;
+  background:rgba(255,255,255,.07);
+  top:-40px;right:-30px;pointer-events:none;
+}
+.user-banner::after{
+  content:'';position:absolute;
+  bottom:-28px;left:0;right:0;height:56px;
+  background:var(--bg);border-radius:32px 32px 0 0;
+}
+.banner-inner{position:relative;z-index:1;display:flex;align-items:center;gap:12px;}
+.banner-avi{
+  width:50px;height:50px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.5);
+  background:rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:700;color:#fff;
+  flex-shrink:0;overflow:hidden;
+}
+.banner-avi img{width:100%;height:100%;object-fit:cover;}
+.banner-greet{font-size:11.5px;color:rgba(255,255,255,.7);margin-bottom:1px;}
+.banner-name{font-size:18px;font-weight:700;color:#fff;line-height:1.2;letter-spacing:-.2px;}
+.banner-dept{
+  margin-top:5px;display:inline-flex;align-items:center;gap:4px;
+  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:99px;padding:3px 9px;font-size:11px;font-weight:600;color:rgba(255,255,255,.9);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   PAGE WRAP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.page-wrap{
+  max-width:520px;margin:0 auto;
+  padding:0 12px 120px;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SECTION TITLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.sec-title{
+  display:flex;align-items:center;gap:8px;
+  padding:18px 2px 8px;
+}
+.sec-title-text{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;}
+.sec-title-line{flex:1;height:1px;background:var(--border);}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CARDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r5);
+  margin-bottom:10px;
+  box-shadow:var(--shadow-sm);
+  overflow:hidden;
+}
+.card-hd{
+  padding:14px 16px 12px;
+  border-bottom:1px solid var(--border-soft);
+  display:flex;align-items:center;gap:10px;
+}
+.card-ico{
+  width:32px;height:32px;border-radius:9px;
+  background:var(--primary-light);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--primary);font-size:14px;flex-shrink:0;
+}
+.card-ttl{font-size:14px;font-weight:700;color:var(--text-primary);}
+.card-sub{font-size:12px;color:var(--text-muted);margin-top:1px;}
+.card-bd{padding:14px 16px;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   HISTORY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.hist-wrap{padding:4px 16px 12px;}
+.hist-empty{
+  padding:20px 0;text-align:center;color:var(--text-muted);font-size:13px;
+}
+.hist-row{
+  display:flex;align-items:center;gap:11px;
+  padding:10px 0;border-bottom:1px solid var(--border-soft);
+}
+.hist-row:last-child{border-bottom:none;}
+.hist-pip{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.hist-pip.green{background:var(--mint-500);}
+.hist-pip.amber{background:var(--amber);}
+.hist-body{flex:1;min-width:0;}
+.hist-car{font-size:13.5px;font-weight:600;color:var(--text-primary);}
+.hist-meta{font-size:11.5px;color:var(--text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hist-tail{text-align:right;flex-shrink:0;}
+.hist-tag{font-size:11px;font-weight:700;}
+.hist-tag.green{color:var(--mint-600);}
+.hist-tag.amber{color:var(--amber);}
+.hist-km{font-size:11px;color:var(--text-muted);margin-top:1px;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STEP INDICATOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.steps{
+  display:flex;align-items:center;gap:0;
+  padding:0 16px 14px;
+}
+.step{
+  display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;
+  position:relative;
+}
+.step::after{
+  content:'';position:absolute;
+  top:13px;left:calc(50% + 14px);right:calc(-50% + 14px);
+  height:2px;background:var(--border);
+}
+.step:last-child::after{display:none;}
+.step.done::after{background:var(--mint-400);}
+.step-dot{
+  width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;
+  background:var(--neutral-100);border:2px solid var(--border);
+  color:var(--text-muted);
+  transition:all .2s;
+  position:relative;z-index:1;
+}
+.step.active .step-dot{background:var(--primary);border-color:var(--primary);color:#fff;}
+.step.done .step-dot{background:var(--mint-100);border-color:var(--mint-400);color:var(--mint-600);}
+.step-lbl{font-size:10px;color:var(--text-muted);font-weight:600;text-align:center;white-space:nowrap;}
+.step.active .step-lbl{color:var(--primary);font-weight:700;}
+.step.done .step-lbl{color:var(--mint-600);}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FORM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .frow{margin-bottom:13px;}
-.flabel{display:block;font-size:11.5px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;}
+.flabel{
+  display:block;font-size:12px;font-weight:700;color:var(--text-secondary);
+  margin-bottom:6px;letter-spacing:.2px;
+}
 .flabel .req{color:var(--red);margin-left:2px;}
+.flabel .opt{font-size:10.5px;font-weight:400;color:var(--text-muted);}
 .fwrap{position:relative;}
-.ficon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px;pointer-events:none;z-index:1;}
+.ficon{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  color:var(--mint-500);font-size:14px;pointer-events:none;z-index:1;
+}
 .ficon.top{top:14px;transform:none;}
-input,select,textarea{width:100%;padding:12px 13px 12px 38px;border:1px solid var(--border-strong);border-radius:var(--r2);font-size:16px;color:var(--text-primary);background:var(--surface);transition:border .15s var(--ease),box-shadow .15s var(--ease);appearance:none;-webkit-appearance:none;-webkit-tap-highlight-color:transparent;}
-input::placeholder,textarea::placeholder{color:var(--text-muted);}
-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%233f7a58' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:36px;}
-textarea{padding-left:38px;min-height:84px;resize:none;line-height:1.6;}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-glow);}
-.ferr{display:none;align-items:center;gap:5px;font-size:11.5px;color:var(--red);margin-top:5px;}
+input,select,textarea{
+  width:100%;padding:12px 13px 12px 38px;
+  border:1.5px solid var(--neutral-300);border-radius:var(--r3);
+  font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:16px;color:var(--text-primary);
+  background:var(--surface);
+  transition:border .15s,box-shadow .15s,background .15s;
+  appearance:none;-webkit-appearance:none;
+  -webkit-tap-highlight-color:transparent;
+}
+input::placeholder,textarea::placeholder{color:var(--neutral-400);}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2318a857' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;
+  padding-right:36px;
+}
+select option{background:#fff;}
+textarea{
+  padding-left:38px;min-height:82px;
+  resize:none;line-height:1.6;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none;
+  border-color:var(--mint-400);
+  background:var(--mint-50);
+  box-shadow:0 0 0 3px rgba(37,201,110,.12);
+}
+.ferr{
+  display:none;align-items:center;gap:5px;
+  font-size:12px;color:var(--red);margin-top:5px;
+}
 .ferr.show{display:flex;}
 
-/* ── CAR CAROUSEL ── */
-.car-rail{display:flex;gap:9px;overflow-x:auto;padding:2px 2px 4px;margin:0 0 14px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
-  mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 10px),transparent 100%);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 10px),transparent 100%);}
-.car-rail::-webkit-scrollbar{display:none;}
-.car-pill{scroll-snap-align:start;flex:0 0 auto;width:106px;display:flex;flex-direction:column;align-items:flex-start;gap:5px;padding:12px 11px;border-radius:var(--r3);border:1px solid var(--border-strong);background:var(--surface);cursor:pointer;transition:all .15s var(--ease);touch-action:manipulation;position:relative;}
-.car-pill:active,.car-pill.selected{background:var(--surface-2);border-color:var(--gold);}
-.car-pill.selected{box-shadow:0 0 0 2px var(--gold);}
-.car-pill.selected::before{content:'\f00c';font-family:'Font Awesome 6 Free';font-weight:900;position:absolute;top:6px;right:7px;font-size:8px;color:#fff;width:15px;height:15px;border-radius:50%;background:var(--gold-dark);display:flex;align-items:center;justify-content:center;}
+/* CAR PILL SELECT */
+.car-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:2px;}
+.car-pill{
+  flex:1;min-width:calc(50% - 4px);
+  display:flex;align-items:center;gap:7px;
+  padding:10px 11px;border-radius:var(--r3);
+  border:1.5px solid var(--neutral-200);
+  background:var(--neutral-50);
+  cursor:pointer;transition:all .15s;
+  touch-action:manipulation;
+}
+.car-pill:active,.car-pill.selected{
+  background:var(--mint-100);
+  border-color:var(--mint-400);
+}
 .car-pill input[type=radio]{display:none;}
-.car-pill-icon{font-size:19px;color:var(--gold-dark);}
-.car-pill-name{font-size:11.5px;font-weight:700;color:var(--text-primary);}
-.car-pill-plate{font-size:10px;color:var(--text-muted);}
+.car-pill-icon{font-size:20px;flex-shrink:0;}
+.car-pill-info{}
+.car-pill-name{font-size:12px;font-weight:700;color:var(--text-primary);}
+.car-pill-plate{font-size:11px;color:var(--text-muted);}
 
-/* ── UPLOAD ── */
-.upload-area{border:1.5px dashed var(--border-strong);border-radius:var(--r3);background:var(--surface-2);padding:20px;text-align:center;cursor:pointer;transition:all .2s var(--ease);position:relative;min-height:76px;}
-.upload-area:active,.upload-area.has-file{border-color:var(--gold);background:#fff;}
-.upload-area input[type=file]{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;padding:0;border:none;}
-.upload-ico{font-size:21px;color:var(--text-muted);margin-bottom:5px;}
-.upload-area.has-file .upload-ico{color:var(--gold-dark);}
-.upload-lbl{font-size:12.5px;color:var(--text-muted);}
-.upload-progress{display:none;margin-top:9px;}
+/* UPLOAD */
+.upload-area{
+  border:2px dashed var(--neutral-300);
+  border-radius:var(--r3);background:var(--neutral-50);
+  padding:20px;text-align:center;cursor:pointer;
+  transition:all .2s;position:relative;min-height:80px;
+}
+.upload-area:active,.upload-area.has-file{
+  border-color:var(--mint-400);background:var(--mint-50);
+}
+.upload-area input[type=file]{
+  position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;
+  padding:0;border:none;
+}
+.upload-ico{font-size:24px;color:var(--neutral-400);margin-bottom:5px;}
+.upload-area.has-file .upload-ico{color:var(--mint-500);}
+.upload-lbl{font-size:13px;color:var(--text-muted);font-weight:500;}
+/* UPLOAD PROGRESS */
+.upload-progress{display:none;margin-top:8px;}
 .upload-progress.show{display:block;}
-.upload-progress-bar-wrap{height:3px;background:var(--border-strong);overflow:hidden;}
-.upload-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--gold-dark),var(--gold));transition:width .2s ease;}
-.upload-progress-label{font-size:10.5px;color:var(--gold-dark);font-weight:600;margin-top:5px;text-align:center;}
-.preview-wrap{display:none;margin-top:10px;position:relative;}
+.upload-progress-bar-wrap{height:6px;background:var(--neutral-200);border-radius:99px;overflow:hidden;}
+.upload-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--mint-600),var(--mint-400));border-radius:99px;transition:width .2s ease;}
+.upload-progress-label{font-size:11px;color:var(--mint-700);font-weight:600;margin-top:4px;text-align:center;}
+
+.preview-wrap{display:none;margin-top:9px;}
 .preview-wrap.show{display:block;}
-.preview-wrap.show::after{content:'\f00c';font-family:'Font Awesome 6 Free';font-weight:900;position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:var(--gold-dark);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;}
-.preview-img{width:100%;max-height:160px;object-fit:contain;border-radius:var(--r2);border:1px solid var(--border);background:var(--surface-2);}
-.preview-meta{font-size:11.5px;color:var(--gold-dark);font-weight:600;margin-top:5px;}
-.preview-rm{margin-top:8px;width:100%;padding:9px;background:transparent;border:1px solid var(--border-strong);border-radius:var(--r2);font-size:12px;color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;}
+.preview-img{width:100%;max-height:160px;object-fit:contain;border-radius:var(--r2);border:1px solid var(--border);}
+.preview-meta{font-size:12px;color:var(--mint-600);font-weight:600;margin-top:4px;}
+.preview-rm{
+  margin-top:6px;width:100%;padding:8px;
+  background:transparent;border:1px solid var(--border);
+  border-radius:var(--r2);font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:12.5px;color:var(--red);cursor:pointer;touch-action:manipulation;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
 .preview-rm:active{background:var(--red-l);}
 
-/* ── MAP ── */
-#map{width:100%;height:250px;border-radius:var(--r2);overflow:hidden;touch-action:pan-x pan-y;border:1px solid var(--border-strong);filter:saturate(.95) contrast(1.02);}
-.map-search{display:flex;gap:7px;margin-bottom:10px;}
+/* MAP */
+#map{
+  width:100%;height:270px;border-radius:var(--r2);
+  overflow:hidden;touch-action:pan-x pan-y;
+  border:1px solid var(--border);
+}
+.map-search{
+  display:flex;gap:7px;margin-bottom:10px;
+}
 .map-search input{padding-left:13px;}
-.route-chip{display:flex;align-items:center;gap:8px;margin-top:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r2);padding:9px 14px;font-size:12.5px;color:var(--text-secondary);}
-.route-chip i{color:var(--gold-dark);}
-.dest-list{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r2);padding:10px 12px;font-size:12px;color:var(--text-muted);min-height:38px;white-space:pre-line;line-height:1.8;margin-top:8px;}
-.map-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px;}
-.map-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 5px;border-radius:var(--r2);border:1px solid var(--border-strong);background:var(--surface);font-size:10.5px;font-weight:600;color:var(--text-secondary);cursor:pointer;min-height:50px;}
-.map-btn i{font-size:14px;color:var(--gold-dark);}
-.map-btn:active{border-color:var(--gold);}
+.route-chip{
+  display:flex;align-items:center;gap:8px;margin-top:9px;
+  background:var(--mint-100);border:1px solid var(--mint-200);
+  border-radius:var(--rFull);padding:8px 13px;
+  font-size:13px;color:var(--mint-700);font-weight:500;
+}
+.route-chip i{color:var(--mint-500);}
+.dest-list{
+  background:var(--neutral-50);border:1px solid var(--border);
+  border-radius:var(--r2);padding:9px 12px;
+  font-size:12.5px;color:var(--text-muted);
+  min-height:38px;white-space:pre-line;line-height:1.8;margin-top:7px;
+}
+.map-actions{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;
+}
+.map-btn{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:9px 5px;border-radius:var(--r2);
+  border:1px solid var(--border);background:var(--surface);
+  font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:11px;font-weight:600;color:var(--text-secondary);
+  cursor:pointer;touch-action:manipulation;min-height:50px;
+}
+.map-btn i{font-size:15px;color:var(--mint-500);}
+.map-btn:active{background:var(--mint-100);border-color:var(--mint-300);}
 
-/* ── BUTTONS ── */
-.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 18px;border-radius:var(--r2);font-size:14.5px;font-weight:700;border:1px solid transparent;cursor:pointer;width:100%;text-decoration:none;transition:transform .15s var(--ease),opacity .15s;min-height:50px;touch-action:manipulation;user-select:none;}
-.btn:disabled{opacity:.45;pointer-events:none;}
-.btn-primary{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#fff;box-shadow:0 8px 20px rgba(95,174,124,.28);}
-.btn-primary:active{transform:scale(.97);background:var(--gold-dark);}
-.btn-danger{background:transparent;border-color:var(--red);color:var(--red);}
-.btn-danger:active{background:var(--red-l);}
-.btn-blue{background:transparent;border-color:var(--blue);color:var(--blue);}
-.btn-blue:active{background:var(--blue-l);}
-.btn-ghost{background:var(--surface-2);color:var(--text-secondary);border-color:var(--border);}
-.btn-ghost:active{border-color:var(--gold);color:var(--gold-dark);}
-.btn-outline{background:transparent;border-color:var(--border-strong);color:var(--text-secondary);}
-.btn-outline:active{border-color:var(--gold);color:var(--gold-dark);}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BUTTONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 18px;border-radius:var(--rFull);
+  font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:15px;font-weight:700;
+  border:none;cursor:pointer;width:100%;text-decoration:none;
+  transition:all .15s;min-height:50px;
+  touch-action:manipulation;user-select:none;
+}
+.btn:disabled{opacity:.5;pointer-events:none;}
+.btn-primary{
+  background:linear-gradient(135deg,var(--mint-700),var(--mint-500));
+  color:#fff;box-shadow:0 4px 14px rgba(20,133,67,.28);
+}
+.btn-primary:active{transform:scale(.97);box-shadow:0 2px 8px rgba(20,133,67,.2);}
+.btn-danger{background:linear-gradient(135deg,#dc2626,var(--red));color:#fff;box-shadow:0 4px 14px rgba(239,68,68,.22);}
+.btn-danger:active{transform:scale(.97);}
+.btn-blue{background:linear-gradient(135deg,var(--blue-d),var(--blue));color:#fff;box-shadow:0 4px 14px rgba(59,130,246,.22);}
+.btn-blue:active{transform:scale(.97);}
+.btn-ghost{background:var(--neutral-100);color:var(--text-secondary);border:1px solid var(--border);}
+.btn-ghost:active{background:var(--mint-100);}
+.btn-outline{background:transparent;border:1.5px solid var(--neutral-300);color:var(--text-secondary);}
+.btn-outline:active{background:var(--neutral-100);}
 
-/* ── ACTION BAR ── */
-.action-bar{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(250,250,250,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--border);padding:10px 14px;padding-bottom:max(10px,env(safe-area-inset-bottom,10px));}
-.action-bar-inner{max-width:520px;margin:0 auto;}
-.action-hint{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted);padding:0 4px 7px;}
-.action-hint i{color:var(--text-secondary);}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FIXED SUBMIT BAR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.action-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  padding:10px 14px;
+  padding-bottom:max(10px,env(safe-area-inset-bottom,10px));
+  box-shadow:0 -4px 20px rgba(0,50,20,.07);
+}
+.action-bar .btn{max-width:520px;margin:0 auto;}
 
-/* ── STATUS SCREENS ── */
-#screen-pending,#screen-suspended{min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:0 20px 40px;}
-.status-blob{width:100%;height:190px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
-.status-icon{width:88px;height:88px;border-radius:50%;background:var(--surface-2);border:1px solid var(--hair);display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--gold-dark);}
-#screen-suspended .status-icon{color:var(--red);}
-.status-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r5);padding:28px 24px;max-width:380px;width:100%;text-align:center;box-shadow:var(--shadow-md);}
-.status-h{font-size:20px;font-weight:700;color:var(--text-primary);margin-bottom:9px;}
-.status-p{color:var(--text-muted);font-size:13.5px;line-height:1.85;}
-.status-actions{margin-top:20px;display:flex;flex-direction:column;gap:8px;}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STATUS SCREENS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#screen-pending,#screen-suspended{
+  min-height:100vh;flex-direction:column;
+  align-items:center;justify-content:center;padding:28px 18px;
+  background:linear-gradient(155deg,#edfaf3,var(--bg) 60%);
+}
+.status-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r6);padding:36px 24px;
+  max-width:380px;width:100%;text-align:center;
+  box-shadow:var(--shadow-lg);
+}
+.status-icon{
+  width:96px;height:96px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:48px;
+  margin:0 auto 18px;
+}
+.status-icon.warn{background:var(--amber-l);box-shadow:0 0 0 8px rgba(245,158,11,.08);}
+.status-icon.danger{background:var(--red-l);box-shadow:0 0 0 8px rgba(239,68,68,.06);}
+.status-h{font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:9px;}
+.status-p{color:var(--text-muted);font-size:14px;line-height:1.85;}
+.status-actions{margin-top:22px;display:flex;flex-direction:column;gap:8px;}
 
-/* ── REGISTER ── */
-#screen-register{min-height:100vh;background:var(--bg);padding-bottom:30px;}
-.reg-hero{padding:34px 20px 26px;text-align:center;}
-.reg-av{width:76px;height:76px;border-radius:50%;background:var(--surface-2);border:1px solid var(--hair);display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--gold-dark);margin:0 auto 12px;overflow:hidden;}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   REGISTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#screen-register{
+  min-height:100vh;
+  background:linear-gradient(155deg,#edfaf3,var(--bg) 60%);
+  padding:28px 14px 30px;
+}
+.reg-inner{max-width:460px;margin:0 auto;}
+.reg-top{text-align:center;margin-bottom:20px;}
+.reg-av{
+  width:84px;height:84px;border-radius:50%;
+  background:var(--mint-100);border:2.5px solid var(--mint-300);
+  display:flex;align-items:center;justify-content:center;
+  font-size:34px;font-weight:700;color:var(--mint-600);
+  margin:0 auto 12px;overflow:hidden;
+  box-shadow:0 0 0 6px rgba(37,201,110,.09);
+}
 .reg-av img{width:100%;height:100%;object-fit:cover;}
-.reg-hero h2{font-size:19px;font-weight:700;color:var(--text-primary);}
-.reg-hero p{font-size:12.5px;color:var(--text-muted);margin-top:4px;}
-.reg-inner{max-width:460px;margin:0 auto;padding:0 14px;}
-.reg-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r4);padding:22px 16px;box-shadow:var(--shadow-sm);}
-.reg-divider{display:flex;align-items:center;gap:8px;margin:16px 0 13px;}
-.reg-divider span{font-size:10.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;}
-.reg-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.reg-top h2{font-size:21px;font-weight:700;color:var(--text-primary);}
+.reg-top p{font-size:13.5px;color:var(--text-muted);margin-top:4px;}
+.reg-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r5);padding:22px 16px;box-shadow:var(--shadow-md);
+}
 
-/* ── CAR-IN-USE ── */
-#screen-car-in-use{min-height:100vh;flex-direction:column;align-items:center;justify-content:flex-start;padding:0 0 110px;overflow-y:auto;background:var(--bg);}
-.iu-hero{width:100%;padding:28px 18px 30px;text-align:center;background:linear-gradient(160deg,var(--gold-dark),var(--gold));color:#fff;}
-.iu-car{font-size:30px;margin-bottom:8px;display:inline-block;}
-.iu-h{font-size:11.5px;font-weight:600;color:rgba(255,255,255,.6);margin-bottom:12px;}
-#timerDisplay{font-size:clamp(38px,10vw,50px);font-weight:700;color:#fff;letter-spacing:2px;font-variant-numeric:tabular-nums;line-height:1.1;}
-.timer-panel.warn #timerDisplay{color:#f87171;animation:timerPulse 1s ease-in-out infinite;}
-@keyframes timerPulse{0%,100%{opacity:1;}50%{opacity:.5;}}
-.iu-card{width:100%;max-width:440px;margin:0 auto;padding:0 16px;position:relative;z-index:1;}
-.iu-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r4);padding:18px;margin-top:14px;box-shadow:var(--shadow-md);}
-.iu-sub{font-size:12px;color:var(--text-muted);text-align:center;margin-bottom:15px;}
-.iu-info{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:15px;}
-.iu-tile{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r2);padding:11px 12px;text-align:left;}
-.iu-tile-l{font-size:9.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
-.iu-tile-v{font-size:13px;font-weight:700;color:var(--text-primary);}
-.loc-bar{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r2);padding:11px 12px;font-size:12.5px;color:var(--text-muted);text-align:left;margin:0 0 10px;}
-.loc-bar.loading{background:var(--amber-l);border-color:rgba(169,122,18,.25);color:var(--amber);}
-.loc-bar.ok{background:var(--ok-l);border-color:rgba(46,125,70,.25);color:var(--ok);}
-.loc-bar.err{background:var(--red-l);border-color:rgba(194,59,52,.25);color:var(--red);}
-.acc-tag{display:inline-block;border-radius:99px;padding:2px 8px;font-size:10.5px;font-weight:700;margin-top:4px;}
-.acc-tag.hi{background:var(--ok-l);color:var(--ok);}
-.acc-tag.mid{background:var(--amber-l);color:var(--amber);}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CAR IN USE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#screen-car-in-use{
+  min-height:100vh;flex-direction:column;
+  align-items:center;justify-content:flex-start;
+  padding:20px 14px 110px;overflow-y:auto;
+  background:linear-gradient(155deg,#edfaf3,var(--bg) 70%);
+}
+.iu-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r6);padding:24px 18px;
+  max-width:440px;width:100%;text-align:center;
+  box-shadow:var(--shadow-xl);
+}
+.iu-car{
+  font-size:56px;margin-bottom:10px;display:inline-block;
+  animation:iuFloat 3s ease-in-out infinite;
+}
+@keyframes iuFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.iu-h{font-size:21px;font-weight:700;color:var(--text-primary);margin-bottom:3px;}
+.iu-sub{font-size:13px;color:var(--text-muted);margin-bottom:18px;}
+
+/* info row */
+.iu-info{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;
+}
+.iu-tile{
+  background:var(--sage-100);border:1px solid var(--sage-200);
+  border-radius:var(--r3);padding:10px 12px;text-align:left;
+}
+.iu-tile-l{font-size:10px;font-weight:700;color:var(--sage-600);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.iu-tile-v{font-size:13.5px;font-weight:700;color:var(--text-primary);}
+
+/* timer */
+.timer-panel{
+  background:linear-gradient(135deg,var(--mint-800),var(--mint-600));
+  border-radius:var(--r4);padding:16px;margin-bottom:14px;
+  box-shadow:0 4px 18px rgba(20,133,67,.25);
+}
+.timer-l{font-size:11px;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;}
+#timerDisplay{
+  font-size:clamp(38px,10vw,52px);font-weight:700;color:#fff;
+  letter-spacing:3px;font-variant-numeric:tabular-nums;line-height:1.05;
+  text-shadow:0 1px 12px rgba(0,0,0,.2);
+}
+
+/* location */
+.loc-bar{
+  background:var(--neutral-50);border:1px solid var(--border);
+  border-radius:var(--r2);padding:10px 12px;
+  font-size:13px;color:var(--text-muted);text-align:left;margin:10px 0 6px;
+}
+.loc-bar.loading{background:var(--amber-l);border-color:rgba(245,158,11,.3);color:#92400e;}
+.loc-bar.ok{background:var(--mint-100);border-color:var(--mint-300);color:var(--mint-700);}
+.loc-bar.err{background:var(--red-l);border-color:rgba(239,68,68,.3);color:var(--red);}
+.acc-tag{display:inline-block;border-radius:99px;padding:2px 8px;font-size:11px;font-weight:700;margin-top:4px;}
+.acc-tag.hi{background:var(--mint-100);color:var(--mint-700);}
+.acc-tag.mid{background:var(--amber-l);color:#92400e;}
 .acc-tag.lo{background:var(--red-l);color:var(--red);}
-#locationDetail{font-size:11.5px;color:var(--text-muted);text-align:left;padding:0 1px;margin-bottom:10px;}
-.iu-actions{display:flex;flex-direction:column;gap:9px;}
+#locationDetail{font-size:12px;color:var(--text-muted);text-align:left;padding:0 1px;margin-bottom:6px;}
+.iu-actions{display:flex;flex-direction:column;gap:8px;margin-top:2px;}
 
-/* ── SHEET ── */
-.overlay{display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.5);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);align-items:flex-end;justify-content:center;}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BOTTOM SHEET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.overlay{
+  display:none;position:fixed;inset:0;z-index:9000;
+  background:rgba(10,40,18,.45);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  align-items:flex-end;justify-content:center;
+}
 .overlay.show{display:flex;}
-.sheet{background:var(--surface);border-radius:var(--r5) var(--r5) 0 0;border:1px solid var(--border-strong);border-bottom:none;padding:18px 16px;padding-bottom:max(18px,calc(env(safe-area-inset-bottom,0px)+12px));width:100%;max-width:520px;box-shadow:var(--shadow-xl);animation:shUp .25s var(--ease);max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;}
+.sheet{
+  background:var(--surface);border-radius:var(--r6) var(--r6) 0 0;
+  border:1px solid var(--border);border-bottom:none;
+  padding:18px 16px;
+  padding-bottom:max(18px,calc(env(safe-area-inset-bottom,0px)+12px));
+  width:100%;max-width:520px;
+  box-shadow:var(--shadow-xl);
+  animation:shUp .26s cubic-bezier(.16,1,.3,1);
+  max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
 @keyframes shUp{from{transform:translateY(100%)}to{transform:none}}
-.sheet-grip{width:36px;height:3px;border-radius:2px;background:var(--border-strong);margin:0 auto 14px;}
-.sheet-hd{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
-.sheet-ico{width:32px;height:32px;border-radius:var(--r2);background:var(--surface-2);color:var(--gold-dark);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
-.sheet-title{font-size:14.5px;font-weight:700;color:var(--text-primary);}
-.sheet-title small{display:block;font-size:10.5px;font-weight:400;color:var(--text-muted);margin-top:1px;}
-.conf-rows{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r3);padding:2px 14px;margin-bottom:14px;}
-.conf-row{display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.sheet-grip{
+  width:36px;height:4px;border-radius:2px;
+  background:var(--neutral-200);margin:0 auto 16px;
+}
+.sheet-title{font-size:16px;font-weight:700;color:var(--text-primary);text-align:center;margin-bottom:14px;}
+.conf-rows{
+  background:var(--neutral-50);border:1px solid var(--border);
+  border-radius:var(--r3);padding:2px 14px;margin-bottom:14px;
+}
+.conf-row{
+  display:flex;align-items:flex-start;gap:8px;padding:10px 0;
+  border-bottom:1px solid var(--border-soft);font-size:13.5px;
+}
 .conf-row:last-child{border-bottom:none;}
 .conf-l{color:var(--text-muted);flex-shrink:0;width:76px;padding-top:1px;}
 .conf-v{font-weight:600;color:var(--text-primary);flex:1;word-break:break-word;}
-.sheet-btns{display:flex;gap:9px;}
+.sheet-btns{display:flex;gap:8px;}
 .sheet-btns .btn{flex:1;}
 
-/* ── MODALS ── */
-.modal-overlay{display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:22px;}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MODAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:9500;
+  background:rgba(10,40,18,.5);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:22px;
+}
 .modal-overlay.show{display:flex;}
-.modal{background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r4);padding:0;max-width:320px;width:100%;text-align:center;box-shadow:var(--shadow-xl);animation:mPop .22s var(--ease);overflow:hidden;}
-@keyframes mPop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
-.modal-top{background:var(--surface-2);padding:24px 22px 18px;}
-.modal-ico{font-size:38px;color:var(--gold-dark);}
-.modal-body{padding:19px 22px 22px;}
-.modal-h{font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:7px;}
-.modal-p{color:var(--text-muted);font-size:13px;line-height:1.8;margin-bottom:18px;}
+.modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r5);padding:30px 22px;
+  max-width:320px;width:100%;text-align:center;
+  box-shadow:var(--shadow-xl);
+  animation:mPop .25s cubic-bezier(.16,1,.3,1);
+}
+@keyframes mPop{from{transform:scale(.88);opacity:0}to{transform:none;opacity:1}}
+.modal-ico{font-size:54px;margin-bottom:12px;}
+.modal-h{font-size:19px;font-weight:700;color:var(--text-primary);margin-bottom:7px;}
+.modal-p{color:var(--text-muted);font-size:13.5px;line-height:1.8;margin-bottom:20px;}
 
-.busy-card{background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r4);max-width:340px;width:100%;text-align:center;box-shadow:var(--shadow-xl);animation:mPop .22s var(--ease);overflow:hidden;}
-.busy-top{background:var(--surface-2);padding:20px 20px 16px;}
-.busy-ico{font-size:36px;color:var(--red);}
-.busy-body{padding:17px 20px 19px;}
-.busy-h{font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:5px;}
-.busy-sub{font-size:12.5px;color:var(--text-muted);margin-bottom:15px;}
-.busy-box{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r3);padding:14px;margin-bottom:15px;text-align:left;}
-.busy-row{display:flex;gap:8px;font-size:12.5px;margin-bottom:7px;align-items:flex-start;}
+/* ── CAR BUSY MODAL ── */
+.busy-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r5);padding:26px 20px;max-width:340px;width:100%;text-align:center;box-shadow:var(--shadow-xl);animation:mPop .25s cubic-bezier(.16,1,.3,1);}
+.busy-ico{font-size:52px;margin-bottom:8px;}
+.busy-h{font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:5px;}
+.busy-sub{font-size:13px;color:var(--text-muted);margin-bottom:16px;}
+.busy-box{background:#fffbeb;border:1px solid #fde68a;border-radius:var(--r3);padding:13px 14px;margin-bottom:16px;text-align:left;}
+.busy-row{display:flex;gap:8px;font-size:13px;margin-bottom:7px;align-items:flex-start;}
 .busy-row:last-child{margin-bottom:0;}
-.busy-lbl{color:var(--text-muted);flex-shrink:0;width:66px;font-size:11.5px;padding-top:1px;}
+.busy-lbl{color:var(--text-muted);flex-shrink:0;width:68px;font-size:12px;padding-top:1px;}
 .busy-val{font-weight:600;color:var(--text-primary);word-break:break-word;}
-.car-pill-busy{opacity:.4;pointer-events:none;position:relative;}
-.car-pill-busy::after{content:"ไม่ว่าง";position:absolute;top:6px;right:7px;font-size:8px;font-weight:700;background:var(--red);color:#fff;border-radius:99px;padding:2px 6px;}
-.car-pill-status{position:absolute;top:6px;right:7px;font-size:8px;font-weight:700;padding:2px 6px;border-radius:99px;pointer-events:none;}
-.car-pill-status.free{background:var(--ok-l);color:var(--ok);}
-.car-pill-status.busy{background:var(--red-l);color:var(--red);}
+.car-pill-busy{opacity:.5;pointer-events:none;position:relative;}
+.car-pill-busy::after{content:"ไม่ว่าง";position:absolute;top:4px;right:6px;font-size:9px;font-weight:700;background:#ef4444;color:#fff;border-radius:99px;padding:2px 6px;letter-spacing:.3px;}
+.car-pill-status{position:absolute;top:5px;right:7px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;pointer-events:none;}
+.car-pill-status.free{background:#dcfce7;color:#15803d;}
+.car-pill-status.busy{background:#fee2e2;color:#dc2626;}
 
-/* ── TOAST / MISC ── */
-#toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-110px);z-index:99999;font-size:13px;font-weight:600;padding:11px 19px;border-radius:var(--r2);white-space:nowrap;max-width:88vw;box-shadow:var(--shadow-lg);transition:transform .3s var(--ease);display:flex;align-items:center;gap:8px;background:var(--surface-2);color:var(--text-primary);border:1px solid var(--border-strong);border-left:3px solid var(--gold);}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TOAST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#toast{
+  position:fixed;top:16px;left:50%;
+  transform:translateX(-50%) translateY(-110px);
+  z-index:99999;
+  font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:13.5px;font-weight:600;
+  padding:10px 18px;border-radius:var(--rFull);
+  white-space:nowrap;max-width:88vw;
+  box-shadow:var(--shadow-lg);
+  transition:transform .28s cubic-bezier(.16,1,.3,1);
+  display:flex;align-items:center;gap:7px;
+  background:var(--neutral-700);color:#fff;
+}
 #toast.show{transform:translateX(-50%) translateY(0);}
-#toast::before{font-family:'Font Awesome 6 Free';font-weight:900;font-size:13px;}
-#toast.success::before{content:'\f058';color:#4ade80;}
-#toast.error::before{content:'\f057';color:#f87171;}
-#toast.warning::before{content:'\f06a';color:#facc15;}
-#toast.info::before{content:'\f05a';color:#60a5fa;}
+#toast.success{background:linear-gradient(135deg,var(--mint-700),var(--mint-500));}
+#toast.error{background:linear-gradient(135deg,#dc2626,var(--red));}
+#toast.warning{background:linear-gradient(135deg,#d97706,var(--amber));}
+#toast.info{background:linear-gradient(135deg,var(--blue-d),var(--blue));}
+
+/* timer warning */
+.timer-panel.warn{background:linear-gradient(135deg,#7f1d1d,#dc2626);}
+.timer-panel.warn #timerDisplay{animation:timerPulse 1s ease-in-out infinite;}
+@keyframes timerPulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+
+/* progress ring */
 .timer-ring-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;width:100%;}
 .timer-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:110px;height:110px;opacity:.18;pointer-events:none;}
-.confetti-piece{position:fixed;width:6px;height:6px;border-radius:1px;pointer-events:none;z-index:99998;animation:confettiFall 1.2s ease forwards;}
-@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.anim{animation:fadeUp .3s var(--ease) both;}
 
+/* confetti */
+.confetti-piece{position:fixed;width:8px;height:8px;border-radius:2px;pointer-events:none;z-index:99998;animation:confettiFall 1.2s ease forwards;}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+
+/* swipe sheet */
+.sheet{touch-action:pan-y;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.anim>*{animation:fadeUp .3s cubic-bezier(.16,1,.3,1) both;}
+.anim>*:nth-child(1){animation-delay:.04s;}
+.anim>*:nth-child(2){animation-delay:.09s;}
+.anim>*:nth-child(3){animation-delay:.14s;}
+.anim>*:nth-child(4){animation-delay:.19s;}
+.anim>*:nth-child(5){animation-delay:.24s;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   RESPONSIVE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 @media(max-width:374px){
-  .page-wrap{padding:14px 10px 126px;}
-  .btn{font-size:13px;min-height:47px;}
-  #timerDisplay{font-size:34px!important;}
+  .page-wrap{padding:0 10px 114px;}
+  .card-bd{padding:12px;}
+  .btn{font-size:14px;min-height:46px;}
+  #timerDisplay{font-size:36px!important;}
   .iu-info{grid-template-columns:1fr;}
-  .car-pill{width:94px;}
+  .car-pill{min-width:100%;}
 }
-@media(min-width:480px){#map{height:290px;}}
+@media(min-width:480px){
+  #map{height:310px;}
+  .site-header{height:60px;}
+}
 </style>
 </head>
 <body>
 
 <!-- ════════════ LOADING ════════════ -->
 <div id="appLoading">
-  <div class="ld-ring"><div class="ld-car"><i class="fas fa-car-side"></i></div></div>
+  <div class="ld-car">🚗</div>
   <div class="ld-text">CarTrack</div>
   <div class="ld-sub">กำลังเชื่อมต่อ LINE LIFF…</div>
   <div class="ld-track"><div class="ld-track-fill"></div></div>
@@ -366,201 +729,250 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);bo
 <!-- ════════════ MAIN ════════════ -->
 <div id="screen-main" class="screen">
 
-  <header class="topbar">
-    <div class="tb-mark"><i class="fas fa-car-side"></i></div>
-    <div class="tb-word">CarTrack</div>
-    <a href="/history" class="tb-hist"><i class="fas fa-clock-rotate-left"></i>ประวัติ</a>
-    <div class="tb-av" id="topbarAvatar"><i class="fas fa-user" style="font-size:11px;color:var(--forest-600)"></i></div>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="hdr-brand">
+      <div class="hdr-logo"><i class="fas fa-car-side"></i></div>
+      <div>
+        <div class="hdr-name">ระบบบันทึกการใช้รถ</div>
+        <div class="hdr-tagline">Powered by N/_\ck</div>
+      </div>
+    </div>
+    <a href="/history" class="hdr-hist"><i class="fas fa-clock-rotate-left"></i>ประวัติ</a>
+    <div class="hdr-av" id="topbarAvatar"><i class="fas fa-user" style="font-size:13px;color:var(--mint-600)"></i></div>
   </header>
+
+  <!-- User Banner -->
+  <div class="user-banner">
+    <div class="banner-inner">
+      <div class="banner-avi" id="userAvatar">👤</div>
+      <div>
+        <div class="banner-greet" id="userGreeting">สวัสดี คุณ</div>
+        <div class="banner-name" id="userName">—</div>
+        <div class="banner-dept" id="userDept">
+          <i class="fas fa-building" style="font-size:9px"></i> —
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="page-wrap anim">
 
-    <!-- ── Trip pass (identity) ── -->
-    <div class="pass">
-      <div class="pass-row">
-        <div class="pass-avatar" id="userAvatar"><i class="fas fa-user"></i></div>
-        <div class="pass-id">
-          <div class="pass-greet" id="userGreeting">สวัสดี คุณ</div>
-          <div class="pass-name" id="userName">—</div>
-          <div class="pass-dept" id="userDept"><i class="fas fa-building"></i> —</div>
+    <!-- ── ประวัติ ── -->
+    <div class="sec-title">
+      <div class="sec-title-text">ประวัติล่าสุด</div>
+      <div class="sec-title-line"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ico"><i class="fas fa-clock-rotate-left"></i></div>
+        <div>
+          <div class="card-ttl">บันทึกการใช้รถของคุณ</div>
+          <div class="card-sub">5 รายการล่าสุด</div>
         </div>
-        <div class="pass-tag"><span class="dot"></span><span class="lbl">พร้อมใช้งาน</span></div>
       </div>
-      <div class="pass-perf"></div>
-      <div class="pass-foot">
-        <span>Fleet ID <b>CT-01</b></span>
-        <span>ระบบบันทึกการใช้รถ</span>
+      <div class="hist-wrap" id="userHistorySection">
+        <div class="hist-empty">
+          <i class="fas fa-spinner fa-spin" style="color:var(--mint-400);margin-right:6px"></i>กำลังโหลด...
+        </div>
       </div>
     </div>
 
-    <!-- ── Recent trips rail ── -->
-    <div class="sec-head"><h2><i class="fas fa-ticket" style="color:var(--forest-500);margin-right:6px;font-size:13px"></i>ทริปล่าสุด</h2><span>5 รายการ</span></div>
-    <div id="userHistorySection">
-      <div class="hist-empty"><i class="fas fa-spinner fa-spin" style="color:var(--forest-400);margin-right:6px"></i>กำลังโหลด...</div>
+    <!-- ── ฟอร์ม ── -->
+    <div class="sec-title">
+      <div class="sec-title-text">บันทึกการใช้รถใหม่</div>
+      <div class="sec-title-line"></div>
     </div>
 
-    <!-- ── New trip journey (chat-wizard) ── -->
-    <div class="sec-head"><h2><i class="fas fa-comments"></i>เริ่มทริปใหม่</h2><span>ตอบทีละข้อ</span></div>
+    <!-- Steps -->
+    <div class="card">
+      <div class="steps" id="stepBar" style="padding-top:14px">
+        <div class="step active" id="step1">
+          <div class="step-dot">1</div>
+          <div class="step-lbl">ข้อมูลรถ</div>
+        </div>
+        <div class="step" id="step2">
+          <div class="step-dot">2</div>
+          <div class="step-lbl">ภารกิจ</div>
+        </div>
+        <div class="step" id="step3">
+          <div class="step-dot">3</div>
+          <div class="step-lbl">เส้นทาง</div>
+        </div>
+        <div class="step" id="step4">
+          <div class="step-dot">4</div>
+          <div class="step-lbl">ส่ง</div>
+        </div>
+      </div>
+    </div>
 
     <form id="mainForm" novalidate>
-      <div class="journey">
 
-        <!-- Checkpoint 1: Car -->
-        <div class="wz-block wz-focusable" id="wzBlock1">
-          <div class="wz-bubble"><div class="wz-bot"><i class="fas fa-car-side"></i></div><div class="wz-msg">รถคันไหนที่จะใช้ครับ? พร้อมเลขไมล์และรูปหน้าปัดด้วยนะ</div></div>
-          <div class="step active" id="step1">
-            <div class="step-dot">1</div>
-            <div class="step-card">
-              <div class="step-bd">
-                <div class="frow" style="margin-bottom:11px">
-                  <div class="car-rail" id="carPills">
-                    <label class="car-pill">
-                      <input type="radio" name="carPill" value="Nissan : ผอ 5757" onchange="onCarPick(this)">
-                      <div class="car-pill-icon"><i class="fas fa-car-side"></i></div>
-                      <div class="car-pill-name">Nissan</div>
-                      <div class="car-pill-plate">ผอ 5757</div>
-                    </label>
-                    <label class="car-pill">
-                      <input type="radio" name="carPill" value="Mazda : ยค 3777" onchange="onCarPick(this)">
-                      <div class="car-pill-icon"><i class="fas fa-car-side"></i></div>
-                      <div class="car-pill-name">Mazda</div>
-                      <div class="car-pill-plate">ยค 3777</div>
-                    </label>
-                    <label class="car-pill">
-                      <input type="radio" name="carPill" value="MG : งบ 255" onchange="onCarPick(this)">
-                      <div class="car-pill-icon"><i class="fas fa-car-side"></i></div>
-                      <div class="car-pill-name">MG</div>
-                      <div class="car-pill-plate">งบ 255</div>
-                    </label>
-                    <label class="car-pill">
-                      <input type="radio" name="carPill" value="Click : จงจ 222" onchange="onCarPick(this)">
-                      <div class="car-pill-icon"><i class="fas fa-motorcycle"></i></div>
-                      <div class="car-pill-name">Honda Click</div>
-                      <div class="car-pill-plate">จงจ 222</div>
-                    </label>
-                    <label class="car-pill">
-                      <input type="radio" name="carPill" value="Fino : งธท 222" onchange="onCarPick(this)">
-                      <div class="car-pill-icon"><i class="fas fa-motorcycle"></i></div>
-                      <div class="car-pill-name">Fino</div>
-                      <div class="car-pill-plate">งธท 222</div>
-                    </label>
-                  </div>
-                  <select id="car" style="display:none" required>
-                    <option value="" disabled selected></option>
-                    <option value="Nissan : ผอ 5757">Nissan : ผอ 5757</option>
-                    <option value="Mazda : ยค 3777">Mazda : ยค 3777</option>
-                    <option value="MG : งบ 255">MG : งบ 255</option>
-                    <option value="Click : จงจ 222">Click : จงจ 222</option>
-                    <option value="Fino : งธท 222">Fino : งธท 222</option>
-                  </select>
-                  <div class="ferr" id="car-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
+      <!-- ── Card 1: ข้อมูลรถ ── -->
+      <div class="card" id="formCard1">
+        <div class="card-hd">
+          <div class="card-ico"><i class="fas fa-car-side"></i></div>
+          <div>
+            <div class="card-ttl">เลือกรถที่จะใช้</div>
+            <div class="card-sub">แตะเพื่อเลือกทะเบียน</div>
+          </div>
+        </div>
+        <div class="card-bd">
+          <div class="frow">
+            <div class="car-pills" id="carPills">
+              <label class="car-pill">
+                <input type="radio" name="carPill" value="Nissan : ผอ 5757" onchange="onCarPick(this)">
+                <div class="car-pill-icon">🚙</div>
+                <div class="car-pill-info">
+                  <div class="car-pill-name">Nissan</div>
+                  <div class="car-pill-plate">ผอ 5757</div>
                 </div>
+              </label>
+              <label class="car-pill">
+                <input type="radio" name="carPill" value="Mazda : ยค 3777" onchange="onCarPick(this)">
+                <div class="car-pill-icon">🚗</div>
+                <div class="car-pill-info">
+                  <div class="car-pill-name">Mazda</div>
+                  <div class="car-pill-plate">ยค 3777</div>
+                </div>
+              </label>
+              <label class="car-pill">
+                <input type="radio" name="carPill" value="MG : งบ 255" onchange="onCarPick(this)">
+                <div class="car-pill-icon">🚘</div>
+                <div class="car-pill-info">
+                  <div class="car-pill-name">MG</div>
+                  <div class="car-pill-plate">งบ 255</div>
+                </div>
+              </label>
+              <label class="car-pill">
+                <input type="radio" name="carPill" value="Click : จงจ 222" onchange="onCarPick(this)">
+                <div class="car-pill-icon">🛵</div>
+                <div class="car-pill-info">
+                  <div class="car-pill-name">Honda Click</div>
+                  <div class="car-pill-plate">จงจ 222</div>
+                </div>
+              </label>
+              <label class="car-pill">
+                <input type="radio" name="carPill" value="Fino : งธท 222" onchange="onCarPick(this)">
+                <div class="car-pill-icon">🛵</div>
+                <div class="car-pill-info">
+                  <div class="car-pill-name">Fino</div>
+                  <div class="car-pill-plate">งธท 222</div>
+                </div>
+              </label>
+            </div>
+            <!-- hidden select for validation -->
+            <select id="car" style="display:none" required>
+              <option value="" disabled selected></option>
+              <option value="Nissan : ผอ 5757">Nissan : ผอ 5757</option>
+              <option value="Mazda : ยค 3777">Mazda : ยค 3777</option>
+              <option value="MG : งบ 255">MG : งบ 255</option>
+              <option value="Click : จงจ 222">Click : จงจ 222</option>
+              <option value="Fino : งธท 222">Fino : งธท 222</option>
+            </select>
+            <div class="ferr" id="car-error" style="margin-top:8px"><i class="fas fa-circle-exclamation"></i><span></span></div>
+          </div>
 
-                <div class="frow">
-                  <label class="flabel">เลขไมล์รถ <span class="req">*</span></label>
-                  <div class="fwrap">
-                    <i class="fas fa-gauge-high ficon"></i>
-                    <input type="number" id="mileage" placeholder="กรอกเลขไมล์" inputmode="numeric" min="0" required>
-                  </div>
-                  <div class="ferr" id="mileage-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
-                </div>
+          <div class="frow">
+            <label class="flabel">เลขไมล์รถ <span class="req">*</span></label>
+            <div class="fwrap">
+              <i class="fas fa-gauge-high ficon"></i>
+              <input type="number" id="mileage" placeholder="กรอกเลขไมล์" inputmode="numeric" min="0" required>
+            </div>
+            <div class="ferr" id="mileage-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
+          </div>
 
-                <div class="frow" style="margin-bottom:0">
-                  <label class="flabel">รูปถ่ายเลขไมล์</label>
-                  <div class="upload-area" id="photoArea">
-                    <input type="file" id="mileagePhoto" accept="image/*" capture="environment">
-                    <div class="upload-ico"><i class="fas fa-camera"></i></div>
-                    <div class="upload-lbl">แตะเพื่อถ่ายรูปหน้าปัดไมล์</div>
-                  </div>
-                  <div class="upload-progress" id="uploadProgress">
-                    <div class="upload-progress-bar-wrap"><div class="upload-progress-bar" id="uploadProgressBar"></div></div>
-                    <div class="upload-progress-label" id="uploadProgressLabel">กำลังอัปโหลด... 0%</div>
-                  </div>
-                  <div class="preview-wrap" id="photoPreviewWrap">
-                    <img class="preview-img" id="photoPreview" alt="">
-                    <div class="preview-meta" id="photoInfo"></div>
-                    <button type="button" class="preview-rm" onclick="clearPhoto()"><i class="fas fa-trash-alt"></i> ลบรูปนี้</button>
-                  </div>
-                </div>
-              </div>
+          <div class="frow" style="margin-bottom:0">
+            <label class="flabel">รูปถ่ายเลขไมล์</label>
+            <div class="upload-area" id="photoArea">
+              <input type="file" id="mileagePhoto" accept="image/*" capture="environment">
+              <div class="upload-ico"><i class="fas fa-camera"></i></div>
+              <div class="upload-lbl">แตะเพื่อถ่ายรูปหน้าปัดไมล์</div>
+            </div>
+            <div class="upload-progress" id="uploadProgress">
+              <div class="upload-progress-bar-wrap"><div class="upload-progress-bar" id="uploadProgressBar"></div></div>
+              <div class="upload-progress-label" id="uploadProgressLabel">กำลังอัปโหลด... 0%</div>
+            </div>
+            <div class="preview-wrap" id="photoPreviewWrap">
+              <img class="preview-img" id="photoPreview" alt="">
+              <div class="preview-meta" id="photoInfo"></div>
+              <button type="button" class="preview-rm" onclick="clearPhoto()">
+                <i class="fas fa-trash-alt"></i> ลบรูปนี้
+              </button>
             </div>
           </div>
-          <button type="button" class="wz-next" onclick="__wzNextFromCar()">ถัดไป: ภารกิจ <i class="fas fa-arrow-down"></i></button>
-        </div>
-
-        <!-- Checkpoint 2: Mission -->
-        <div class="wz-block wz-focusable wz-hidden" id="wzBlock2">
-          <div class="wz-bubble"><div class="wz-bot"><i class="fas fa-comment-dots"></i></div><div class="wz-msg">ครั้งนี้ไปทำอะไรครับ? เล่าสั้นๆ ก็ได้</div></div>
-          <div class="step" id="step2">
-            <div class="step-dot">2</div>
-            <div class="step-card">
-              <div class="step-bd">
-                <div class="frow" style="margin-bottom:0">
-                  <div class="fwrap">
-                    <i class="fas fa-clipboard-list ficon top"></i>
-                    <textarea id="reason" placeholder="เช่น ไปส่งของที่ลูกค้า / ประชุมนอกสถานที่..." required></textarea>
-                  </div>
-                  <div class="ferr" id="reason-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <button type="button" class="wz-next" onclick="__wzNextFromReason()">ถัดไป: ปลายทาง <i class="fas fa-arrow-down"></i></button>
-        </div>
-
-        <!-- Checkpoint 3: Route -->
-        <div class="wz-block wz-focusable wz-hidden" id="wzBlock3">
-          <div class="wz-bubble"><div class="wz-bot"><i class="fas fa-map-location-dot"></i></div><div class="wz-msg">ปลายทางอยู่ที่ไหนบ้างครับ? แตะปักหมุดบนแผนที่ได้เลย (สูงสุด 3 จุด)</div></div>
-          <div class="step" id="step3">
-            <div class="step-dot">3</div>
-            <div class="step-card">
-              <div class="step-bd" style="padding-top:14px">
-                <div class="map-search">
-                  <div class="fwrap" style="flex:1">
-                    <i class="fas fa-magnifying-glass ficon"></i>
-                    <input type="text" id="searchInput" placeholder="ค้นหาสถานที่..." style="padding-left:38px">
-                  </div>
-                </div>
-                <div id="map"></div>
-                <div class="dest-list" id="selectedDestinations"><i class="fas fa-location-dot"></i> แตะบนแผนที่เพื่อปักหมุดปลายทาง</div>
-                <div class="route-chip" id="routeInfo"><i class="fas fa-route"></i><span>เลือกปลายทางเพื่อคำนวณระยะทาง</span></div>
-                <div class="ferr" id="destinations-error" style="margin-top:7px"><i class="fas fa-circle-exclamation"></i><span></span></div>
-                <div class="map-actions">
-                  <button type="button" class="map-btn" onclick="clearAllMarkers()"><i class="fas fa-trash-can"></i>ล้างหมุด</button>
-                  <button type="button" class="map-btn" onclick="centerMap()"><i class="fas fa-crosshairs"></i>จุดเริ่มต้น</button>
-                  <button type="button" class="map-btn" onclick="toggleMapType()"><i class="fas fa-satellite-dish"></i>สลับมุมมอง</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <button type="button" class="wz-next" onclick="__wzNextFromRoute()">ถัดไป: ยืนยัน <i class="fas fa-arrow-down"></i></button>
-        </div>
-
-        <!-- Checkpoint 4: Ready -->
-        <div class="wz-block wz-focusable journey-end wz-hidden" id="wzBlock4">
-          <div class="wz-bubble"><div class="wz-bot"><i class="fas fa-flag-checkered"></i></div><div class="wz-msg">ครบแล้วครับ ✓ กดปุ่ม<b>ด้านล่างสุด</b>เพื่อส่งข้อมูลไปกลุ่ม LINE ได้เลย</div></div>
-          <div class="step" id="step4"><div class="step-dot"></div></div>
         </div>
       </div>
-    </form>
 
+      <!-- ── Card 2: ภารกิจ ── -->
+      <div class="card" id="formCard2">
+        <div class="card-hd">
+          <div class="card-ico"><i class="fas fa-pen-to-square"></i></div>
+          <div>
+            <div class="card-ttl">ภารกิจ / สาเหตุ</div>
+            <div class="card-sub">ระบุว่าจะใช้รถทำอะไร</div>
+          </div>
+        </div>
+        <div class="card-bd">
+          <div class="frow" style="margin-bottom:0">
+            <div class="fwrap">
+              <i class="fas fa-clipboard-list ficon top"></i>
+              <textarea id="reason" placeholder="เช่น ไปส่งของที่ลูกค้า / ประชุมนอกสถานที่..." required></textarea>
+            </div>
+            <div class="ferr" id="reason-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Card 3: แผนที่ ── -->
+      <div class="card" id="formCard3">
+        <div class="card-hd">
+          <div class="card-ico"><i class="fas fa-map-location-dot"></i></div>
+          <div>
+            <div class="card-ttl">เส้นทาง & ปลายทาง</div>
+            <div class="card-sub">แตะแผนที่เพื่อปักหมุด (สูงสุด 3 จุด)</div>
+          </div>
+        </div>
+        <div class="card-bd" style="padding-top:10px">
+          <div class="map-search">
+            <div class="fwrap" style="flex:1">
+              <i class="fas fa-magnifying-glass ficon"></i>
+              <input type="text" id="searchInput" placeholder="ค้นหาสถานที่..." style="padding-left:38px">
+            </div>
+          </div>
+          <div id="map"></div>
+          <div class="dest-list" id="selectedDestinations">📍 แตะบนแผนที่เพื่อปักหมุดปลายทาง</div>
+          <div class="route-chip" id="routeInfo">
+            <i class="fas fa-route"></i>
+            <span>เลือกปลายทางเพื่อคำนวณระยะทาง</span>
+          </div>
+          <div class="ferr" id="destinations-error" style="margin-top:7px"><i class="fas fa-circle-exclamation"></i><span></span></div>
+          <div class="map-actions">
+            <button type="button" class="map-btn" onclick="clearAllMarkers()"><i class="fas fa-trash-can"></i>ล้างหมุด</button>
+            <button type="button" class="map-btn" onclick="centerMap()"><i class="fas fa-crosshairs"></i>จุดเริ่มต้น</button>
+            <button type="button" class="map-btn" onclick="toggleMapType()"><i class="fas fa-satellite-dish"></i>สลับมุมมอง</button>
+          </div>
+        </div>
+      </div>
+
+    </form>
   </div><!-- /page-wrap -->
 
+  <!-- Action Bar -->
   <div class="action-bar">
-    <div class="action-bar-inner">
-      <div class="action-hint"><i class="fas fa-circle-info"></i> ตรวจสอบข้อมูลให้ครบก่อนบันทึก</div>
-      <button type="submit" form="mainForm" class="btn btn-primary" id="submitBtn">
-        <i class="fas fa-share-nodes"></i> บันทึก & แชร์ไปกลุ่ม LINE
-      </button>
-    </div>
+    <button type="submit" form="mainForm" class="btn btn-primary" id="submitBtn">
+      <i class="fas fa-share-nodes"></i>
+      บันทึก & แชร์ไปกลุ่ม LINE
+    </button>
   </div>
 
 </div><!-- /screen-main -->
 
 <!-- ════════════ PENDING ════════════ -->
 <div id="screen-pending" class="screen">
-  <div class="status-blob"><div class="status-icon"><i class="fas fa-hourglass-half"></i></div></div>
   <div class="status-card">
+    <div class="status-icon warn">⏳</div>
     <div class="status-h" id="pendingTitle">รอการอนุมัติ</div>
     <p class="status-p" id="pendingMsg">คำขอของคุณส่งเรียบร้อยแล้ว<br>กรุณารอแอดมินยืนยัน</p>
     <div class="status-actions">
@@ -573,8 +985,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);bo
 
 <!-- ════════════ SUSPENDED ════════════ -->
 <div id="screen-suspended" class="screen">
-  <div class="status-blob"><div class="status-icon"><i class="fas fa-ban"></i></div></div>
   <div class="status-card">
+    <div class="status-icon danger">⛔</div>
     <div class="status-h">บัญชีถูกระงับ</div>
     <p class="status-p" id="suspendedMsg">บัญชีของคุณถูกระงับการใช้งาน<br>กรุณาติดต่อผู้ดูแลระบบ</p>
     <div class="status-actions">
@@ -587,12 +999,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);bo
 
 <!-- ════════════ REGISTER ════════════ -->
 <div id="screen-register" class="screen">
-  <div class="reg-hero">
-    <div class="reg-av" id="regAvatar"><i class="fas fa-user"></i></div>
-    <h2>ขอสิทธิ์ใช้งานระบบ</h2>
-    <p>กรอกข้อมูลเพื่อส่งคำขอถึงผู้ดูแล</p>
-  </div>
   <div class="reg-inner">
+    <div class="reg-top">
+      <div class="reg-av" id="regAvatar">👤</div>
+      <h2>ขอสิทธิ์ใช้งานระบบ</h2>
+      <p>กรอกข้อมูลเพื่อส่งคำขอถึงผู้ดูแล</p>
+    </div>
     <div class="reg-card">
       <form id="regForm" novalidate>
         <div class="frow">
@@ -618,9 +1030,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);bo
           </div>
           <div class="ferr" id="regPhone-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
         </div>
-
-        <div class="reg-divider"><span>สังกัด</span></div>
-
         <div class="frow">
           <label class="flabel">แผนก <span class="req">*</span></label>
           <div class="fwrap">
@@ -643,7 +1052,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);bo
             <input type="text" id="regOtherDept" placeholder="ชื่อแผนก">
           </div>
         </div>
-        <button type="submit" class="btn btn-primary" id="regSubmitBtn" style="margin-top:8px">
+        <button type="submit" class="btn btn-primary" id="regSubmitBtn" style="margin-top:6px">
           <i class="fas fa-paper-plane"></i> ส่งคำขอสมัคร
         </button>
       </form>
@@ -653,29 +1062,50 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);bo
 
 <!-- ════════════ CAR IN USE ════════════ -->
 <div id="screen-car-in-use" class="screen">
-  <div class="iu-hero">
-    <div class="iu-car"><i class="fas fa-car-side"></i></div>
-    <div class="iu-h">กำลังใช้รถอยู่ · กรุณาคืนรถเมื่อเสร็จภารกิจ</div>
+  <div class="iu-card">
+    <div class="iu-car">🚗</div>
+    <div class="iu-h">กำลังใช้รถอยู่</div>
+    <div class="iu-sub">คืนรถเมื่อเสร็จภารกิจด้วยนะครับ 🙏</div>
+
+    <div class="iu-info">
+      <div class="iu-tile">
+        <div class="iu-tile-l">ทะเบียนรถ</div>
+        <div class="iu-tile-v" id="infoCarPlate">—</div>
+      </div>
+      <div class="iu-tile">
+        <div class="iu-tile-l">ผู้ใช้</div>
+        <div class="iu-tile-v" id="infoUserName" style="font-size:12px">—</div>
+      </div>
+      <div class="iu-tile">
+        <div class="iu-tile-l">เลขไมล์</div>
+        <div class="iu-tile-v" id="infoMileage">—</div>
+      </div>
+      <div class="iu-tile">
+        <div class="iu-tile-l">เริ่มใช้เมื่อ</div>
+        <div class="iu-tile-v" id="infoStartTime" style="font-size:10.5px;line-height:1.4">—</div>
+      </div>
+    </div>
+
     <div class="timer-panel">
+      <div class="timer-l">⏱ เวลาที่ใช้งาน</div>
       <div id="timerDisplay">00:00:00</div>
     </div>
-  </div>
-  <div class="iu-card">
-    <div class="iu-panel">
-      <div class="iu-sub">รายละเอียดทริปที่กำลังดำเนินอยู่</div>
-      <div class="iu-info">
-        <div class="iu-tile"><div class="iu-tile-l">ทะเบียนรถ</div><div class="iu-tile-v" id="infoCarPlate">—</div></div>
-        <div class="iu-tile"><div class="iu-tile-l">ผู้ใช้</div><div class="iu-tile-v" id="infoUserName" style="font-size:12px">—</div></div>
-        <div class="iu-tile"><div class="iu-tile-l">เลขไมล์</div><div class="iu-tile-v" id="infoMileage">—</div></div>
-        <div class="iu-tile"><div class="iu-tile-l">เริ่มใช้เมื่อ</div><div class="iu-tile-v" id="infoStartTime" style="font-size:10.5px;line-height:1.4">—</div></div>
-      </div>
-      <div class="loc-bar" id="locationStatus"><i class="fas fa-location-dot"></i> ยังไม่ได้ดึงตำแหน่ง (ไม่บังคับ)</div>
-      <div id="locationDetail" style="display:none"></div>
-      <div class="iu-actions">
-        <button class="btn btn-blue" id="getLocationBtn" onclick="getReturnLocation()"><i class="fas fa-location-crosshairs"></i> ดึงตำแหน่งปัจจุบัน</button>
-        <button class="btn btn-danger" id="returnCarBtn" onclick="handleReturnCar()"><i class="fas fa-rotate-left"></i> คืนรถ & แจ้งกลุ่ม LINE</button>
-        <button class="btn btn-ghost" onclick="handleCancelUsage()" style="font-size:13px;min-height:42px"><i class="fas fa-xmark"></i> ยกเลิก (ไม่ได้ใช้จริง)</button>
-      </div>
+
+    <div class="loc-bar" id="locationStatus">
+      <i class="fas fa-location-dot"></i> ยังไม่ได้ดึงตำแหน่ง (ไม่บังคับ)
+    </div>
+    <div id="locationDetail" style="display:none"></div>
+
+    <div class="iu-actions">
+      <button class="btn btn-blue" id="getLocationBtn" onclick="getReturnLocation()">
+        <i class="fas fa-location-crosshairs"></i> ดึงตำแหน่งปัจจุบัน
+      </button>
+      <button class="btn btn-danger" id="returnCarBtn" onclick="handleReturnCar()">
+        <i class="fas fa-rotate-left"></i> คืนรถ & แจ้งกลุ่ม LINE
+      </button>
+      <button class="btn btn-ghost" onclick="handleCancelUsage()" style="font-size:13px;min-height:42px">
+        <i class="fas fa-xmark"></i> ยกเลิก (ไม่ได้ใช้จริง)
+      </button>
     </div>
   </div>
 </div>
@@ -684,10 +1114,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);bo
 <div class="overlay" id="confirmSubmitModal">
   <div class="sheet">
     <div class="sheet-grip"></div>
-    <div class="sheet-hd">
-      <div class="sheet-ico"><i class="fas fa-clipboard-check"></i></div>
-      <div class="sheet-title">ตรวจสอบข้อมูลก่อนส่ง<small>ยืนยันความถูกต้องก่อนแชร์ไปกลุ่ม LINE</small></div>
-    </div>
+    <div class="sheet-title">📋 ตรวจสอบข้อมูลก่อนส่ง</div>
     <div class="conf-rows" id="confirmSummaryContent"></div>
     <div id="confirmMapWrap" style="margin-bottom:12px;display:none;">
       <div id="confirmMiniMap" style="width:100%;height:160px;border-radius:12px;overflow:hidden;border:1px solid var(--border);"></div>
@@ -702,30 +1129,28 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);bo
 <!-- ════════════ SUCCESS MODAL ════════════ -->
 <div class="modal-overlay" id="successModal">
   <div class="modal">
-    <div class="modal-top"><div class="modal-ico" id="modalIcon"><i class="fas fa-check"></i></div></div>
-    <div class="modal-body">
-      <div class="modal-h" id="modalTitle">สำเร็จ!</div>
-      <div class="modal-p" id="modalMessage">—</div>
-      <button class="btn btn-primary" onclick="closeModal()"><i class="fas fa-check"></i> ตกลง</button>
-    </div>
+    <div class="modal-ico" id="modalIcon">✅</div>
+    <div class="modal-h" id="modalTitle">สำเร็จ!</div>
+    <div class="modal-p" id="modalMessage">—</div>
+    <button class="btn btn-primary" onclick="closeModal()"><i class="fas fa-check"></i> ตกลง</button>
   </div>
 </div>
 
 <!-- Car Busy Modal -->
 <div class="modal-overlay" id="carBusyModal">
   <div class="busy-card">
-    <div class="busy-top"><div class="busy-ico"><i class="fas fa-ban"></i></div></div>
-    <div class="busy-body">
-      <div class="busy-h">รถคันนี้ไม่ว่าง</div>
-      <div class="busy-sub">กำลังถูกใช้งานอยู่ในขณะนี้ กรุณาเลือกรถคันอื่น</div>
-      <div class="busy-box" id="carBusyInfo">
-        <div class="busy-row"><span class="busy-lbl"><i class="fas fa-car-side"></i> ทะเบียน</span><span class="busy-val" id="busyCar">—</span></div>
-        <div class="busy-row"><span class="busy-lbl"><i class="fas fa-user"></i> ผู้ใช้</span><span class="busy-val" id="busyUser">—</span></div>
-        <div class="busy-row"><span class="busy-lbl"><i class="fas fa-building"></i> แผนก</span><span class="busy-val" id="busyDept">—</span></div>
-        <div class="busy-row"><span class="busy-lbl"><i class="fas fa-clock"></i> เริ่มเมื่อ</span><span class="busy-val" id="busyTime" style="font-size:12px">—</span></div>
-      </div>
-      <button class="btn btn-ghost" onclick="closeCarBusyModal()" style="width:100%;margin-top:2px"><i class="fas fa-arrow-left"></i> กลับไปเลือกรถคันอื่น</button>
+    <div class="busy-ico">🚫</div>
+    <div class="busy-h">รถคันนี้ไม่ว่าง</div>
+    <div class="busy-sub">กำลังถูกใช้งานอยู่ในขณะนี้ กรุณาเลือกรถคันอื่น</div>
+    <div class="busy-box" id="carBusyInfo">
+      <div class="busy-row"><span class="busy-lbl">🚗 ทะเบียน</span><span class="busy-val" id="busyCar">—</span></div>
+      <div class="busy-row"><span class="busy-lbl">👤 ผู้ใช้</span><span class="busy-val" id="busyUser">—</span></div>
+      <div class="busy-row"><span class="busy-lbl">🏢 แผนก</span><span class="busy-val" id="busyDept">—</span></div>
+      <div class="busy-row"><span class="busy-lbl">🕐 เริ่มเมื่อ</span><span class="busy-val" id="busyTime" style="font-size:12px">—</span></div>
     </div>
+    <button class="btn btn-ghost" onclick="closeCarBusyModal()" style="width:100%;margin-top:2px">
+      <i class="fas fa-arrow-left"></i> กลับไปเลือกรถคันอื่น
+    </button>
   </div>
 </div>
 
@@ -1265,69 +1690,6 @@ window.addEventListener('load',initApp);
 document.addEventListener('DOMContentLoaded',()=>{
   initSwipeSheet('confirmSubmitModal');
 });
-</script>
-
-<!-- Cosmetic/UX-flow helper: reveals the next question block, hides
-     ones not yet reached, and reuses the app's own showErr/clearErr
-     for gating (no app state is read/written beyond that). Namespaced
-     (__wz*) so it cannot collide with the app code above. -->
-<script>
-(function(){
-  function reveal(id){
-    var el = document.getElementById(id);
-    if (!el) return;
-    el.classList.remove('wz-hidden');
-    // Google Maps needs a real, visible container to size its tiles.
-    // The #map div lives inside wzBlock3 and was 0-sized while hidden,
-    // so once it becomes visible we ask the existing map instance
-    // (declared with `let map` in the app script above, shared at the
-    // top-level script scope) to recalculate and re-center itself.
-    if (id === 'wzBlock3'){
-      setTimeout(function(){
-        try{
-          if (typeof map !== 'undefined' && map && window.google){
-            google.maps.event.trigger(map, 'resize');
-            if (typeof CONFIG !== 'undefined' && CONFIG.originLatLng){
-              map.setCenter(CONFIG.originLatLng);
-            }
-          }
-        }catch(err){ /* silently ignore - purely cosmetic */ }
-      }, 60);
-    }
-    setTimeout(function(){ el.scrollIntoView({behavior:'smooth', block:'start'}); }, 80);
-  }
-
-  window.__wzNextFromCar = function(){
-    var car = document.getElementById('car');
-    var mileage = document.getElementById('mileage');
-    var ok = true;
-    if (!car || !car.value){ if(typeof showErr==='function') showErr('car','กรุณาเลือกรถ'); ok=false; }
-    else if (typeof clearErr==='function') clearErr('car');
-    if (!mileage || !mileage.value.trim()){ if(typeof showErr==='function') showErr('mileage','กรุณากรอกเลขไมล์'); ok=false; }
-    else if (typeof clearErr==='function') clearErr('mileage');
-    if (!ok) return;
-    reveal('wzBlock2');
-  };
-
-  window.__wzNextFromReason = function(){
-    var reason = document.getElementById('reason');
-    if (!reason || !reason.value.trim()){
-      if (typeof showErr==='function') showErr('reason','กรุณาระบุภารกิจ');
-      return;
-    }
-    if (typeof clearErr==='function') clearErr('reason');
-    reveal('wzBlock3');
-  };
-
-  window.__wzNextFromRoute = function(){
-    if (typeof markers === 'undefined' || !markers.length){
-      if (typeof showErr==='function') showErr('destinations','กรุณาเลือกปลายทางอย่างน้อย 1 จุด');
-      return;
-    }
-    if (typeof clearErr==='function') clearErr('destinations');
-    reveal('wzBlock4');
-  };
-})();
 </script>
 </body>
 </html>
