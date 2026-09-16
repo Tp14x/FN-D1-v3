@@ -207,8 +207,24 @@ body{
   display:flex;align-items:center;gap:8px;
   padding:18px 2px 8px;
 }
+.sec-title i{color:var(--mint-500);font-size:12px;}
 .sec-title-text{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;}
 .sec-title-line{flex:1;height:1px;background:var(--border);}
+.sec-title-link{font-size:11.5px;font-weight:700;color:var(--mint-600);text-decoration:none;display:flex;align-items:center;gap:4px;white-space:nowrap;}
+.sec-title-link:active{opacity:.6;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STICKY PROGRESS DOCK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.progress-dock{
+  position:sticky;top:56px;z-index:250;
+  background:var(--glass);
+  backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);
+  border-bottom:1px solid var(--border-soft);
+  padding:12px 16px 10px;
+  box-shadow:var(--shadow-xs);
+}
+.progress-dock .steps{padding:0;}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    CARDS
@@ -531,6 +547,13 @@ input:focus,select:focus,textarea:focus{
   background:var(--surface);border:1px solid var(--border);
   border-radius:var(--r5);padding:22px 16px;box-shadow:var(--shadow-md);
 }
+.reg-row{display:flex;gap:12px;}
+.reg-row .frow{flex:1;min-width:0;}
+@media(max-width:479px){.reg-row{flex-direction:column;gap:0;}}
+
+/* compact secondary card (history) */
+.card-secondary{opacity:.97;}
+.card-secondary .card-hd{padding:12px 16px 10px;}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    CAR IN USE
@@ -775,55 +798,35 @@ input:focus,select:focus,textarea:focus{
     </div>
   </div>
 
+  <!-- Sticky step progress -->
+  <div class="progress-dock">
+    <div class="steps" id="stepBar">
+      <div class="step active" id="step1">
+        <div class="step-dot">1</div>
+        <div class="step-lbl">ข้อมูลรถ</div>
+      </div>
+      <div class="step" id="step2">
+        <div class="step-dot">2</div>
+        <div class="step-lbl">ภารกิจ</div>
+      </div>
+      <div class="step" id="step3">
+        <div class="step-dot">3</div>
+        <div class="step-lbl">เส้นทาง</div>
+      </div>
+      <div class="step" id="step4">
+        <div class="step-dot">4</div>
+        <div class="step-lbl">ส่ง</div>
+      </div>
+    </div>
+  </div>
+
   <div class="page-wrap anim">
 
-    <!-- ── ประวัติ ── -->
+    <!-- ── ฟอร์มบันทึกการใช้รถใหม่ (โฟกัสหลัก) ── -->
     <div class="sec-title">
-      <div class="sec-title-text">ประวัติล่าสุด</div>
-      <div class="sec-title-line"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-hd">
-        <div class="card-ico"><i class="fas fa-clock-rotate-left"></i></div>
-        <div>
-          <div class="card-ttl">บันทึกการใช้รถของคุณ</div>
-          <div class="card-sub">5 รายการล่าสุด</div>
-        </div>
-      </div>
-      <div class="hist-wrap" id="userHistorySection">
-        <div class="hist-empty">
-          <i class="fas fa-spinner fa-spin" style="color:var(--mint-400);margin-right:6px"></i>กำลังโหลด...
-        </div>
-      </div>
-    </div>
-
-    <!-- ── ฟอร์ม ── -->
-    <div class="sec-title">
+      <i class="fas fa-route"></i>
       <div class="sec-title-text">บันทึกการใช้รถใหม่</div>
       <div class="sec-title-line"></div>
-    </div>
-
-    <!-- Steps -->
-    <div class="card">
-      <div class="steps" id="stepBar" style="padding-top:14px">
-        <div class="step active" id="step1">
-          <div class="step-dot">1</div>
-          <div class="step-lbl">ข้อมูลรถ</div>
-        </div>
-        <div class="step" id="step2">
-          <div class="step-dot">2</div>
-          <div class="step-lbl">ภารกิจ</div>
-        </div>
-        <div class="step" id="step3">
-          <div class="step-dot">3</div>
-          <div class="step-lbl">เส้นทาง</div>
-        </div>
-        <div class="step" id="step4">
-          <div class="step-dot">4</div>
-          <div class="step-lbl">ส่ง</div>
-        </div>
-      </div>
     </div>
 
     <form id="mainForm" novalidate>
@@ -976,6 +979,30 @@ input:focus,select:focus,textarea:focus{
       </div>
 
     </form>
+
+    <!-- ── ประวัติล่าสุด (ข้อมูลรอง) ── -->
+    <div class="sec-title">
+      <i class="fas fa-clock-rotate-left"></i>
+      <div class="sec-title-text">ประวัติล่าสุดของคุณ</div>
+      <div class="sec-title-line"></div>
+      <a href="/history" class="sec-title-link">ดูทั้งหมด <i class="fas fa-chevron-right" style="font-size:9px"></i></a>
+    </div>
+
+    <div class="card card-secondary">
+      <div class="card-hd">
+        <div class="card-ico"><i class="fas fa-inbox"></i></div>
+        <div>
+          <div class="card-ttl">บันทึกการใช้รถของคุณ</div>
+          <div class="card-sub">5 รายการล่าสุด</div>
+        </div>
+      </div>
+      <div class="hist-wrap" id="userHistorySection">
+        <div class="hist-empty">
+          <i class="fas fa-spinner fa-spin" style="color:var(--mint-400);margin-right:6px"></i>กำลังโหลด...
+        </div>
+      </div>
+    </div>
+
   </div><!-- /page-wrap -->
 
   <!-- Action Bar -->
@@ -1026,43 +1053,47 @@ input:focus,select:focus,textarea:focus{
     </div>
     <div class="reg-card">
       <form id="regForm" novalidate>
-        <div class="frow">
-          <label class="flabel">ชื่อ-นามสกุล <span class="req">*</span></label>
-          <div class="fwrap">
-            <i class="fas fa-user ficon"></i>
-            <input type="text" id="regName" placeholder="ชื่อจริง นามสกุลจริง" required>
+        <div class="reg-row">
+          <div class="frow">
+            <label class="flabel">ชื่อ-นามสกุล <span class="req">*</span></label>
+            <div class="fwrap">
+              <i class="fas fa-user ficon"></i>
+              <input type="text" id="regName" placeholder="ชื่อจริง นามสกุลจริง" required>
+            </div>
+            <div class="ferr" id="regName-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
           </div>
-          <div class="ferr" id="regName-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
+          <div class="frow">
+            <label class="flabel">ชื่อเล่น <span class="opt">(ไม่บังคับ)</span></label>
+            <div class="fwrap">
+              <i class="fas fa-smile ficon"></i>
+              <input type="text" id="regNickname" placeholder="ใช้ค้นหาเมื่อ !unblock">
+            </div>
+          </div>
         </div>
-        <div class="frow">
-          <label class="flabel">ชื่อเล่น</label>
-          <div class="fwrap">
-            <i class="fas fa-smile ficon"></i>
-            <input type="text" id="regNickname" placeholder="ชื่อเล่น (ใช้สำหรับค้นหาเมื่อ !unblock)">
+        <div class="reg-row">
+          <div class="frow">
+            <label class="flabel">เบอร์โทรศัพท์ <span class="req">*</span></label>
+            <div class="fwrap">
+              <i class="fas fa-phone ficon"></i>
+              <input type="tel" id="regPhone" placeholder="0XX-XXX-XXXX" maxlength="10" inputmode="tel" required>
+            </div>
+            <div class="ferr" id="regPhone-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
           </div>
-        </div>
-        <div class="frow">
-          <label class="flabel">เบอร์โทรศัพท์ <span class="req">*</span></label>
-          <div class="fwrap">
-            <i class="fas fa-phone ficon"></i>
-            <input type="tel" id="regPhone" placeholder="0XX-XXX-XXXX" maxlength="10" inputmode="tel" required>
+          <div class="frow">
+            <label class="flabel">แผนก <span class="req">*</span></label>
+            <div class="fwrap">
+              <i class="fas fa-building ficon"></i>
+              <select id="regDept" required>
+                <option value="" disabled selected>— เลือกแผนก —</option>
+                <option>AE</option><option>Graphics</option>
+                <option>Graphics &amp; Print</option>
+                <option>Prod &amp; Print</option>
+                <option>นักศึกษาฝึกงาน</option>
+                <option value="อื่นๆ">อื่นๆ (ระบุ)</option>
+              </select>
+            </div>
+            <div class="ferr" id="regDept-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
           </div>
-          <div class="ferr" id="regPhone-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
-        </div>
-        <div class="frow">
-          <label class="flabel">แผนก <span class="req">*</span></label>
-          <div class="fwrap">
-            <i class="fas fa-building ficon"></i>
-            <select id="regDept" required>
-              <option value="" disabled selected>— เลือกแผนก —</option>
-              <option>AE</option><option>Graphics</option>
-              <option>Graphics &amp; Print</option>
-              <option>Prod &amp; Print</option>
-              <option>นักศึกษาฝึกงาน</option>
-              <option value="อื่นๆ">อื่นๆ (ระบุ)</option>
-            </select>
-          </div>
-          <div class="ferr" id="regDept-error"><i class="fas fa-circle-exclamation"></i><span></span></div>
         </div>
         <div class="frow" id="otherDeptGroup" style="display:none">
           <label class="flabel">ระบุแผนก</label>
@@ -1086,6 +1117,11 @@ input:focus,select:focus,textarea:focus{
     <div class="iu-h">กำลังใช้รถอยู่</div>
     <div class="iu-sub">คืนรถเมื่อเสร็จภารกิจด้วยนะครับ 🙏</div>
 
+    <div class="timer-panel">
+      <div class="timer-l">⏱ เวลาที่ใช้งาน</div>
+      <div id="timerDisplay">00:00:00</div>
+    </div>
+
     <div class="iu-info">
       <div class="iu-tile">
         <div class="iu-tile-l">ทะเบียนรถ</div>
@@ -1103,11 +1139,6 @@ input:focus,select:focus,textarea:focus{
         <div class="iu-tile-l">เริ่มใช้เมื่อ</div>
         <div class="iu-tile-v" id="infoStartTime" style="font-size:10.5px;line-height:1.4">—</div>
       </div>
-    </div>
-
-    <div class="timer-panel">
-      <div class="timer-l">⏱ เวลาที่ใช้งาน</div>
-      <div id="timerDisplay">00:00:00</div>
     </div>
 
     <div class="loc-bar" id="locationStatus">
@@ -1175,6 +1206,7 @@ input:focus,select:focus,textarea:focus{
 
 <!-- Toast -->
 <div id="toast"></div>
+
 
 <script src="https://static.line-scdn.net/liff/edge/versions/2.22.3/sdk.js"></script>
 <script>
