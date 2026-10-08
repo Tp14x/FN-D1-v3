@@ -115,27 +115,52 @@ function closeCarBusyModal(){
   document.getElementById('carBusyModal').classList.remove('show');
 }
 
-/* ─── PHOTO ─── */
-document.getElementById('mileagePhoto').addEventListener('change',e=>{
-  const f=e.target.files[0];cachedPhotoBase64=null;cachedPhotoFile=null;
-  const prev=document.getElementById('photoPreview'),wrap=document.getElementById('photoPreviewWrap'),info=document.getElementById('photoInfo'),area=document.getElementById('photoArea');
-  const prog=document.getElementById('uploadProgress'),bar=document.getElementById('uploadProgressBar'),lbl=document.getElementById('uploadProgressLabel');
-  if(!f){wrap.classList.remove('show');area.classList.remove('has-file');prog.classList.remove('show');return;}
-  if(!['image/jpeg','image/png','image/gif','image/webp'].includes(f.type)){showToast('รองรับ JPG, PNG, WEBP เท่านั้น','warning');e.target.value='';return;}
-  if(f.size>10*1024*1024){showToast('ไฟล์ต้องไม่เกิน 10MB','warning');e.target.value='';return;}
-  cachedPhotoFile=f;
-  prog.classList.add('show');bar.style.width='0%';lbl.textContent='กำลังอ่านไฟล์...';
-  let pct=0;const iv=setInterval(()=>{pct=Math.min(pct+Math.random()*18+5,90);bar.style.width=pct+'%';lbl.textContent=`กำลังโหลด... ${Math.round(pct)}%`;},80);
-  const r=new FileReader();
-  r.onloadend=()=>{
-    clearInterval(iv);bar.style.width='100%';lbl.textContent='✅ โหลดสำเร็จ!';
-    cachedPhotoBase64=r.result;prev.src=r.result;wrap.classList.add('show');area.classList.add('has-file');
-    info.textContent=`✅ ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)`;
-    setTimeout(()=>prog.classList.remove('show'),1200);
-  };
-  r.readAsDataURL(f);
-});
-function clearPhoto(){document.getElementById('mileagePhoto').value='';cachedPhotoBase64=null;cachedPhotoFile=null;document.getElementById('photoPreviewWrap').classList.remove('show');document.getElementById('photoArea').classList.remove('has-file');document.getElementById('photoInfo').textContent='';}
+/* ─── PHOTO / CAMERA ONLY ─── */
+let mileageCameraStream=null;
+function stopMileageCamera(){
+  if(mileageCameraStream){mileageCameraStream.getTracks().forEach(t=>t.stop());mileageCameraStream=null;}
+  const video=document.getElementById('mileageCameraVideo');
+  if(video)video.srcObject=null;
+}
+async function openMileageCamera(){
+  const modal=document.getElementById('mileageCameraModal'),video=document.getElementById('mileageCameraVideo'),err=document.getElementById('cameraError');
+  err.textContent='';modal.classList.add('show');
+  if(!navigator.mediaDevices?.getUserMedia){err.textContent='เบราว์เซอร์นี้ไม่รองรับการเปิดกล้อง กรุณาใช้โทรศัพท์/เบราว์เซอร์ที่อนุญาตกล้อง';return;}
+  try{
+    stopMileageCamera();
+    mileageCameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+    video.srcObject=mileageCameraStream;
+    await video.play();
+  }catch(e){
+    console.error(e);err.textContent=e?.name==='NotAllowedError'?'กรุณาอนุญาตสิทธิ์ใช้กล้อง แล้วกดเปิดกล้องอีกครั้ง':'ไม่สามารถเปิดกล้องได้ กรุณาตรวจสอบสิทธิ์กล้องของอุปกรณ์';
+  }
+}
+function closeMileageCamera(){document.getElementById('mileageCameraModal').classList.remove('show');stopMileageCamera();}
+function captureMileagePhoto(){
+  const video=document.getElementById('mileageCameraVideo'),canvas=document.getElementById('mileageCameraCanvas');
+  if(!video.videoWidth||!video.videoHeight){document.getElementById('cameraError').textContent='กล้องยังไม่พร้อม กรุณารอสักครู่แล้วลองใหม่';return;}
+  const maxW=1600,scale=Math.min(1,maxW/video.videoWidth),w=Math.round(video.videoWidth*scale),h=Math.round(video.videoHeight*scale);
+  canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');ctx.drawImage(video,0,0,w,h);
+  canvas.toBlob(blob=>{
+    if(!blob){document.getElementById('cameraError').textContent='ถ่ายรูปไม่สำเร็จ กรุณาลองใหม่';return;}
+    cachedPhotoFile=new File([blob],`mileage-${Date.now()}.jpg`,{type:'image/jpeg'});
+    const reader=new FileReader();reader.onloadend=()=>{
+      cachedPhotoBase64=reader.result;
+      const prev=document.getElementById('photoPreview'),wrap=document.getElementById('photoPreviewWrap'),info=document.getElementById('photoInfo'),area=document.getElementById('photoArea');
+      prev.src=reader.result;wrap.classList.add('show');area.classList.add('has-file');
+      info.textContent=`✅ ถ่ายรูปจากกล้องแล้ว (${(blob.size/1024/1024).toFixed(2)} MB)`;
+      document.getElementById('retakeMileagePhotoBtn').style.display='block';
+      closeMileageCamera();
+    };reader.readAsDataURL(blob);
+  },'image/jpeg',0.9);
+}
+function clearPhoto(){
+  cachedPhotoBase64=null;cachedPhotoFile=null;
+  document.getElementById('photoPreviewWrap').classList.remove('show');
+  document.getElementById('photoArea').classList.remove('has-file');
+  document.getElementById('photoInfo').textContent='ระบบจะไม่ให้เลือกภาพจากแกลเลอรีหรือไฟล์ในเครื่อง';
+  document.getElementById('retakeMileagePhotoBtn').style.display='none';
+}
 
 /* ─── MAP ─── */
 function initMap(){
@@ -338,6 +363,9 @@ function showCarInUseScreen(u){
   document.getElementById('infoStartTime').textContent=u.startedAt?new Date(u.startedAt).toLocaleString('th-TH'):'-';
   returnLocation=null;
   document.getElementById('returnCarBtn').innerHTML='<i class="fas fa-rotate-left"></i> คืนรถ & แจ้งกลุ่ม LINE';
+  document.getElementById('returnCarBtn').disabled=false;
+  document.getElementById('getLocationBtn').disabled=false;
+  document.getElementById('getLocationBtn').innerHTML='<i class="fas fa-location-crosshairs"></i> ดึงตำแหน่งปัจจุบัน';
   document.getElementById('locationStatus').className='loc-bar';
   document.getElementById('locationStatus').innerHTML='<i class="fas fa-location-dot"></i> ยังไม่ได้ดึงตำแหน่ง (ไม่บังคับ)';
   document.getElementById('locationDetail').style.display='none';
