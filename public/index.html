@@ -1,34 +1,62 @@
 <!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Fleet OS · บันทึกการใช้รถ</title><link rel="stylesheet" href="/app.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"><script src="https://static.line-scdn.net/liff/edge/versions/2.22.3/sdk.js"></script></head><body>
 <div id="appLoading" class="loading"><div class="loading-box"><div class="loading-mark">◈</div><h2>Fleet OS</h2><p>กำลังเชื่อมต่อ LINE และเตรียมระบบ…</p></div></div>
 <div id="screen-main" class="screen">
-  <div class="shell">
-    <header class="top"><div class="brand"><div class="brandmark"><i class="fa-solid fa-road"></i></div><div><h1>Fleet OS</h1><p>Vehicle operations workspace</p></div></div><div class="top-actions"><a class="ghost" href="/history"><i class="fa-solid fa-clock-rotate-left"></i> ประวัติ</a><div class="avatar" id="topbarAvatar">U</div></div></header>
-    <section class="hero"><div id="userAvatar" class="avatar" style="display:none"></div><div id="userName" style="display:none"></div><div class="eyebrow">DRIVER CONSOLE</div><h2 id="userGreeting">สวัสดี</h2><p>จัดการการใช้รถตั้งแต่เริ่มภารกิจ วางเส้นทาง ไปจนถึงคืนรถ — ทุกอย่างอยู่ในหน้าเดียว</p><div class="hero-meta"><span class="chip" id="userDept">—</span><span class="chip"><i class="fa-solid fa-shield-halved"></i> LINE verified</span><span class="chip"><i class="fa-solid fa-bolt"></i> Live fleet</span></div></section>
-    <div class="workspace">
-      <main class="card">
-        <div class="card-head"><div><h3>เริ่มภารกิจใหม่</h3><div class="sub">กรอกข้อมูลตามลำดับ แล้วส่งคำขอใช้งานรถ</div></div><span class="chip">STEP <b id="currentStepLabel">01</b>/04</span></div>
-        <div class="steps" id="stepBar"><div class="step active" id="step1"><div class="step-dot">1</div><div>รถ</div></div><div class="step" id="step2"><div class="step-dot">2</div><div>ภารกิจ</div></div><div class="step" id="step3"><div class="step-dot">3</div><div>เส้นทาง</div></div><div class="step" id="step4"><div class="step-dot">4</div><div>ส่ง</div></div></div>
+  <div class="shell fresh-shell">
+    <header class="top fresh-top">
+      <div class="brand fresh-brand">
+        <div class="brandmark fresh-brandmark"><i class="fa-solid fa-car-side"></i></div>
+        <div><h1>Fleet</h1><p>ระบบใช้งานรถ</p></div>
+      </div>
+      <div class="top-actions"><a class="ghost fresh-history" href="/history"><i class="fa-solid fa-clock-rotate-left"></i> ประวัติ</a><div class="avatar" id="topbarAvatar">U</div></div>
+    </header>
+
+    <section class="fresh-welcome">
+      <div>
+        <div class="eyebrow fresh-eyebrow">READY TO DRIVE</div>
+        <h2 id="userGreeting">สวัสดี</h2>
+        <p>เลือกคันรถ แล้วเริ่มใช้งานได้ทันที</p>
+      </div>
+      <div class="fresh-user-pill"><span class="fresh-online-dot"></span><span id="userDept">พร้อมใช้งาน</span></div>
+    </section>
+
+    <main class="fresh-main">
+      <section class="fresh-section">
+        <div class="fresh-section-head"><div><span class="fresh-kicker">เลือกรถด้วยตัวเอง</span><h3>รถที่พร้อมใช้งาน</h3></div><span class="fresh-count"><i class="fa-solid fa-circle"></i> พร้อมใช้งาน</span></div>
         <form id="mainForm" novalidate>
-          <div class="section-tag">01 / VEHICLE</div><div class="car-grid">
-<div class="car-pill"><input type="radio" name="carChoice" value="Nissan : ผอ 5757" onchange="onCarPick(this)"><label><span class="car-pill-main"><span class="car-icon">🚙</span><span><span class="car-name">Nissan</span><span class="car-type">ผอ 5757</span></span></span><span class="car-pill-status free">ว่าง</span></label></div>
-<div class="car-pill"><input type="radio" name="carChoice" value="Mazda : ยค 3777" onchange="onCarPick(this)"><label><span class="car-pill-main"><span class="car-icon">🚗</span><span><span class="car-name">Mazda</span><span class="car-type">ยค 3777</span></span></span><span class="car-pill-status free">ว่าง</span></label></div>
-<div class="car-pill"><input type="radio" name="carChoice" value="MG : งบ 255" onchange="onCarPick(this)"><label><span class="car-pill-main"><span class="car-icon">🚘</span><span><span class="car-name">MG</span><span class="car-type">งบ 255</span></span></span><span class="car-pill-status free">ว่าง</span></label></div>
-<div class="car-pill"><input type="radio" name="carChoice" value="Click : จงจ 222" onchange="onCarPick(this)"><label><span class="car-pill-main"><span class="car-icon">🛵</span><span><span class="car-name">Honda Click</span><span class="car-type">จงจ 222</span></span></span><span class="car-pill-status free">ว่าง</span></label></div>
-<div class="car-pill"><input type="radio" name="carChoice" value="Fino : งธท 222" onchange="onCarPick(this)"><label><span class="car-pill-main"><span class="car-icon">🛵</span><span><span class="car-name">Fino</span><span class="car-type">งธท 222</span></span></span><span class="car-pill-status free">ว่าง</span></label></div>
-</div><input type="hidden" id="car"><div id="car-error" class="error"><span></span></div>
-          <div class="section-tag">02 / MISSION</div><div class="field"><label class="label">เลขไมล์เริ่มต้น <span>km</span></label><input class="input" id="mileage" type="number" min="0" inputmode="numeric" placeholder="เช่น 125430"><div id="mileage-error" class="error"><span></span></div></div><div class="field"><label class="label">เหตุผล / ภารกิจ</label><textarea class="textarea" id="reason" placeholder="เช่น ออกพบลูกค้า / ส่งเอกสาร / งานภาคสนาม"></textarea><div id="reason-error" class="error"><span></span></div></div>
-          <div class="field"><label class="label">รูปเลขไมล์ <span>ถ่ายจากกล้องเท่านั้น</span></label><div class="upload" id="photoArea"><button type="button" class="secondary camera-btn" id="openMileageCameraBtn" onclick="openMileageCamera()"><i class="fa-solid fa-camera"></i> เปิดกล้องถ่ายรูปเลขไมล์</button><div id="photoInfo" class="sub">ระบบจะไม่ให้เลือกภาพจากแกลเลอรีหรือไฟล์ในเครื่อง</div><div class="progress" id="uploadProgress"><div id="uploadProgressBar"></div></div><div class="sub" id="uploadProgressLabel"></div><div class="photo-preview" id="photoPreviewWrap"><img id="photoPreview" alt="ตัวอย่างรูปเลขไมล์ที่ถ่ายจากกล้อง"></div><button type="button" class="btn-outline photo-retake" id="retakeMileagePhotoBtn" onclick="openMileageCamera()" style="display:none"><i class="fa-solid fa-camera-rotate"></i> ถ่ายใหม่</button></div></div>
-          <div class="section-tag">03 / ROUTE</div><div class="field"><label class="label">ค้นหาปลายทาง</label><input class="input" id="searchInput" placeholder="ค้นหาสถานที่ หรือแตะบนแผนที่"></div><div class="map-wrap"><div id="map" class="map"></div><div class="map-tools"><button type="button" onclick="centerMap()" title="จุดเริ่มต้น"><i class="fa-solid fa-crosshairs"></i></button><button type="button" onclick="toggleMapType()" title="ดาวเทียม"><i class="fa-solid fa-layer-group"></i></button><button type="button" onclick="clearAllMarkers()" title="ล้างหมุด"><i class="fa-solid fa-eraser"></i></button></div></div><div class="route" id="routeInfo"><i class="fa-solid fa-route"></i> เลือกปลายทางเพื่อคำนวณระยะทาง</div><div id="selectedDestinations" class="dest-list">📍 แตะบนแผนที่เพื่อปักหมุดปลายทาง</div><div id="destinations-error" class="error"><span></span></div>
-          <div class="section-tag">04 / SUBMIT</div><button id="submitBtn" class="primary" type="submit"><i class="fa-solid fa-paper-plane"></i> ตรวจสอบและส่งคำขอ</button>
+          <div class="fresh-car-grid car-grid">
+            <div class="car-pill fresh-car-pill"><input type="radio" name="carChoice" value="Nissan : ผอ 5757" onchange="onCarPick(this)"><label><span class="car-pill-main"><span class="car-icon fresh-car-icon">🚙</span><span><span class="car-name">Nissan</span><span class="car-type">ผอ 5757</span></span></span><span class="car-pill-status free">ว่าง</span></label></div>
+            <div class="car-pill fresh-car-pill"><input type="radio" name="carChoice" value="Mazda : ยค 3777" onchange="onCarPick(this)"><label><span class="car-pill-main"><span class="car-icon fresh-car-icon">🚗</span><span><span class="car-name">Mazda</span><span class="car-type">ยค 3777</span></span></span><span class="car-pill-status free">ว่าง</span></label></div>
+            <div class="car-pill fresh-car-pill"><input type="radio" name="carChoice" value="MG : งบ 255" onchange="onCarPick(this)"><label><span class="car-pill-main"><span class="car-icon fresh-car-icon">🚘</span><span><span class="car-name">MG</span><span class="car-type">งบ 255</span></span></span><span class="car-pill-status free">ว่าง</span></label></div>
+            <div class="car-pill fresh-car-pill"><input type="radio" name="carChoice" value="Click : จงจ 222" onchange="onCarPick(this)"><label><span class="car-pill-main"><span class="car-icon fresh-car-icon">🛵</span><span><span class="car-name">Honda Click</span><span class="car-type">จงจ 222</span></span></span><span class="car-pill-status free">ว่าง</span></label></div>
+            <div class="car-pill fresh-car-pill"><input type="radio" name="carChoice" value="Fino : งธท 222" onchange="onCarPick(this)"><label><span class="car-pill-main"><span class="car-icon fresh-car-icon">🛵</span><span><span class="car-name">Fino</span><span class="car-type">งธท 222</span></span></span><span class="car-pill-status free">ว่าง</span></label></div>
+          </div>
+          <input type="hidden" id="car"><div id="car-error" class="error"><span></span></div>
+
+          <div class="fresh-divider"></div>
+          <div class="fresh-step-heading"><span class="fresh-number">02</span><div><h3>รายละเอียดการใช้งาน</h3><p>กรอกข้อมูลสั้น ๆ ก่อนออกเดินทาง</p></div></div>
+          <div class="fresh-form-grid">
+            <div class="field"><label class="label">เลขไมล์เริ่มต้น <span>km</span></label><input class="input" id="mileage" type="number" min="0" inputmode="numeric" placeholder="เช่น 125430"><div id="mileage-error" class="error"><span></span></div></div>
+            <div class="field fresh-reason-field"><label class="label">เหตุผล / ภารกิจ</label><textarea class="textarea" id="reason" placeholder="เช่น ออกพบลูกค้า / ส่งเอกสาร / งานภาคสนาม"></textarea><div id="reason-error" class="error"><span></span></div></div>
+          </div>
+
+          <div class="fresh-photo-card field"><div class="fresh-photo-title"><span class="fresh-photo-icon"><i class="fa-solid fa-camera"></i></span><div><label class="label">ถ่ายรูปเลขไมล์</label><span>ต้องถ่ายใหม่จากกล้องเท่านั้น</span></div></div><div class="upload" id="photoArea"><button type="button" class="secondary camera-btn fresh-camera-btn" id="openMileageCameraBtn" onclick="openMileageCamera()"><i class="fa-solid fa-camera"></i> เปิดกล้องถ่ายรูป</button><div id="photoInfo" class="sub">ไม่สามารถเลือกภาพจากแกลเลอรีหรือไฟล์ในเครื่อง</div><div class="progress" id="uploadProgress"><div id="uploadProgressBar"></div></div><div class="sub" id="uploadProgressLabel"></div><div class="photo-preview" id="photoPreviewWrap"><img id="photoPreview" alt="ตัวอย่างรูปเลขไมล์ที่ถ่ายจากกล้อง"></div><button type="button" class="btn-outline photo-retake" id="retakeMileagePhotoBtn" onclick="openMileageCamera()" style="display:none"><i class="fa-solid fa-camera-rotate"></i> ถ่ายใหม่</button></div></div>
+
+          <div class="fresh-divider"></div>
+          <div class="fresh-step-heading"><span class="fresh-number">03</span><div><h3>ปลายทาง</h3><p>ค้นหาหรือแตะบนแผนที่เพื่อเพิ่มจุดหมาย</p></div></div>
+          <div class="field"><label class="label">ค้นหาปลายทาง</label><input class="input" id="searchInput" placeholder="พิมพ์ชื่อสถานที่ หรือแตะบนแผนที่"></div>
+          <div class="map-wrap"><div id="map" class="map"></div><div class="map-tools"><button type="button" onclick="centerMap()" title="จุดเริ่มต้น"><i class="fa-solid fa-crosshairs"></i></button><button type="button" onclick="toggleMapType()" title="ดาวเทียม"><i class="fa-solid fa-layer-group"></i></button><button type="button" onclick="clearAllMarkers()" title="ล้างหมุด"><i class="fa-solid fa-eraser"></i></button></div></div>
+          <div class="route" id="routeInfo"><i class="fa-solid fa-route"></i> เลือกปลายทางเพื่อคำนวณระยะทาง</div><div id="selectedDestinations" class="dest-list">📍 แตะบนแผนที่เพื่อปักหมุดปลายทาง</div><div id="destinations-error" class="error"><span></span></div>
+
+          <div class="fresh-submit"><div><span class="fresh-kicker">04 · พร้อมออกเดินทาง</span><strong>ตรวจสอบข้อมูลก่อนเริ่มใช้งาน</strong><small>ระบบจะบันทึกข้อมูลและแจ้งไปยังกลุ่ม LINE</small></div><button id="submitBtn" class="primary fresh-submit-btn" type="submit"><i class="fa-solid fa-arrow-right"></i> ตรวจสอบและเริ่มใช้งาน</button></div>
         </form>
-      </main>
-      <aside class="side-stack">
-        <div class="card"><div class="card-head"><div><h3>สถานะของฉัน</h3><div class="sub">ข้อมูลจากภารกิจล่าสุด</div></div><span class="chip">LIVE</span></div><div class="info-list"><div class="info-row"><span>ผู้ใช้</span><span id="infoUserName">—</span></div><div class="info-row"><span>รถ</span><span id="infoCarPlate">—</span></div><div class="info-row"><span>เลขไมล์</span><span id="infoMileage">—</span></div><div class="info-row"><span>เริ่มใช้เมื่อ</span><span id="infoStartTime">—</span></div></div><div class="pre-use-note"><i class="fa-solid fa-circle-info"></i> เมื่อเริ่มใช้งานรถแล้ว เมนูคืนรถจะปรากฏในหน้าสถานะรถที่กำลังใช้งาน</div></div>
-        <div class="card"><div class="card-head"><div><h3>กิจกรรมล่าสุด</h3><div class="sub">5 รายการล่าสุดของคุณ</div></div><a class="chip" href="/history">ดูทั้งหมด</a></div><div id="userHistorySection" class="history-mini"><div class="sub">กำลังโหลด…</div></div></div>
-      </aside>
-    </div>
+      </section>
+    </main>
+
+    <!-- Runtime-only fields kept for existing JS compatibility; not shown in the UI. -->
+    <div class="runtime-fields" aria-hidden="true"><span id="infoUserName">—</span><span id="infoCarPlate">—</span><span id="infoMileage">—</span><span id="infoStartTime">—</span><span id="userHistorySection"></span><span id="userAvatar"></span><span id="userName"></span></div>
   </div>
 </div>
+
 <div id="screen-register" class="screen"><div class="register"><div class="register-card"><div class="reg-avatar" id="regAvatar">U</div><div class="eyebrow">ACCESS REQUEST</div><h2>ขอสิทธิ์เข้าใช้งาน</h2><p class="sub">กรอกข้อมูลครั้งแรกเพื่อให้ผู้ดูแลอนุมัติบัญชี</p><form id="regForm"><div class="field"><label class="label">ชื่อ-นามสกุล</label><input class="input" id="regName"><div id="regName-error" class="error"><span></span></div></div><div class="field"><label class="label">ชื่อเล่น</label><input class="input" id="regNickname"></div><div class="field"><label class="label">เบอร์โทร</label><input class="input" id="regPhone" inputmode="tel"><div id="regPhone-error" class="error"><span></span></div></div><div class="field"><label class="label">แผนก</label><select class="select" id="regDept"><option value="">เลือกแผนก</option><option>ฝ่ายปฏิบัติการ</option><option>ฝ่ายขาย</option><option>บัญชี</option><option>อื่นๆ</option></select><div id="regDept-error" class="error"><span></span></div></div><div class="field" id="otherDeptGroup" style="display:none"><label class="label">ระบุแผนก</label><input class="input" id="regOtherDept"><div id="regOtherDept-error" class="error"><span></span></div></div><button class="primary" id="regSubmitBtn">ส่งคำขอสมัคร</button></form></div></div></div></div>
 <div id="screen-pending" class="screen"><div class="state"><div class="state-card"><div class="state-icon">⏳</div><h2 id="pendingTitle">รอการอนุมัติ</h2><p id="pendingMsg" class="sub"></p></div></div></div>
 <div id="screen-suspended" class="screen"><div class="state"><div class="state-card"><div class="state-icon">⛔</div><h2>บัญชีถูกระงับ</h2><p id="suspendedMsg" class="sub"></p></div></div></div>
