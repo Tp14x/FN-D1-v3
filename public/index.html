@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ระบบบันทึกการใช้รถ</title>
-<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Prompt:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Prompt:wght@500;600&family=Mali:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--ink:#0F1B2D;--mut:#52627A;--line:#E2E8F0;--bg:#F4F6FA;--pri:#1D4ED8;--priD:#1A43BD;--tint:#E8EEFC;--ok:#0E7A4B;--okT:#E3F4EB;--bad:#C23B22}
 *{box-sizing:border-box}
@@ -54,6 +54,55 @@ input:focus,select:focus{outline:0;border-color:var(--pri);box-shadow:0 0 0 4px 
 @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}@keyframes spin{to{transform:rotate(360deg)}}@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
 @keyframes shine{0%{left:-60%}50%,100%{left:130%}}@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(14,122,75,.5)}100%{box-shadow:0 0 0 8px rgba(14,122,75,0)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* cute party theme */
+:root{--bg:#EEF2FF}
+body{background:#EEF2FF;-webkit-tap-highlight-color:transparent}
+button{touch-action:manipulation}
+h1,h2,.h,.ttl,.tile b,.timer .h{font-family:'Mali','Prompt',sans-serif}
+#app{position:relative;z-index:1}
+.bgfx{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+.blob{position:absolute;width:340px;height:340px;border-radius:50%;filter:blur(60px);opacity:.6;animation:drift 20s ease-in-out infinite alternate}
+.fp{position:absolute;bottom:-40px;opacity:.5;animation:fup linear infinite}
+@keyframes drift{to{transform:translate(60px,-50px) scale(1.15)}}
+@keyframes fup{0%{transform:translateY(0) rotate(0)}50%{transform:translateY(-55vh) rotate(25deg) translateX(20px)}100%{transform:translateY(-115vh) rotate(-15deg)}}
+.app{background:#D3E6FF;border-bottom:0;border-radius:0 0 26px 26px;overflow:hidden;box-shadow:0 6px 18px rgba(59,91,219,.14)}
+.app>*{position:relative;z-index:1}
+.app::before{content:"☁️";position:absolute;top:8px;left:-40px;font-size:24px;opacity:.9;animation:cloud 32s linear infinite}
+.app::after{content:"✨";position:absolute;right:86px;top:10px;animation:tk 2.4s ease-in-out infinite}
+.logo{background:#fff;border-radius:50%;box-shadow:0 3px 8px rgba(59,91,219,.25);cursor:pointer;animation:bob 4s ease-in-out infinite}
+.intro h1::after{content:"";display:block;height:6px;width:90px;border-radius:3px;margin-top:8px;background:linear-gradient(90deg,#FF8FAB,#FFC857,#6EE7B7,#7AA2FF,#C4A1FF,#FF8FAB);background-size:200% 100%;animation:flowg 4s linear infinite}
+.card{border:2px solid #fff;border-radius:24px;box-shadow:0 6px 20px rgba(59,91,219,.08)}
+#regForm{background:#F0EAFF}#form>.card:nth-child(1){background:#DDF0FF}#form>.card:nth-child(2){background:#FFF3C7}#form>.card:nth-child(3){background:#FFE3EC}#form>.card:nth-child(4){background:#EADFFF}#hist{background:#DFF6EA}
+.nb{box-shadow:0 3px 8px rgba(15,27,45,.2)}.card:hover .nb{transform:rotate(-12deg) scale(1.15)}.nb{transition:transform .25s}
+input,select{border-width:2px;border-radius:16px}
+.btn{border-radius:999px}.btn:hover{animation:wig .5s}
+.car{border-width:2px;border-radius:20px;border-color:#E2E8F0;border-color:color-mix(in srgb,var(--c) 30%,#fff);background:#fff;background:color-mix(in srgb,var(--c) 12%,#fff)}
+.car.sel{border-color:var(--c);animation:bnc .45s cubic-bezier(.3,1.6,.5,1);box-shadow:0 6px 16px rgba(15,27,45,.12)}
+.plate{border-radius:8px}
+#map{border:3px solid #fff;border-radius:20px;box-shadow:0 4px 14px rgba(59,91,219,.15)}
+.route{background:#fff;border-radius:999px;padding:8px 16px;font-weight:500}
+.photo{border-width:2px;border-radius:18px;background:#fff}
+.bar{border-radius:26px 26px 0 0;border-top:0;box-shadow:0 -8px 26px rgba(59,91,219,.14)}
+.tiles .tile{position:relative;border:2px solid #fff;border-radius:22px;box-shadow:0 6px 16px rgba(59,91,219,.08)}
+.tiles .tile:nth-child(1){background:#DDF0FF}.tiles .tile:nth-child(2){background:#FFE3EC}.tiles .tile:nth-child(3){background:#FFF3C7}.tiles .tile:nth-child(4){background:#DFF6EA}
+.tiles .tile::after{position:absolute;right:12px;top:10px;font-size:20px}
+.tiles .tile:nth-child(1)::after{content:"🚗"}.tiles .tile:nth-child(2)::after{content:"🧑‍💼"}.tiles .tile:nth-child(3)::after{content:"🛣️"}.tiles .tile:nth-child(4)::after{content:"🕐"}
+.pw{display:flex;align-items:center;gap:10px;margin-top:10px}.pb{flex:1;height:10px;border-radius:5px;background:#fff;overflow:hidden;box-shadow:inset 0 1px 3px rgba(15,27,45,.12)}
+.pb i{display:block;height:100%;width:0;border-radius:5px;background:linear-gradient(90deg,#FF8FAB,#FFC857,#6EE7B7,#7AA2FF);transition:width .5s cubic-bezier(.3,1.4,.5,1)}
+.sheet{border-radius:28px 28px 0 0}.ic{box-shadow:0 0 0 10px rgba(14,122,75,.12)}
+.bp,.tr{position:fixed;z-index:70;pointer-events:none}
+.bp{animation:fly .9s ease-out forwards}.tr{border-radius:50%;font-size:14px;transform:translate(-50%,-50%);animation:trl .7s ease-out forwards}
+@keyframes fly{from{transform:translate(0,0) rotate(0) scale(1);opacity:1}to{transform:translate(var(--dx),var(--dy)) rotate(var(--r)) scale(.6);opacity:0}}
+@keyframes trl{to{opacity:0;transform:translate(-50%,-110%) scale(.3)}}
+@keyframes cloud{from{transform:translateX(0)}to{transform:translateX(130vw)}}
+@keyframes tk{0%,100%{opacity:.2;transform:scale(.6) rotate(0)}50%{opacity:1;transform:scale(1.3) rotate(25deg)}}
+@keyframes bob{50%{transform:translateY(4px) rotate(6deg)}}
+@keyframes wig{25%{transform:rotate(-2deg)}75%{transform:rotate(2deg)}}
+@keyframes bnc{0%{transform:scale(.9)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes flowg{to{background-position:200% 0}}
+@media(hover:none){.btn:hover{animation:none}}
+@media(max-width:480px){.blob{filter:blur(40px);width:240px;height:240px}}
 </style>
 </head>
 <body>
@@ -63,7 +112,7 @@ input:focus,select:focus{outline:0;border-color:var(--pri);box-shadow:0 0 0 4px 
 
 <section class="scr" id="s-reg">
 <div class="app"><span class="logo">🚗</span><span class="ttl">ระบบบันทึกการใช้รถ</span></div>
-<div class="intro"><h1 style="font-size:26px">สมัครใช้งาน</h1><p class="mut">กรอกข้อมูลครั้งเดียว แล้วรอผู้ดูแลอนุมัติ</p></div>
+<div class="intro"><h1 style="font-size:26px">สมัครใช้งาน 🎉</h1><p class="mut">กรอกข้อมูลครั้งเดียว แล้วรอผู้ดูแลอนุมัติ</p></div>
 <form class="card" id="regForm" style="padding-bottom:20px">
 <div><label for="rn">ชื่อ-นามสกุล</label><input id="rn" autocomplete="name" placeholder="สมชาย ใจดี"><div class="err" id="e-rn"></div></div>
 <div><label for="rk">ชื่อเล่น</label><input id="rk" placeholder="ชาย"></div>
@@ -82,7 +131,7 @@ input:focus,select:focus{outline:0;border-color:var(--pri);box-shadow:0 0 0 4px 
 
 <section class="scr" id="s-main">
 <div class="app"><span class="logo">🚗</span><span class="ttl">บันทึกการใช้รถ</span><div class="av" id="av"></div></div>
-<div class="intro" style="padding-bottom:6px"><p class="mut" id="hi"></p><h1 style="font-size:24px" id="un"></h1></div>
+<div class="intro" style="padding-bottom:6px"><p class="mut" id="hi"></p><h1 style="font-size:24px" id="un"></h1><div class="pw"><div class="pb"><i id="pgf"></i></div><span class="mut" id="pgt">กรอกแล้ว 0/4 ✨</span></div></div>
 <form id="form" novalidate>
 <div class="card"><div class="sh"><span class="nb">1</span>เลือกรถ</div><div class="cars" id="cars"></div><div class="err" id="e-car"></div></div>
 <div class="card"><div class="sh"><span class="nb">2</span>เลขไมล์เริ่มต้น</div><div><input id="mi" inputmode="numeric" placeholder="เลขไมล์ปัจจุบัน" aria-label="เลขไมล์"><div class="err" id="e-mi"></div></div>
@@ -110,21 +159,21 @@ input:focus,select:focus{outline:0;border-color:var(--pri);box-shadow:0 0 0 4px 
 <script src="https://static.line-scdn.net/liff/edge/versions/2.31.2/sdk.js"></script>
 <script>
 const CFG={liffId:'2007130450-YVNvyNbL',mapsKey:'AIzaSyAw5sDr5qXKIpun2dp4jpu8NerbXy6Hfew',origin:{lat:14.975719186601136,lng:102.1254756236624}};
-const CARS=[['Nissan','ผอ 5757'],['Mazda','ยค 3777'],['MG','งบ 255'],['Click','จงจ 222'],['Fino','งธท 222']];
+const CARS=[['Nissan','ผอ 5757','#2563EB','🚙'],['Mazda','ยค 3777','#D9480F','🚗'],['MG','งบ 255','#0F766E','🚕'],['Click','จงจ 222','#7C3AED','🛵'],['Fino','งธท 222','#B45309','🛵']];
 const KEY='car_usage_v2',$=id=>document.getElementById(id);
 let user,map,dr,ds,markers=[],photo=null,retLoc=null,tmr,busy={},mapLoaded=false,carVal='';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const jpost=(u,b)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});
 function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('on',s.id===id))}
 let tt;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),3200)}
-function modal(t,m,cls,fn){$('mi2').className='ic '+(cls||'');$('mi2').textContent=cls==='b'?'✕':'✓';$('mt').textContent=t;$('mm').innerHTML=esc(m).replace(/\n/g,'<br>');$('md').classList.add('on');$('mo').onclick=()=>{$('md').classList.remove('on');fn&&fn()}}
+function modal(t,m,cls,fn){$('mi2').className='ic '+(cls||'');$('mi2').textContent=cls==='b'?'✕':'✓';$('mt').textContent=t;$('mm').innerHTML=esc(m).replace(/\n/g,'<br>');$('md').classList.add('on');if(!cls)burst(innerWidth/2,innerHeight/2.4,40);$('mo').onclick=()=>{$('md').classList.remove('on');fn&&fn()}}
 function err(id,m){const e=$('e-'+id);e.textContent=m||'';e.classList.toggle('on',!!m)}
 function loadUsage(){try{const u=JSON.parse(localStorage.getItem(KEY)||'null');if(!u)return null;if(u.startedAt&&Date.now()-new Date(u.startedAt)>864e5){localStorage.removeItem(KEY);return null}return u.isUsing?u:null}catch{return null}}
 const saveUsage=d=>{try{localStorage.setItem(KEY,JSON.stringify(d))}catch{}},clearUsage=()=>{try{localStorage.removeItem(KEY)}catch{}};
 
 /* cars */
-function drawCars(){$('cars').innerHTML=CARS.map(([n,p])=>{const v=n+' : '+p,b=busy[v];return `<button type="button" class="car${v===carVal?' sel':''}${b?' busy':''}" data-v="${esc(v)}"><span class="h" style="font-size:14px;color:var(--ink)">${esc(n)}</span><span class="plate">${esc(p)}</span>${b?'ไม่ว่าง':'ว่าง · พร้อมใช้'}</button>`}).join('');
-document.querySelectorAll('.car').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(busy[v]){const r=busy[v];$('bzc').innerHTML=[['รถ',r.car],['ผู้ใช้',r.name],['แผนก',r.department],['เริ่มเมื่อ',r.timestamp?new Date(r.timestamp).toLocaleString('th-TH'):'—']].map(([a,c])=>`<div class="row"><span>${a}</span><span>${esc(c||'—')}</span></div>`).join('');$('bz').classList.add('on');return}carVal=v;err('car');drawCars()})}
+function drawCars(){$('cars').innerHTML=CARS.map(([n,p,c,e])=>{const v=n+' : '+p,b=busy[v];return `<button type="button" class="car${v===carVal?' sel':''}${b?' busy':''}" data-v="${esc(v)}" style="--c:${c}"><span class="h" style="font-size:14px;color:var(--ink)">${e} ${esc(n)}</span><span class="plate">${esc(p)}</span>${b?'ไม่ว่าง':'ว่าง · พร้อมใช้'}</button>`}).join('');
+document.querySelectorAll('.car').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(busy[v]){const r=busy[v];$('bzc').innerHTML=[['รถ',r.car],['ผู้ใช้',r.name],['แผนก',r.department],['เริ่มเมื่อ',r.timestamp?new Date(r.timestamp).toLocaleString('th-TH'):'—']].map(([a,c])=>`<div class="row"><span>${a}</span><span>${esc(c||'—')}</span></div>`).join('');$('bz').classList.add('on');return}carVal=v;err('car');drawCars();prog()})}
 $('bzx').onclick=()=>$('bz').classList.remove('on');
 async function loadBusy(){try{const d=await fetch('/get-records?status=pending&limit=50').then(r=>r.json());busy={};(d.records||[]).forEach(r=>{if(r.car)busy[r.car]=r});drawCars()}catch{}}
 
@@ -144,10 +193,10 @@ const ac=new google.maps.places.Autocomplete($('sq'),{types:['establishment','ge
 ac.addListener('place_changed',()=>{const p=ac.getPlace();if(p.geometry?.location){addM(p.geometry.location);map.panTo(p.geometry.location)}});
 map.addListener('click',e=>addM(e.latLng))}catch{$('map').innerHTML='<p class="mut" style="padding:40px;text-align:center">ไม่สามารถโหลดแผนที่ได้</p>'}};
 function addM(pos){if(markers.length>=3){toast('เลือกได้สูงสุด 3 จุด');return}
-const m=new google.maps.Marker({position:pos,map,animation:google.maps.Animation.DROP});m.addListener('click',()=>{m.setMap(null);markers=markers.filter(x=>x!==m);route()});markers.push(m);err('dest');route()}
+const m=new google.maps.Marker({position:pos,map,animation:google.maps.Animation.DROP});m.addListener('click',()=>{m.setMap(null);markers=markers.filter(x=>x!==m);route();prog()});markers.push(m);err('dest');route();prog()}
 function route(){const el=$('route');if(!markers.length){dr&&dr.set('directions',null);el.textContent='แตะบนแผนที่เพื่อปักหมุดปลายทาง';return}
 ds.route({origin:CFG.origin,destination:markers[markers.length-1].getPosition(),waypoints:markers.slice(0,-1).map(m=>({location:m.getPosition(),stopover:true})),travelMode:'DRIVING'},(r,st)=>{if(st!=='OK'){el.textContent='คำนวณเส้นทางไม่สำเร็จ';return}dr.setDirections(r);let d=0,t=0;r.routes[0].legs.forEach(l=>{d+=l.distance.value;t+=l.duration.value});el.dataset.d=(d/1000).toFixed(2);el.dataset.t=Math.round(t/60);el.innerHTML='🛣️ <strong>'+(d/1000).toFixed(2)+' กม.</strong> · ⏱ <strong>'+Math.round(t/60)+' นาที</strong>'})}
-$('clr').onclick=()=>{markers.forEach(m=>m.setMap(null));markers=[];route()};
+$('clr').onclick=()=>{markers.forEach(m=>m.setMap(null));markers=[];route();prog()};
 
 /* submit */
 let ps=null;
@@ -166,7 +215,7 @@ const rt=$('route').textContent;
 const res=await jpost('/save-record',{userId:user.userId,name:user.name,phone:user.phone||'-',car:p.car,mileage:p.mile,reason:p.reason,routeText:rt,totalDistance:p.d,totalTime:p.t,hasPhoto:!!pk,photoKey:pk,destinations:markers.map((m,i)=>({point:i+1,lat:m.getPosition().lat(),lng:m.getPosition().lng()})),timestamp:new Date().toISOString()});
 const d=await res.json().catch(()=>({}));
 if(!res.ok){if(res.status===403)modal('ไม่สามารถบันทึกได้',d.error||'บัญชีของคุณถูกระงับการใช้งาน\nกรุณาติดต่อผู้ดูแลระบบ','b');else toast(d.error||'เกิดข้อผิดพลาด กรุณาลองใหม่');return}
-const u={isUsing:true,carPlate:p.car,carModel:p.car.split(':')[0].trim(),startedAt:new Date().toISOString(),userName:user.name,userId:user.userId,mileage:p.mile};saveUsage(u);showUse(u);toast('✅ บันทึกสำเร็จ! ใช้รถ '+p.car)}
+const u={isUsing:true,carPlate:p.car,carModel:p.car.split(':')[0].trim(),startedAt:new Date().toISOString(),userName:user.name,userId:user.userId,mileage:p.mile};saveUsage(u);showUse(u);toast('✅ บันทึกสำเร็จ! ใช้รถ '+p.car);burst(innerWidth/2,innerHeight/3,40)}
 catch{toast('เกิดข้อผิดพลาด กรุณาลองใหม่')}finally{b.disabled=false;b.textContent='ตรวจสอบและบันทึก'}};
 
 /* in use */
@@ -218,6 +267,18 @@ if(role==='inactive'||status==='inactive'||status==='blocked'||role==='rejected'
 else if(role==='pending'){const c=await jpost('/user-request',{action:'check',userId:pr.userId}).then(r=>r.json()).catch(()=>({exists:false}));if(c.exists)wait(pr.displayName,true);else show('s-reg')}
 else{const h=new Date().getHours();$('hi').textContent=(h<12?'อรุณสวัสดิ์':h<18?'สวัสดีตอนบ่าย':'สวัสดีตอนเย็น')+' · '+(user.department||'');$('un').textContent=user.name;avatar(user.name,pr.pictureUrl);drawCars();loadBusy();hist(pr.userId);show('s-main');loadMap()}
 }catch(e){$('load').style.display='none';modal('เปิดระบบไม่สำเร็จ','กรุณาเปิดผ่านแอป LINE หรือลองใหม่อีกครั้ง','b')}})();
+/* party mode */
+const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,EM=['✨','⭐','💙','🌟','🎉','🚗','💛'],CLR=['#FF8FAB','#FFC857','#6EE7B7','#7AA2FF','#C4A1FF'];
+function burst(x,y,n){if(RM)return;for(let i=0;i<n;i++){const e=document.createElement('span');e.className='bp';const a=Math.random()*Math.PI*2,d=40+Math.random()*90;e.style.cssText='left:'+x+'px;top:'+y+'px;--dx:'+Math.cos(a)*d+'px;--dy:'+(Math.sin(a)*d-30)+'px;--r:'+(Math.random()*540-270)+'deg';
+if(Math.random()<.55){e.textContent=EM[i%EM.length];e.style.fontSize=(12+Math.random()*10)+'px'}else{e.style.width=e.style.height=(6+Math.random()*6)+'px';e.style.background=CLR[i%5];e.style.borderRadius=Math.random()<.5?'50%':'2px'}document.body.appendChild(e);setTimeout(()=>e.remove(),900)}}
+let pdone=false;function prog(){const n=[!!carVal,!!$('mi').value.trim(),!!$('rs').value.trim(),markers.length>0].filter(Boolean).length;$('pgf').style.width=n*25+'%';$('pgt').textContent=n===4?'พร้อมบันทึกแล้ว 🎉':'กรอกแล้ว '+n+'/4 ✨';if(n===4&&!pdone){pdone=true;burst(innerWidth/2,130,28)}if(n<4)pdone=false}
+$('form').addEventListener('input',prog);
+document.querySelectorAll('.logo').forEach(l=>l.onclick=e=>{const r=l.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,18);toast('ปิ๊นๆ! 🚗💨')});
+if(!RM){const bg=document.createElement('div');bg.className='bgfx';bg.setAttribute('aria-hidden','true');
+bg.innerHTML=['#FFC2D4','#FFE9A8','#B8F0D6','#D5C8FF'].map((c,i)=>'<i class="blob" style="background:'+c+';'+['left:-80px;top:80px','right:-100px;top:30%','left:20%;bottom:-120px','right:10%;bottom:10%'][i]+';animation-delay:-'+i*4+'s"></i>').join('');
+for(let i=0;i<(innerWidth<600?8:16);i++){const e=document.createElement('span');e.className='fp';e.textContent=EM[i%EM.length];e.style.cssText='left:'+Math.random()*100+'%;font-size:'+(14+Math.random()*14)+'px;animation-duration:'+(16+Math.random()*16)+'s;animation-delay:-'+Math.random()*30+'s';bg.appendChild(e)}document.body.prepend(bg);
+document.addEventListener('mousedown',e=>{if(e.target.closest('.btn,.car,.photo'))burst(e.clientX,e.clientY,10)});
+if(matchMedia('(hover:hover)').matches){let lt=0;addEventListener('mousemove',e=>{const n=performance.now();if(n-lt<45)return;lt=n;const t=document.createElement('span');t.className='tr';if(Math.random()<.5)t.textContent='✨';else{t.style.background=CLR[(Math.random()*5)|0];t.style.width=t.style.height='8px'}t.style.left=e.clientX+'px';t.style.top=e.clientY+'px';document.body.appendChild(t);setTimeout(()=>t.remove(),700)})}}
 </script>
 </body>
 </html>
