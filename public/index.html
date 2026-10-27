@@ -117,6 +117,21 @@ input,select{border-width:2px;border-radius:16px}
 .tk{color:#7DD3FC}.ts{color:#86EFAC}.tn{color:#FCD34D}.tc{color:#8FA0B8}.tp{color:#F9A8D4}
 .tcur{display:inline-block;width:6px;height:11px;background:#86EFAC;vertical-align:-1px;margin-left:3px;animation:blk 1s steps(1) infinite}
 @keyframes blk{50%{opacity:0}}
+
+#s-main{padding-bottom:116px}
+.tw{margin:0 auto 10px;max-width:480px;border-radius:16px;overflow:hidden;background:#0B1220;border:1px solid #2A3756;box-shadow:0 10px 28px rgba(29,78,216,.28),0 0 0 1px rgba(125,211,252,.08)}
+.bar>.tw{display:block;gap:0}
+.tb{white-space:nowrap;display:flex;align-items:center;gap:6px;padding:7px 12px;background:#121C33;border-bottom:1px solid #1E2A44}
+.tb i{width:9px;height:9px;border-radius:50%}
+.tb span{flex:1;margin-left:6px;color:#8FA0B8;font:11px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.tb em{font-style:normal;font:700 10px/1 ui-monospace,Menlo,Consolas,monospace;padding:4px 9px;border-radius:999px;background:var(--bc,#7DD3FC);color:#0B1220;transition:background .3s}
+.tw .term{margin:0;max-width:none;background:none;border-radius:0;box-shadow:none;height:66px}
+.pgb{height:3px;background:#1E2A44}.pgb i{display:block;height:100%;width:0;background:linear-gradient(90deg,#FF8FAB,#FFC857,#6EE7B7,#7AA2FF,#C4A1FF);transition:width .3s ease-out}
+.lc.mv{text-shadow:0 0 10px currentColor,0 0 18px currentColor}
+.lc.fl{animation:flash .5s ease-out}
+@keyframes flash{0%{text-shadow:0 0 14px #fff,0 0 28px #8EC5FF}100%{text-shadow:none}}
+.btn.run{animation:runring 1.4s ease-in-out infinite}
+@keyframes runring{0%,100%{box-shadow:0 6px 16px rgba(29,78,216,.22)}50%{box-shadow:0 0 0 5px rgba(125,211,252,.35),0 8px 22px rgba(29,78,216,.4)}}
 </style>
 </head>
 <body>
@@ -153,7 +168,7 @@ input,select{border-width:2px;border-radius:16px}
 <div class="card"><div class="sh"><span class="nb">3</span>สาเหตุการใช้รถ</div><div><input id="rs" placeholder="เช่น ส่งเอกสาร พบลูกค้า" aria-label="สาเหตุ"><div class="err" id="e-rs"></div></div></div>
 <div class="card"><div class="sh"><span class="nb">4</span>ปลายทาง (สูงสุด 3 จุด)</div><input id="sq" placeholder="ค้นหาสถานที่" aria-label="ค้นหาสถานที่"><div id="map"></div><div class="route" id="route">แตะบนแผนที่เพื่อปักหมุดปลายทาง</div><div style="display:flex;gap:8px"><button type="button" class="btn ghost" id="clr" style="height:44px;font-size:14px">ล้างหมุด</button></div><div class="err" id="e-dest"></div></div>
 <div class="card" id="hist" style="display:none"><div class="sh">ประวัติล่าสุด</div><div id="histl"></div></div>
-<div class="bar"><pre class="term" id="term" aria-hidden="true"></pre><div><button class="btn" type="submit" id="sub" aria-label="ตรวจสอบและบันทึก"></button></div></div>
+<div class="bar"><div class="tw" aria-hidden="true"><div class="tb"><i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i><span id="tt">sort_label.py</span><em id="tm">PYTHON</em></div><pre class="term" id="term"></pre><div class="pgb"><i id="pg"></i></div></div><div><button class="btn" type="submit" id="sub" aria-label="ตรวจสอบและบันทึก"></button></div></div>
 </form></section>
 
 <section class="scr" id="s-use">
@@ -292,7 +307,7 @@ document.querySelectorAll('.logo').forEach(l=>l.onclick=e=>{const r=l.getBoundin
 let towTok=0;const TXT='ตรวจสอบและบันทึก',sl=ms=>new Promise(r=>setTimeout(r,ms));
 function initTow(){const b=$('sub');b.setAttribute('aria-label',TXT);
 b.innerHTML='<span class="lt" aria-hidden="true">'+(TXT.match(/[^\u0E31\u0E34-\u0E3A\u0E47-\u0E4E][\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]*/gu)||[TXT]).map(c=>'<span class="lc">'+c+'</span>').join('')+'</span>';
-if(RM){const t=$('term');if(t)t.style.display='none';return}tow(++towTok)}
+if(RM){const t=document.querySelector('.tw');if(t)t.style.display='none';return}tow(++towTok)}
 const MODES=['python','json','log'];let cyc=0;
 const P=(c,t)=>'<span class="'+c+'">'+t+'</span>';
 const J=v=>Array.isArray(v)?'['+v.map(J).join(',')+']':typeof v==='object'?'{'+Object.entries(v).map(([k,x])=>P('tk','"'+k+'"')+':'+J(x)).join(',')+'}':typeof v==='number'?P('tn',v):typeof v==='boolean'?P('tp',v):P('ts','"'+v+'"');
@@ -313,13 +328,13 @@ const nat=L.map(l=>({x:l.offsetLeft,w:l.offsetWidth})),Wn=lt.offsetWidth,W=Math.
 lt.style.width=W+'px';lt.style.height=lt.offsetHeight+'px';
 const nx=k=>nat[k].x+off,cx=(k,s)=>(W-N*CELL)/2+s*CELL+(CELL-nat[k].w)/2;
 L.forEach((l,k)=>{l.style.position='absolute';l.style.left='0';l.style.top='0';cur[k]=nx(k);l.style.transform='translate('+cur[k]+'px,0)'});
-const go=async(k,x1,d,arc)=>{const l=L[k],x0=cur[k];cur[k]=x1;const a=l.animate(arc?[{transform:'translate('+x0+'px,0)'},{transform:'translate('+(x0+x1)/2+'px,'+arc+'px)'},{transform:'translate('+x1+'px,0)'}]:[{transform:'translate('+x0+'px,0)'},{transform:'translate('+x1+'px,0)'}],{duration:d,easing:'ease-in-out',fill:'forwards'});
-try{await a.finished}catch{}l.style.transform='translate('+x1+'px,0)';a.cancel()};
-const t=$('term');if(t)t.innerHTML='';
+const go=async(k,x1,d,arc)=>{const l=L[k],x0=cur[k];cur[k]=x1;l.classList.add('mv');const a=l.animate(arc?[{transform:'translate('+x0+'px,0)'},{transform:'translate('+(x0+x1)/2+'px,'+arc+'px)'},{transform:'translate('+x1+'px,0)'}]:[{transform:'translate('+x0+'px,0)'},{transform:'translate('+x1+'px,0)'}],{duration:d,easing:'ease-in-out',fill:'forwards'});
+try{await a.finished}catch{}l.classList.remove('mv');l.style.transform='translate('+x1+'px,0)';a.cancel()};
+const t=$('term');if(t)t.innerHTML='';const MN=MODES[(cyc-1)%3],tm=$('tm');$('tt').textContent='sort_label.'+({python:'py',json:'json',log:'log'})[MN];tm.textContent=MN.toUpperCase();tm.style.setProperty('--bc',({python:'#7DD3FC',json:'#FCD34D',log:'#86EFAC'})[MN]);$('pg').style.width='0';b.classList.add('run');
 tl(EVm.start(N));await sl(700);if(my!==towTok)return;
 let slot,tries=0;do{slot=[...Array(N).keys()].sort(()=>Math.random()-.5);tries++}while(slot.filter((v,k)=>v!==k).length<N-3&&tries<50);
 const own=[];slot.forEach((sl_,k)=>own[sl_]=k);
-L.forEach(l=>l.classList.add('un'));tl(EVm.shuf());
+L.forEach((l,k)=>{l.classList.add('un');l.style.color='hsl('+(k*26)+',95%,78%)'});tl(EVm.shuf());
 await Promise.all(L.map((l,k)=>go(k,cx(k,slot[k]),420,k%2?-9:9)));if(my!==towTok)return;
 tl(EVm.data(own.map(k=>[k,CH[k]])));await sl(700);tl(EVm.run());await sl(500);
 let step=0;
@@ -327,8 +342,8 @@ for(let s=0;s<N;s++){if(my!==towTok)return;
 if(slot[s]!==s){const p=slot[s],o=own[s];step++;tl(EVm.swap(step,s,p,CH[s],CH[o]));
 slot[s]=s;own[s]=s;slot[o]=p;own[p]=o;
 await Promise.all([go(s,cx(s,s),320,-10),go(o,cx(o,p),320,10)]);await sl(60)}
-L[s].classList.remove('un')}
-tl(EVm.done());await sl(500);
+L[s].classList.remove('un');L[s].style.color='';L[s].classList.add('fl');setTimeout(()=>L[s].classList.remove('fl'),520);$('pg').style.width=((s+1)/N*100)+'%';{const r=L[s].getBoundingClientRect();burst(r.left+r.width/2,r.top+6,3)}}
+tl(EVm.done());tm.textContent='SORTED ✓';tm.style.setProperty('--bc','#4ADE80');b.classList.remove('run');await sl(500);
 await Promise.all(L.map((l,k)=>go(k,nx(k),340,k%2?-6:6)));if(my!==towTok)return;
 fireworks();
 L.forEach((l,k)=>l.animate([{transform:'translate('+cur[k]+'px,0)'},{transform:'translate('+cur[k]+'px,-6px)'},{transform:'translate('+cur[k]+'px,0)'}],{duration:380,delay:k*35,easing:'ease-in-out'}));
