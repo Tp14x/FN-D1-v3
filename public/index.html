@@ -108,7 +108,9 @@ input,select{border-width:2px;border-radius:16px}
 #sub{position:relative;overflow:hidden}
 .lt{position:relative;display:inline-block;white-space:nowrap;line-height:1.2}
 .lc{display:inline-block;will-change:transform}
-.tcar{position:absolute;left:0;top:50%;margin-top:-14px;font-size:26px;line-height:1;transform:translateX(420px);pointer-events:none;filter:drop-shadow(0 3px 2px rgba(0,0,0,.25))}
+.tcar{position:absolute;left:0;top:50%;margin-top:-6px;font-size:24px;line-height:1;pointer-events:none;filter:drop-shadow(0 3px 2px rgba(0,0,0,.25))}
+.tcar i{display:inline-block;font-style:normal;transform:scaleX(-1);animation:jit .16s linear infinite}
+@keyframes jit{0%,100%{transform:scaleX(-1) translateY(0)}50%{transform:scaleX(-1) translateY(-1.5px)}}
 </style>
 </head>
 <body>
@@ -283,21 +285,23 @@ document.querySelectorAll('.logo').forEach(l=>l.onclick=e=>{const r=l.getBoundin
 /* car picks up the label letter by letter */
 let towTok=0;const TXT='ตรวจสอบและบันทึก',sl=ms=>new Promise(r=>setTimeout(r,ms));
 function initTow(){const b=$('sub');b.setAttribute('aria-label',TXT);
-b.innerHTML='<span class="lt" aria-hidden="true">'+(TXT.match(/[^\u0E31\u0E34-\u0E3A\u0E47-\u0E4E][\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]*/gu)||[TXT]).map(c=>'<span class="lc">'+c+'</span>').join('')+'<span class="tcar">🚗</span></span>';
+b.innerHTML='<span class="lt" aria-hidden="true">'+(TXT.match(/[^\u0E31\u0E34-\u0E3A\u0E47-\u0E4E][\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]*/gu)||[TXT]).map(c=>'<span class="lc">'+c+'</span>').join('')+'</span>';
 if(RM)return;tow(++towTok)}
 async function tow(my){const b=$('sub');if(document.fonts)await document.fonts.ready;
-while(my===towTok){const lt=b.querySelector('.lt'),car=b.querySelector('.tcar');if(!lt||!car)return;
+const CAR=['🚗','🚕','🚙','🚓'],WV=[{transform:'translateY(0)'},{transform:'translateY(-6px)'},{transform:'translateY(0)'}];
+while(my===towTok){const lt=b.querySelector('.lt');if(!lt)return;
 if(!$('s-main').classList.contains('on')){await sl(500);continue}
-const L=[...lt.querySelectorAll('.lc')];L.forEach(l=>{l.style.visibility='hidden'});
-const CW=30,x0=b.getBoundingClientRect().right-lt.getBoundingClientRect().left+8;
-for(const l of L){if(my!==towTok)return;const lx=l.offsetLeft,x1=lx-CW-2;l.style.visibility='visible';
-const a1=l.animate([{transform:'translateX('+(x0+CW+2-lx)+'px)'},{transform:'none'}],{duration:210,easing:'cubic-bezier(.2,.8,.3,1)',fill:'forwards'});
-const a2=car.animate([{transform:'translateX('+x0+'px)'},{transform:'translateX('+x1+'px)'}],{duration:210,easing:'cubic-bezier(.2,.8,.3,1)',fill:'forwards'});
-await sl(215);
-const a3=car.animate([{transform:'translateX('+x1+'px) scaleX(-1)'},{transform:'translateX('+x0+'px) scaleX(-1)'}],{duration:130,easing:'ease-in',fill:'forwards'});
-await sl(130);car.style.transform='translateX('+x0+'px)';a1.cancel();a2.cancel();a3.cancel()}
-if(my!==towTok)return;L.forEach((l,i)=>l.animate([{transform:'translateY(0)'},{transform:'translateY(-6px)'},{transform:'translateY(0)'}],{duration:380,delay:i*35,easing:'ease-in-out'}));
-await sl(7500)}}
+const L=[...lt.querySelectorAll('.lc')],ltL=lt.getBoundingClientRect().left,bR=b.getBoundingClientRect(),x0=bR.left-ltL-40,x2=bR.right-ltL+40,v=.6,CW=26,GAP=140,DROP=240;let end=0;
+L.forEach((l,i)=>{const lx=l.offsetLeft,w=l.offsetWidth,ta=(lx+w/2-CW/2-x0)/v,T=(x2-x0)/v,dl=i*GAP;
+l.animate([{transform:'translate('+(x0+CW/2-w/2-lx)+'px,-15px)',offset:0},{transform:'translate(0,-15px)',offset:ta/(ta+DROP),easing:'cubic-bezier(.34,1.56,.64,1)'},{transform:'translate(0,0)',offset:1}],{duration:ta+DROP,delay:dl,fill:'both'});
+const c=document.createElement('span');c.className='tcar';c.innerHTML='<i style="filter:hue-rotate('+(i*47)%360+'deg) saturate(1.3)">'+CAR[i%4]+'</i>';lt.appendChild(c);
+const a=c.animate([{transform:'translateX('+x0+'px)'},{transform:'translateX('+x2+'px)'}],{duration:T,delay:dl,fill:'both'});a.onfinish=()=>c.remove();
+end=Math.max(end,dl+ta+DROP)});
+await sl(end+60);if(my!==towTok)return;
+L.forEach((l,i)=>l.animate(WV,{duration:380,delay:i*35,easing:'ease-in-out'}));
+await sl(1300);if(my!==towTok)return;
+L.forEach(l=>l.getAnimations().forEach(x=>x.cancel()));
+await sl(7000)}}
 initTow();
 if(!RM){const bg=document.createElement('div');bg.className='bgfx';bg.setAttribute('aria-hidden','true');
 bg.innerHTML=['#FFC2D4','#FFE9A8','#B8F0D6','#D5C8FF'].map((c,i)=>'<i class="blob" style="background:'+c+';'+['left:-80px;top:80px','right:-100px;top:30%','left:20%;bottom:-120px','right:10%;bottom:10%'][i]+';animation-delay:-'+i*4+'s"></i>').join('');
