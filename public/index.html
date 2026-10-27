@@ -103,6 +103,14 @@ input,select{border-width:2px;border-radius:16px}
 @keyframes flowg{to{background-position:200% 0}}
 @media(hover:none){.btn:hover{animation:none}}
 @media(max-width:480px){.blob{filter:blur(40px);width:240px;height:240px}}
+
+.tow{display:inline-flex;align-items:center;animation:tow 7s cubic-bezier(.3,.9,.3,1) infinite;will-change:transform}
+.tow .tt{display:inline-block;animation:lag 7s cubic-bezier(.3,.9,.3,1) infinite;transform-origin:right center}
+.tow .rope{width:18px;height:0;border-top:2px dashed rgba(255,255,255,.85);margin:0 3px 0 4px}
+.tow .cr{display:inline-block;font-size:27px;line-height:1;transform:scaleX(-1);animation:jit .18s linear infinite;filter:drop-shadow(0 3px 2px rgba(0,0,0,.25))}
+@keyframes tow{0%{transform:translateX(-150%)}32%{transform:translateX(4%)}38%,84%{transform:none}100%{transform:translateX(150%)}}
+@keyframes lag{0%{transform:translateX(-22px) scaleX(.93)}30%{transform:translateX(-4px) scaleX(.98)}38%,84%{transform:none}100%{transform:translateX(-22px) scaleX(.93)}}
+@keyframes jit{0%,100%{transform:scaleX(-1) translateY(0)}50%{transform:scaleX(-1) translateY(-1.5px)}}
 </style>
 </head>
 <body>
@@ -139,7 +147,7 @@ input,select{border-width:2px;border-radius:16px}
 <div class="card"><div class="sh"><span class="nb">3</span>สาเหตุการใช้รถ</div><div><input id="rs" placeholder="เช่น ส่งเอกสาร พบลูกค้า" aria-label="สาเหตุ"><div class="err" id="e-rs"></div></div></div>
 <div class="card"><div class="sh"><span class="nb">4</span>ปลายทาง (สูงสุด 3 จุด)</div><input id="sq" placeholder="ค้นหาสถานที่" aria-label="ค้นหาสถานที่"><div id="map"></div><div class="route" id="route">แตะบนแผนที่เพื่อปักหมุดปลายทาง</div><div style="display:flex;gap:8px"><button type="button" class="btn ghost" id="clr" style="height:44px;font-size:14px">ล้างหมุด</button></div><div class="err" id="e-dest"></div></div>
 <div class="card" id="hist" style="display:none"><div class="sh">ประวัติล่าสุด</div><div id="histl"></div></div>
-<div class="bar"><div><button class="btn" type="submit" id="sub">ตรวจสอบและบันทึก</button></div></div>
+<div class="bar"><div><button class="btn" type="submit" id="sub"><span class="tow"><span class="tt">ตรวจสอบและบันทึก</span><i class="rope"></i><span class="cr" aria-hidden="true">🚗</span></span></button></div></div>
 </form></section>
 
 <section class="scr" id="s-use">
@@ -216,7 +224,7 @@ const res=await jpost('/save-record',{userId:user.userId,name:user.name,phone:us
 const d=await res.json().catch(()=>({}));
 if(!res.ok){if(res.status===403)modal('ไม่สามารถบันทึกได้',d.error||'บัญชีของคุณถูกระงับการใช้งาน\nกรุณาติดต่อผู้ดูแลระบบ','b');else toast(d.error||'เกิดข้อผิดพลาด กรุณาลองใหม่');return}
 const u={isUsing:true,carPlate:p.car,carModel:p.car.split(':')[0].trim(),startedAt:new Date().toISOString(),userName:user.name,userId:user.userId,mileage:p.mile};saveUsage(u);showUse(u);toast('✅ บันทึกสำเร็จ! ใช้รถ '+p.car);burst(innerWidth/2,innerHeight/3,40)}
-catch{toast('เกิดข้อผิดพลาด กรุณาลองใหม่')}finally{b.disabled=false;b.textContent='ตรวจสอบและบันทึก'}};
+catch{toast('เกิดข้อผิดพลาด กรุณาลองใหม่')}finally{b.disabled=false;b.innerHTML=SUBH}};
 
 /* in use */
 function showUse(u){$('iP').textContent=u.carPlate||'-';$('iU').textContent=u.userName||'-';$('iM').textContent=u.mileage?u.mileage+' กม.':'-';
@@ -268,6 +276,7 @@ else if(role==='pending'){const c=await jpost('/user-request',{action:'check',us
 else{const h=new Date().getHours();$('hi').textContent=(h<12?'อรุณสวัสดิ์':h<18?'สวัสดีตอนบ่าย':'สวัสดีตอนเย็น')+' · '+(user.department||'');$('un').textContent=user.name;avatar(user.name,pr.pictureUrl);drawCars();loadBusy();hist(pr.userId);show('s-main');loadMap()}
 }catch(e){$('load').style.display='none';modal('เปิดระบบไม่สำเร็จ','กรุณาเปิดผ่านแอป LINE หรือลองใหม่อีกครั้ง','b')}})();
 /* party mode */
+const SUBH='<span class="tow"><span class="tt">ตรวจสอบและบันทึก</span><i class="rope"></i><span class="cr" aria-hidden="true">🚗</span></span>';
 const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,EM=['✨','⭐','💙','🌟','🎉','🚗','💛'],CLR=['#FF8FAB','#FFC857','#6EE7B7','#7AA2FF','#C4A1FF'];
 function burst(x,y,n){if(RM)return;for(let i=0;i<n;i++){const e=document.createElement('span');e.className='bp';const a=Math.random()*Math.PI*2,d=40+Math.random()*90;e.style.cssText='left:'+x+'px;top:'+y+'px;--dx:'+Math.cos(a)*d+'px;--dy:'+(Math.sin(a)*d-30)+'px;--r:'+(Math.random()*540-270)+'deg';
 if(Math.random()<.55){e.textContent=EM[i%EM.length];e.style.fontSize=(12+Math.random()*10)+'px'}else{e.style.width=e.style.height=(6+Math.random()*6)+'px';e.style.background=CLR[i%5];e.style.borderRadius=Math.random()<.5?'50%':'2px'}document.body.appendChild(e);setTimeout(()=>e.remove(),900)}}
