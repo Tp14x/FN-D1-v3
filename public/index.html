@@ -104,13 +104,11 @@ input,select{border-width:2px;border-radius:16px}
 @media(hover:none){.btn:hover{animation:none}}
 @media(max-width:480px){.blob{filter:blur(40px);width:240px;height:240px}}
 
-.tow{display:inline-flex;align-items:center;animation:tow 7s cubic-bezier(.3,.9,.3,1) infinite;will-change:transform}
-.tow .tt{display:inline-block;animation:lag 7s cubic-bezier(.3,.9,.3,1) infinite;transform-origin:right center}
-.tow .rope{width:18px;height:0;border-top:2px dashed rgba(255,255,255,.85);margin:0 3px 0 4px}
-.tow .cr{display:inline-block;font-size:27px;line-height:1;transform:scaleX(-1);animation:jit .18s linear infinite;filter:drop-shadow(0 3px 2px rgba(0,0,0,.25))}
-@keyframes tow{0%{transform:translateX(-150%)}32%{transform:translateX(4%)}38%,84%{transform:none}100%{transform:translateX(150%)}}
-@keyframes lag{0%{transform:translateX(-22px) scaleX(.93)}30%{transform:translateX(-4px) scaleX(.98)}38%,84%{transform:none}100%{transform:translateX(-22px) scaleX(.93)}}
-@keyframes jit{0%,100%{transform:scaleX(-1) translateY(0)}50%{transform:scaleX(-1) translateY(-1.5px)}}
+
+#sub{position:relative;overflow:hidden}
+.lt{position:relative;display:inline-block;white-space:nowrap;line-height:1.2}
+.lc{display:inline-block;will-change:transform}
+.tcar{position:absolute;left:0;top:50%;margin-top:-14px;font-size:26px;line-height:1;transform:translateX(420px);pointer-events:none;filter:drop-shadow(0 3px 2px rgba(0,0,0,.25))}
 </style>
 </head>
 <body>
@@ -147,7 +145,7 @@ input,select{border-width:2px;border-radius:16px}
 <div class="card"><div class="sh"><span class="nb">3</span>สาเหตุการใช้รถ</div><div><input id="rs" placeholder="เช่น ส่งเอกสาร พบลูกค้า" aria-label="สาเหตุ"><div class="err" id="e-rs"></div></div></div>
 <div class="card"><div class="sh"><span class="nb">4</span>ปลายทาง (สูงสุด 3 จุด)</div><input id="sq" placeholder="ค้นหาสถานที่" aria-label="ค้นหาสถานที่"><div id="map"></div><div class="route" id="route">แตะบนแผนที่เพื่อปักหมุดปลายทาง</div><div style="display:flex;gap:8px"><button type="button" class="btn ghost" id="clr" style="height:44px;font-size:14px">ล้างหมุด</button></div><div class="err" id="e-dest"></div></div>
 <div class="card" id="hist" style="display:none"><div class="sh">ประวัติล่าสุด</div><div id="histl"></div></div>
-<div class="bar"><div><button class="btn" type="submit" id="sub"><span class="tow"><span class="tt">ตรวจสอบและบันทึก</span><i class="rope"></i><span class="cr" aria-hidden="true">🚗</span></span></button></div></div>
+<div class="bar"><div><button class="btn" type="submit" id="sub" aria-label="ตรวจสอบและบันทึก"></button></div></div>
 </form></section>
 
 <section class="scr" id="s-use">
@@ -217,14 +215,14 @@ $('form').onsubmit=e=>{e.preventDefault();if(loadUsage())return showUse(loadUsag
 const rt=$('route');ps={car:carVal,mile:$('mi').value.trim(),reason:$('rs').value.trim(),d:+rt.dataset.d||0,t:+rt.dataset.t||0};
 $('cfc').innerHTML=[['ชื่อ',user.name],['ทะเบียน',ps.car],['เลขไมล์',ps.mile],['ภารกิจ',ps.reason],['ระยะทาง',ps.d?ps.d+' กม. · '+ps.t+' นาที':'ไม่ระบุ'],['รูปไมล์',photo?'✅ มีรูปแนบ':'—']].map(([a,b])=>`<div class="row"><span>${a}</span><span>${esc(b)}</span></div>`).join('');$('cf').classList.add('on')};
 $('cfx').onclick=()=>$('cf').classList.remove('on');
-$('cfo').onclick=async()=>{$('cf').classList.remove('on');if(!ps)return;const p=ps;ps=null;const b=$('sub');b.disabled=true;b.textContent='กำลังบันทึก...';
+$('cfo').onclick=async()=>{$('cf').classList.remove('on');if(!ps)return;const p=ps;ps=null;const b=$('sub');b.disabled=true;towTok++;b.removeAttribute('aria-label');b.textContent='กำลังบันทึก...';
 try{let pk=null;if(photo){const fd=new FormData();fd.append('photo',photo);try{const u=await fetch('/upload-photo',{method:'POST',body:fd}).then(r=>r.json());if(u.success)pk=u.key;else toast('อัปโหลดรูปไม่สำเร็จ')}catch{toast('อัปโหลดรูปไม่สำเร็จ')}}
 const rt=$('route').textContent;
 const res=await jpost('/save-record',{userId:user.userId,name:user.name,phone:user.phone||'-',car:p.car,mileage:p.mile,reason:p.reason,routeText:rt,totalDistance:p.d,totalTime:p.t,hasPhoto:!!pk,photoKey:pk,destinations:markers.map((m,i)=>({point:i+1,lat:m.getPosition().lat(),lng:m.getPosition().lng()})),timestamp:new Date().toISOString()});
 const d=await res.json().catch(()=>({}));
 if(!res.ok){if(res.status===403)modal('ไม่สามารถบันทึกได้',d.error||'บัญชีของคุณถูกระงับการใช้งาน\nกรุณาติดต่อผู้ดูแลระบบ','b');else toast(d.error||'เกิดข้อผิดพลาด กรุณาลองใหม่');return}
 const u={isUsing:true,carPlate:p.car,carModel:p.car.split(':')[0].trim(),startedAt:new Date().toISOString(),userName:user.name,userId:user.userId,mileage:p.mile};saveUsage(u);showUse(u);toast('✅ บันทึกสำเร็จ! ใช้รถ '+p.car);burst(innerWidth/2,innerHeight/3,40)}
-catch{toast('เกิดข้อผิดพลาด กรุณาลองใหม่')}finally{b.disabled=false;b.innerHTML=SUBH}};
+catch{toast('เกิดข้อผิดพลาด กรุณาลองใหม่')}finally{b.disabled=false;initTow()}};
 
 /* in use */
 function showUse(u){$('iP').textContent=u.carPlate||'-';$('iU').textContent=u.userName||'-';$('iM').textContent=u.mileage?u.mileage+' กม.':'-';
@@ -276,13 +274,31 @@ else if(role==='pending'){const c=await jpost('/user-request',{action:'check',us
 else{const h=new Date().getHours();$('hi').textContent=(h<12?'อรุณสวัสดิ์':h<18?'สวัสดีตอนบ่าย':'สวัสดีตอนเย็น')+' · '+(user.department||'');$('un').textContent=user.name;avatar(user.name,pr.pictureUrl);drawCars();loadBusy();hist(pr.userId);show('s-main');loadMap()}
 }catch(e){$('load').style.display='none';modal('เปิดระบบไม่สำเร็จ','กรุณาเปิดผ่านแอป LINE หรือลองใหม่อีกครั้ง','b')}})();
 /* party mode */
-const SUBH='<span class="tow"><span class="tt">ตรวจสอบและบันทึก</span><i class="rope"></i><span class="cr" aria-hidden="true">🚗</span></span>';
 const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,EM=['✨','⭐','💙','🌟','🎉','🚗','💛'],CLR=['#FF8FAB','#FFC857','#6EE7B7','#7AA2FF','#C4A1FF'];
 function burst(x,y,n){if(RM)return;for(let i=0;i<n;i++){const e=document.createElement('span');e.className='bp';const a=Math.random()*Math.PI*2,d=40+Math.random()*90;e.style.cssText='left:'+x+'px;top:'+y+'px;--dx:'+Math.cos(a)*d+'px;--dy:'+(Math.sin(a)*d-30)+'px;--r:'+(Math.random()*540-270)+'deg';
 if(Math.random()<.55){e.textContent=EM[i%EM.length];e.style.fontSize=(12+Math.random()*10)+'px'}else{e.style.width=e.style.height=(6+Math.random()*6)+'px';e.style.background=CLR[i%5];e.style.borderRadius=Math.random()<.5?'50%':'2px'}document.body.appendChild(e);setTimeout(()=>e.remove(),900)}}
 let pdone=false;function prog(){const n=[!!carVal,!!$('mi').value.trim(),!!$('rs').value.trim(),markers.length>0].filter(Boolean).length;$('pgf').style.width=n*25+'%';$('pgt').textContent=n===4?'พร้อมบันทึกแล้ว 🎉':'กรอกแล้ว '+n+'/4 ✨';if(n===4&&!pdone){pdone=true;burst(innerWidth/2,130,28)}if(n<4)pdone=false}
 $('form').addEventListener('input',prog);
 document.querySelectorAll('.logo').forEach(l=>l.onclick=e=>{const r=l.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,18);toast('ปิ๊นๆ! 🚗💨')});
+/* car picks up the label letter by letter */
+let towTok=0;const TXT='ตรวจสอบและบันทึก',sl=ms=>new Promise(r=>setTimeout(r,ms));
+function initTow(){const b=$('sub');b.setAttribute('aria-label',TXT);
+b.innerHTML='<span class="lt" aria-hidden="true">'+(TXT.match(/[^\u0E31\u0E34-\u0E3A\u0E47-\u0E4E][\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]*/gu)||[TXT]).map(c=>'<span class="lc">'+c+'</span>').join('')+'<span class="tcar">🚗</span></span>';
+if(RM)return;tow(++towTok)}
+async function tow(my){const b=$('sub');if(document.fonts)await document.fonts.ready;
+while(my===towTok){const lt=b.querySelector('.lt'),car=b.querySelector('.tcar');if(!lt||!car)return;
+if(!$('s-main').classList.contains('on')){await sl(500);continue}
+const L=[...lt.querySelectorAll('.lc')];L.forEach(l=>{l.style.visibility='hidden'});
+const CW=30,x0=b.getBoundingClientRect().right-lt.getBoundingClientRect().left+8;
+for(const l of L){if(my!==towTok)return;const lx=l.offsetLeft,x1=lx-CW-2;l.style.visibility='visible';
+const a1=l.animate([{transform:'translateX('+(x0+CW+2-lx)+'px)'},{transform:'none'}],{duration:210,easing:'cubic-bezier(.2,.8,.3,1)',fill:'forwards'});
+const a2=car.animate([{transform:'translateX('+x0+'px)'},{transform:'translateX('+x1+'px)'}],{duration:210,easing:'cubic-bezier(.2,.8,.3,1)',fill:'forwards'});
+await sl(215);
+const a3=car.animate([{transform:'translateX('+x1+'px) scaleX(-1)'},{transform:'translateX('+x0+'px) scaleX(-1)'}],{duration:130,easing:'ease-in',fill:'forwards'});
+await sl(130);car.style.transform='translateX('+x0+'px)';a1.cancel();a2.cancel();a3.cancel()}
+if(my!==towTok)return;L.forEach((l,i)=>l.animate([{transform:'translateY(0)'},{transform:'translateY(-6px)'},{transform:'translateY(0)'}],{duration:380,delay:i*35,easing:'ease-in-out'}));
+await sl(7500)}}
+initTow();
 if(!RM){const bg=document.createElement('div');bg.className='bgfx';bg.setAttribute('aria-hidden','true');
 bg.innerHTML=['#FFC2D4','#FFE9A8','#B8F0D6','#D5C8FF'].map((c,i)=>'<i class="blob" style="background:'+c+';'+['left:-80px;top:80px','right:-100px;top:30%','left:20%;bottom:-120px','right:10%;bottom:10%'][i]+';animation-delay:-'+i*4+'s"></i>').join('');
 for(let i=0;i<(innerWidth<600?8:16);i++){const e=document.createElement('span');e.className='fp';e.textContent=EM[i%EM.length];e.style.cssText='left:'+Math.random()*100+'%;font-size:'+(14+Math.random()*14)+'px;animation-duration:'+(16+Math.random()*16)+'s;animation-delay:-'+Math.random()*30+'s';bg.appendChild(e)}document.body.prepend(bg);
