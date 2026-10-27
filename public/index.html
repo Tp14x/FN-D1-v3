@@ -108,10 +108,15 @@ input,select{border-width:2px;border-radius:16px}
 #sub{position:relative;overflow:hidden}
 .lt{position:relative;display:inline-block;white-space:nowrap;line-height:1.2}
 .lc{display:inline-block;will-change:transform}
-.tcar{position:absolute;left:0;top:50%;margin-top:-6px;font-size:24px;line-height:1;pointer-events:none;filter:drop-shadow(0 3px 2px rgba(0,0,0,.25))}
-.tcar i{display:inline-block;font-style:normal;transform:scaleX(-1);animation:jit .16s linear infinite}
-@keyframes jit{0%,100%{transform:scaleX(-1) translateY(0)}50%{transform:scaleX(-1) translateY(-1.5px)}}
 #fx{position:fixed;inset:0;width:100%;height:100%;z-index:65;pointer-events:none}
+
+#s-main{padding-bottom:84px}
+.lc{transition:color .25s}.lc.un{color:#FFE08A}
+.term{margin:0 auto 10px;max-width:480px;background:#0B1220;color:#CBD5E1;border-radius:14px;padding:9px 12px;font:11px/16px ui-monospace,SFMono-Regular,Menlo,Consolas,'Courier New',monospace;height:66px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:inset 0 0 0 1px #1E293B}
+.term div{white-space:pre;overflow:hidden;text-overflow:ellipsis}
+.tk{color:#7DD3FC}.ts{color:#86EFAC}.tn{color:#FCD34D}.tc{color:#8FA0B8}.tp{color:#F9A8D4}
+.tcur{display:inline-block;width:6px;height:11px;background:#86EFAC;vertical-align:-1px;margin-left:3px;animation:blk 1s steps(1) infinite}
+@keyframes blk{50%{opacity:0}}
 </style>
 </head>
 <body>
@@ -148,7 +153,7 @@ input,select{border-width:2px;border-radius:16px}
 <div class="card"><div class="sh"><span class="nb">3</span>สาเหตุการใช้รถ</div><div><input id="rs" placeholder="เช่น ส่งเอกสาร พบลูกค้า" aria-label="สาเหตุ"><div class="err" id="e-rs"></div></div></div>
 <div class="card"><div class="sh"><span class="nb">4</span>ปลายทาง (สูงสุด 3 จุด)</div><input id="sq" placeholder="ค้นหาสถานที่" aria-label="ค้นหาสถานที่"><div id="map"></div><div class="route" id="route">แตะบนแผนที่เพื่อปักหมุดปลายทาง</div><div style="display:flex;gap:8px"><button type="button" class="btn ghost" id="clr" style="height:44px;font-size:14px">ล้างหมุด</button></div><div class="err" id="e-dest"></div></div>
 <div class="card" id="hist" style="display:none"><div class="sh">ประวัติล่าสุด</div><div id="histl"></div></div>
-<div class="bar"><div><button class="btn" type="submit" id="sub" aria-label="ตรวจสอบและบันทึก"></button></div></div>
+<div class="bar"><pre class="term" id="term" aria-hidden="true"></pre><div><button class="btn" type="submit" id="sub" aria-label="ตรวจสอบและบันทึก"></button></div></div>
 </form></section>
 
 <section class="scr" id="s-use">
@@ -287,21 +292,46 @@ document.querySelectorAll('.logo').forEach(l=>l.onclick=e=>{const r=l.getBoundin
 let towTok=0;const TXT='ตรวจสอบและบันทึก',sl=ms=>new Promise(r=>setTimeout(r,ms));
 function initTow(){const b=$('sub');b.setAttribute('aria-label',TXT);
 b.innerHTML='<span class="lt" aria-hidden="true">'+(TXT.match(/[^\u0E31\u0E34-\u0E3A\u0E47-\u0E4E][\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]*/gu)||[TXT]).map(c=>'<span class="lc">'+c+'</span>').join('')+'</span>';
-if(RM)return;tow(++towTok)}
+if(RM){const t=$('term');if(t)t.style.display='none';return}tow(++towTok)}
+const MODES=['python','json','log'];let cyc=0;
+const P=(c,t)=>'<span class="'+c+'">'+t+'</span>';
+const J=v=>Array.isArray(v)?'['+v.map(J).join(',')+']':typeof v==='object'?'{'+Object.entries(v).map(([k,x])=>P('tk','"'+k+'"')+':'+J(x)).join(',')+'}':typeof v==='number'?P('tn',v):typeof v==='boolean'?P('tp',v):P('ts','"'+v+'"');
+const JA=v=>Array.isArray(v)?'['+v.map(J).join(',')+']':J(v);
+const stamp=()=>{const d=new Date(),p=(n,l)=>String(n).padStart(l||2,'0');return p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())+'.'+p(d.getMilliseconds(),3)};
+const LG=(lv,t)=>P('tc','['+stamp()+']')+' '+P(lv==='INFO'?'ts':'tk',lv.padEnd(5))+' '+t;
+const EV={
+python:{start:()=>[P('tc','# python3 sort_label.py')],shuf:()=>[P('tp','random')+'.shuffle(data)'],data:o=>[P('tk','data')+' = ['+o.slice(0,3).map(x=>'{'+P('ts','"i"')+':'+P('tn',x[0])+','+P('ts','"c"')+':'+P('ts','"'+x[1]+'"')+'}').join(', ')+', …]'],run:()=>[P('tk','data')+'.sort(key='+P('tp','lambda')+' x: x['+P('ts','"i"')+'])'],swap:(n,i,j,a,b)=>[P('tc','# swap('+i+', '+j+')  "'+a+'" <-> "'+b+'"')],done:()=>['>>> '+P('tp','""')+'.join(x['+P('ts','"c"')+'] for x in data)',P('ts',"'"+TXT+"'")]},
+json:{start:n=>[JA({cmd:'sort',key:'i',n:n})],shuf:()=>[JA({op:'shuffle',seed:(Math.random()*9e3|0)})],data:o=>[JA({order:o.slice(0,8).map(x=>x[0])})],run:()=>[JA({op:'sort',key:'i',algo:'selection'})],swap:(n,i,j,a,b)=>[JA({step:n,swap:[i,j],chars:[a,b]})],done:()=>[JA({sorted:true,label:TXT})]},
+log:{start:n=>[LG('INFO','job=sort_label n='+n)],shuf:()=>[LG('DEBUG','shuffle() done')],data:o=>[LG('DEBUG','order='+o.slice(0,8).map(x=>x[0]).join(',')+',…')],run:()=>[LG('INFO','sort key=i algo=selection')],swap:(n,i,j,a,b)=>[LG('DEBUG','step='+String(n).padStart(2,'0')+' swap('+i+','+j+') '+a+'<->'+b)],done:()=>[LG('INFO','sorted label="'+TXT+'" exit=0')]}};
+function tl(lines){const t=$('term');if(!t)return;t.querySelectorAll('.tcur').forEach(e=>e.remove());lines.forEach(h=>{const d=document.createElement('div');d.innerHTML=h;t.appendChild(d)});while(t.children.length>3)t.firstChild.remove();const l=t.lastChild;if(l)l.insertAdjacentHTML('beforeend','<span class="tcur"></span>')}
 async function tow(my){const b=$('sub');if(document.fonts)await document.fonts.ready;
-const CAR=['🚗','🚕','🚙','🚓'],WV=[{transform:'translateY(0)'},{transform:'translateY(-6px)'},{transform:'translateY(0)'}];
 while(my===towTok){const lt=b.querySelector('.lt');if(!lt)return;
 if(!$('s-main').classList.contains('on')){await sl(500);continue}
-const L=[...lt.querySelectorAll('.lc')],ltL=lt.getBoundingClientRect().left,bR=b.getBoundingClientRect(),x0=bR.left-ltL-40,x2=bR.right-ltL+40,v=.3,CW=26,GAP=240,DROP=320;let end=0;
-L.forEach((l,i)=>{const lx=l.offsetLeft,w=l.offsetWidth,ta=(lx+w/2-CW/2-x0)/v,T=(x2-x0)/v,dl=i*GAP;
-l.animate([{transform:'translate('+(x0+CW/2-w/2-lx)+'px,-15px)',offset:0},{transform:'translate(0,-15px)',offset:ta/(ta+DROP),easing:'cubic-bezier(.34,1.56,.64,1)'},{transform:'translate(0,0)',offset:1}],{duration:ta+DROP,delay:dl,fill:'both'});
-const c=document.createElement('span');c.className='tcar';c.innerHTML='<i style="filter:hue-rotate('+(i*47)%360+'deg) saturate(1.3)">'+CAR[i%4]+'</i>';lt.appendChild(c);
-const a=c.animate([{transform:'translateX('+x0+'px)'},{transform:'translateX('+x2+'px)'}],{duration:T,delay:dl,fill:'both'});a.onfinish=()=>c.remove();
-end=Math.max(end,dl+ta+DROP)});
-await sl(end+60);if(my!==towTok)return;fireworks();
-L.forEach((l,i)=>l.animate(WV,{duration:380,delay:i*35,easing:'ease-in-out'}));
-await sl(1300);if(my!==towTok)return;
-L.forEach(l=>l.getAnimations().forEach(x=>x.cancel()));
+const L=[...lt.querySelectorAll('.lc')],N=L.length,CELL=15,EVm=EV[MODES[cyc++%3]],CH=L.map(l=>l.textContent);
+lt.style.cssText='';L.forEach(l=>{l.style.cssText='';l.className='lc'});
+const nat=L.map(l=>({x:l.offsetLeft,w:l.offsetWidth})),Wn=lt.offsetWidth,W=Math.max(Wn,N*CELL),off=(W-Wn)/2,cur=[];
+lt.style.width=W+'px';lt.style.height=lt.offsetHeight+'px';
+const nx=k=>nat[k].x+off,cx=(k,s)=>(W-N*CELL)/2+s*CELL+(CELL-nat[k].w)/2;
+L.forEach((l,k)=>{l.style.position='absolute';l.style.left='0';l.style.top='0';cur[k]=nx(k);l.style.transform='translate('+cur[k]+'px,0)'});
+const go=async(k,x1,d,arc)=>{const l=L[k],x0=cur[k];cur[k]=x1;const a=l.animate(arc?[{transform:'translate('+x0+'px,0)'},{transform:'translate('+(x0+x1)/2+'px,'+arc+'px)'},{transform:'translate('+x1+'px,0)'}]:[{transform:'translate('+x0+'px,0)'},{transform:'translate('+x1+'px,0)'}],{duration:d,easing:'ease-in-out',fill:'forwards'});
+try{await a.finished}catch{}l.style.transform='translate('+x1+'px,0)';a.cancel()};
+const t=$('term');if(t)t.innerHTML='';
+tl(EVm.start(N));await sl(700);if(my!==towTok)return;
+let slot,tries=0;do{slot=[...Array(N).keys()].sort(()=>Math.random()-.5);tries++}while(slot.filter((v,k)=>v!==k).length<N-3&&tries<50);
+const own=[];slot.forEach((sl_,k)=>own[sl_]=k);
+L.forEach(l=>l.classList.add('un'));tl(EVm.shuf());
+await Promise.all(L.map((l,k)=>go(k,cx(k,slot[k]),420,k%2?-9:9)));if(my!==towTok)return;
+tl(EVm.data(own.map(k=>[k,CH[k]])));await sl(700);tl(EVm.run());await sl(500);
+let step=0;
+for(let s=0;s<N;s++){if(my!==towTok)return;
+if(slot[s]!==s){const p=slot[s],o=own[s];step++;tl(EVm.swap(step,s,p,CH[s],CH[o]));
+slot[s]=s;own[s]=s;slot[o]=p;own[p]=o;
+await Promise.all([go(s,cx(s,s),320,-10),go(o,cx(o,p),320,10)]);await sl(60)}
+L[s].classList.remove('un')}
+tl(EVm.done());await sl(500);
+await Promise.all(L.map((l,k)=>go(k,nx(k),340,k%2?-6:6)));if(my!==towTok)return;
+fireworks();
+L.forEach((l,k)=>l.animate([{transform:'translate('+cur[k]+'px,0)'},{transform:'translate('+cur[k]+'px,-6px)'},{transform:'translate('+cur[k]+'px,0)'}],{duration:380,delay:k*35,easing:'ease-in-out'}));
 await sl(7000)}}
 /* fireworks when the label is complete */
 let fp=[],fr=[],fraf=0,fxc=null,fxx=null;const DPR=Math.min(2,devicePixelRatio||1);
