@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>สมุดบันทึกการใช้รถ</title>
+<title>บันทึกการใช้รถ</title>
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Prompt:wght@500;600;700&family=Mali:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--ink:#0F1B2D;--mut:#52627A;--line:#E2E8F0;--bg:#F3F5F8;--pri:#1D4ED8;--tint:#E8EEFC;--ok:#0E7A4B;--okT:#E3F4EB;--am:#9A5B00;--amT:#FFF0D6}
@@ -151,6 +151,41 @@ body{background:#EEF2FF}
 @keyframes twk{50%{transform:scale(2);filter:brightness(1.3)}}
 @keyframes pp{0%{transform:scale(1.3)}100%{transform:none}}
 @keyframes flowg{to{background-position:200% 0}}
+
+/* mobile */
+html{-webkit-text-size-adjust:100%}
+button,.seg,.chips{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+input{font-size:16px}
+.tin{display:none}
+.hero{padding-top:env(safe-area-inset-top)}
+.w{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+#tp{bottom:calc(20px + env(safe-area-inset-bottom))}#toast{bottom:calc(20px + env(safe-area-inset-bottom));max-width:90vw;text-align:center}
+@media(max-width:900px){.fleet{margin-inline:-16px;padding-inline:16px;scroll-padding-inline:16px;scrollbar-width:none}.fleet::-webkit-scrollbar{display:none}.fc{min-width:178px}}
+@media(hover:none){.it:hover,.fc:hover,.kpi>div:hover,.btn:hover{transform:none}.btn:hover{animation:none}}
+@media(max-width:640px){
+.hero .w{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-top:22px;padding-bottom:18px}
+.hero .w>*{grid-column:auto}.hero .w>:first-child{grid-column:1/-1;padding-right:48px}.hero .sp{display:none}
+.hero .seg,.hero .road{grid-column:1/-1}.hero .seg{display:flex;width:100%}.seg button{flex:1;padding:0 6px;height:40px}
+.hero .btn{height:46px;width:100%}.hero h1{font-size:26px}
+.sun{right:14px;top:10px;font-size:34px}.cloud{font-size:28px}.road{height:30px}.road .cr{font-size:24px}
+.chips{flex-wrap:nowrap;overflow-x:auto;margin-inline:-16px;padding:3px 16px 8px;scrollbar-width:none;scroll-snap-type:x proximity}.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;height:40px;scroll-snap-align:start}
+.sec>h2{font-size:14px}.card{padding:14px}
+.heat{gap:3px}
+.kpi{gap:10px}.kpi>div:nth-child(n){padding:14px;border-radius:20px}.kpi .n{font-size:24px}.kpi .l{font-size:12px;max-width:80%}.kpi>div::after{font-size:20px;right:10px;top:8px}
+.ln div b{font-size:13px;flex-wrap:wrap;gap:2px 8px}
+.day{top:6px;font-size:14px}
+.it .mut{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.tin{display:inline;font-weight:600;color:var(--ink)}
+.it{padding:12px}.it .chip{grid-column:1/-1;justify-self:start}
+.more{width:100%;height:48px}
+.blob{filter:blur(40px);width:240px;height:240px}
+.dr{top:auto;left:0;right:0;width:100%;max-height:88vh;max-height:88dvh;border-radius:28px 28px 0 0;transform:translateY(105%);box-shadow:0 -10px 30px rgba(15,27,45,.25)}.dr.on{transform:none}
+.dh{border-radius:28px 28px 28px 28px;position:sticky;top:0;z-index:1;padding:18px 18px}.dh::before{content:"";position:absolute;top:7px;left:50%;width:44px;height:5px;margin-left:-22px;border-radius:3px;background:rgba(255,255,255,.55)}
+.db{padding:16px 16px calc(28px + env(safe-area-inset-bottom));gap:8px}
+.x{width:44px;height:44px}
+}
+@media(max-width:560px){.ev{grid-template-columns:14px 1fr;gap:8px}.tm{display:none}}
+@media(max-width:360px){.kpi .n{font-size:21px}.fc{min-width:160px}.hero h1{font-size:23px}}
 </style>
 </head>
 <body>
@@ -195,7 +230,7 @@ function filt(){const s=q.toLowerCase();list=base.filter(r=>(!carF||nm(r)===carF
 function dayLabel(k){const t=ymd(new Date()),y=ymd(new Date(Date.now()-864e5));return k===t?'วันนี้':k===y?'เมื่อวาน':new Date(k+'T00:00').toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'long'})}
 function feed(){$('cnt').textContent=list.length+' รายการ';if(!list.length){$('fd').innerHTML='<div class="empty"><b>📭</b>ไม่พบรายการที่ตรงกับตัวกรอง</div>';$('mo').style.display='none';return}
 const rs=list.slice(0,shown);let cur='',h='',di=0;rs.forEach((r,i)=>{const k=r.timestamp?ymd(r.timestamp):'—';if(k!==cur){cur=k;const n=rs.filter(x=>(x.timestamp?ymd(x.timestamp):'—')===k).length;h+=`<div class="day" style="--dc:${P[di++%5]}">${k==='—'?'ไม่ระบุวันที่':dayLabel(k)}<small>${n} เที่ยว</small></div>`}
-const c=col(nm(r));h+=`<div class="ev" style="animation-delay:${Math.min(i,12)*30}ms"><div class="tm">${hm(r.timestamp)}</div><div class="rail" style="--c:${c}"><i></i></div><button class="it" style="--c:${c}" data-e="${(CARS.find(x=>x[0]===nm(r))||[0,0,0,'🚗'])[3]}" data-i="${all.indexOf(r)}">${av(r)}<span style="min-width:0"><b>${esc(r.name||'—')}</b> <span class="plate" style="font-size:12px">${esc(pl(r))}</span><span class="mut">${esc(r.reason||'—')}${r.totalDistance?' · '+(+r.totalDistance).toFixed(1)+' กม.':''}${done(r)&&r.durationText?' · '+esc(r.durationText):''}</span></span>${done(r)?'<span class="chip ok"><i></i>คืนแล้ว</span>':'<span class="chip am"><i></i>กำลังใช้อยู่</span>'}</button></div>`});
+const c=col(nm(r));h+=`<div class="ev" style="animation-delay:${Math.min(i,12)*30}ms"><div class="tm">${hm(r.timestamp)}</div><div class="rail" style="--c:${c}"><i></i></div><button class="it" style="--c:${c}" data-e="${(CARS.find(x=>x[0]===nm(r))||[0,0,0,'🚗'])[3]}" data-i="${all.indexOf(r)}">${av(r)}<span style="min-width:0"><b>${esc(r.name||'—')}</b> <span class="plate" style="font-size:12px">${esc(pl(r))}</span><span class="mut"><span class="tin">${hm(r.timestamp)} น. · </span>${esc(r.reason||'—')}${r.totalDistance?' · '+(+r.totalDistance).toFixed(1)+' กม.':''}${done(r)&&r.durationText?' · '+esc(r.durationText):''}</span></span>${done(r)?'<span class="chip ok"><i></i>คืนแล้ว</span>':'<span class="chip am"><i></i>กำลังใช้อยู่</span>'}</button></div>`});
 $('fd').innerHTML=h;$('fd').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>detail(all[b.dataset.i]));const left=list.length-shown;$('mo').style.display=left>0?'block':'none';$('mo').textContent='แสดงเพิ่มอีก '+Math.min(STEP,left)+' รายการ'}
 $('mo').onclick=()=>{shown+=STEP;feed()};
 function detail(r){if(!r)return;const c=col(nm(r)),l=r.returnLocation,f=(a,b,w)=>`<div class="f${w?' w2':''}"><small>${a}</small><b>${b}</b></div>`;
@@ -203,8 +238,8 @@ $('dr').style.setProperty('--c',c);$('dh').innerHTML=`<div style="flex:1"><h2>${
 $('db').innerHTML=f('เบอร์โทร',esc(r.phone||'—'))+f('แผนก',esc(r.department||'—'))+f('เลขไมล์',esc(r.mileage||'—'))+f('สถานะ',done(r)?'คืนรถแล้ว':'กำลังใช้อยู่')+f('สาเหตุ',esc(r.reason||'—'),1)+f('เส้นทาง',esc(r.routeText||'—'),1)+f('เริ่มใช้รถ',dt(r.timestamp),1)+(done(r)?f('คืนรถเมื่อ',dt(r.returnedAt))+f('ระยะเวลา',esc(r.durationText||'—')):'')+
 (l&&l.lat!=null?f('ตำแหน่งตอนคืนรถ','<a href="https://www.google.com/maps?q='+encodeURIComponent(l.lat+','+l.lng)+'" target="_blank" rel="noopener" style="color:var(--pri)">ดูบนแผนที่ ±'+Math.round(l.accuracy||0)+' ม.</a>',1):'')+
 (r.photoKey?'<div class="f w2"><small>รูปเลขไมล์ (แตะเพื่อขยาย)</small><img src="/get-photo?key='+encodeURIComponent(r.photoKey)+'" alt="รูปเลขไมล์" loading="lazy" onclick="this.style.maxHeight=this.style.maxHeight===\'none\'?\'280px\':\'none\'"></div>':'');
-$('dr').classList.add('on');$('ov').classList.add('on');$('xx').onclick=close;$('xx').focus()}
-const close=()=>{$('dr').classList.remove('on');$('ov').classList.remove('on')};$('ov').onclick=close;document.onkeydown=e=>{if(e.key==='Escape')close()};
+$('dr').classList.add('on');$('ov').classList.add('on');document.body.style.overflow='hidden';$('xx').onclick=close;$('xx').focus()}
+const close=()=>{$('dr').classList.remove('on');$('ov').classList.remove('on');document.body.style.overflow=''};$('ov').onclick=close;document.onkeydown=e=>{if(e.key==='Escape')close()};
 $('per').querySelectorAll('button').forEach(b=>b.onclick=()=>{days=+b.dataset.d;$('per').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));recalc()});
 $('sc').querySelectorAll('button').forEach(b=>b.onclick=()=>{stF=b.dataset.s;$('sc').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));filt()});
 let db;$('q').oninput=e=>{clearTimeout(db);db=setTimeout(()=>{q=e.target.value.trim();filt()},200)};
@@ -230,12 +265,17 @@ function burst(x,y,n){if(RM)return;for(let i=0;i<n;i++){const e=document.createE
 if(Math.random()<.55){e.textContent=EM[i%EM.length];e.style.fontSize=(12+Math.random()*10)+'px'}else{e.style.width=e.style.height=(6+Math.random()*6)+'px';e.style.background=CLR[i%5];e.style.borderRadius=Math.random()<.5?'50%':'2px'}document.body.appendChild(e);setTimeout(()=>e.remove(),900)}}
 if(!RM){const bg=document.createElement('div');bg.className='bgfx';bg.setAttribute('aria-hidden','true');
 bg.innerHTML=['#FFC2D4','#FFE9A8','#B8F0D6','#D5C8FF'].map((c,i)=>'<i class="blob" style="background:'+c+';'+['left:-80px;top:80px','right:-100px;top:30%','left:20%;bottom:-120px','right:10%;bottom:10%'][i]+';animation-delay:-'+i*4+'s"></i>').join('');
-for(let i=0;i<16;i++){const e=document.createElement('span');e.className='fp';e.textContent=EM[i%EM.length];e.style.cssText='left:'+Math.random()*100+'%;font-size:'+(14+Math.random()*14)+'px;animation-duration:'+(16+Math.random()*16)+'s;animation-delay:-'+Math.random()*30+'s';bg.appendChild(e)}document.body.prepend(bg);
+for(let i=0;i<(innerWidth<600?8:16);i++){const e=document.createElement('span');e.className='fp';e.textContent=EM[i%EM.length];e.style.cssText='left:'+Math.random()*100+'%;font-size:'+(14+Math.random()*14)+'px;animation-duration:'+(16+Math.random()*16)+'s;animation-delay:-'+Math.random()*30+'s';bg.appendChild(e)}document.body.prepend(bg);
 document.addEventListener('mousedown',e=>{if(e.target.closest('.btn,.chips button,.seg button,.more,.fc'))burst(e.clientX,e.clientY,10)});
 if(fh){let lt=0;addEventListener('mousemove',e=>{const n=performance.now();if(n-lt<45)return;lt=n;const t=document.createElement('span');t.className='tr';if(Math.random()<.5)t.textContent='✨';else{t.style.background=CLR[(Math.random()*5)|0];t.style.width=t.style.height='8px'}t.style.left=e.clientX+'px';t.style.top=e.clientY+'px';document.body.appendChild(t);setTimeout(()=>t.remove(),700)})}
 setInterval(()=>{const c=document.querySelectorAll('#ht i:not(.x)');if(!c.length)return;const e=c[(Math.random()*c.length)|0];e.classList.add('tw');setTimeout(()=>e.classList.remove('tw'),700)},500);
 document.querySelector('.sun').onclick=e=>{const r=e.target.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,40);toast('แดดดีจัง ☀️')};
 document.querySelector('.road .cr').onclick=e=>{const r=e.target.getBoundingClientRect();burst(r.left+r.width/2,r.top,18);e.target.classList.add('hn');setTimeout(()=>e.target.classList.remove('hn'),1200);toast('ปิ๊นๆ! 🚗💨')}}
+/* swipe down to close drawer on phones */
+(()=>{const dr=$('dr');let y0=0,dy=0,on=false;
+dr.addEventListener('touchstart',e=>{if(innerWidth>640||dr.scrollTop>0)return;y0=e.touches[0].clientY;on=true;dy=0;dr.style.transition='none'},{passive:true});
+dr.addEventListener('touchmove',e=>{if(!on)return;dy=Math.max(0,e.touches[0].clientY-y0);dr.style.transform='translateY('+dy+'px)'},{passive:true});
+dr.addEventListener('touchend',()=>{if(!on)return;on=false;dr.style.transition='';dr.style.transform='';if(dy>90)close()})})();
 load();
 </script>
 </body>
