@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>สมุดบันทึกการใช้รถ</title>
-<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Prompt:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Prompt:wght@500;600;700&family=Mali:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--ink:#0F1B2D;--mut:#52627A;--line:#E2E8F0;--bg:#F3F5F8;--pri:#1D4ED8;--tint:#E8EEFC;--ok:#0E7A4B;--okT:#E3F4EB;--am:#9A5B00;--amT:#FFF0D6}
 *{box-sizing:border-box}
@@ -82,10 +82,46 @@ input{height:44px;border:1.5px solid #CBD5E1;border-radius:12px;padding:0 14px;f
 @keyframes dash{to{background-position:-36px 0}}@keyframes drive{from{left:-50px}to{left:100%}}
 @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(154,91,0,0)}50%{box-shadow:0 0 0 6px rgba(154,91,0,.14)}}
 @keyframes sweep{0%{transform:translateX(-100%)}60%,100%{transform:translateX(100%)}}@keyframes rpl{to{transform:scale(3.2);opacity:0}}
+
+:root{--bg:#F6F8FF}
+h1,h2,.h,.fh b,.kpi .n,.day{font-family:'Mali','Prompt',sans-serif}
+.two{align-items:start}.two>*{min-width:0}
+.heat{grid-template-columns:repeat(13,minmax(0,1fr));grid-template-rows:repeat(7,auto);gap:5px}
+.heat i{width:100%;border-radius:50%;background:#EAEFFD}
+.l1{background:#C7D2FE!important}.l2{background:#A5B4FC!important}.l3{background:#818CF8!important}.l4{background:#4F46E5!important}
+.hero{position:relative;overflow:hidden;background:#E3EFFF;border-bottom:0;border-radius:0 0 36px 36px}
+.hero .w{position:relative;z-index:1}.hero .eye{color:#3B5BDB}
+.sun{position:absolute;right:7%;top:14px;font-size:46px;animation:bob 4s ease-in-out infinite}
+.cloud{position:absolute;font-size:36px;opacity:.95;animation:cloud 42s linear infinite;pointer-events:none}.cl1{top:16px;left:-80px}.cl2{top:64px;font-size:26px;animation-duration:58s;animation-delay:-24s}
+.road .dash{background:repeating-linear-gradient(90deg,#9DB8E0 0 18px,transparent 18px 36px)}.road .cr{font-size:30px}
+.btn{border-radius:999px}.btn:hover{animation:wig .5s}
+.seg{border-radius:999px}.seg .pl,.seg button{border-radius:999px}
+.fc{border:2px solid #E2E8F0;border:2px solid color-mix(in srgb,var(--c) 28%,#fff);background:#fff;background:color-mix(in srgb,var(--c) 8%,#fff);border-radius:24px;padding:14px 16px}
+.fc .em{display:inline-block;font-size:20px;animation:bob 3.5s ease-in-out infinite}
+.free{background:#fff;border-radius:999px;padding:3px 10px;width:fit-content}.busy{background:#fff;border-radius:999px;padding:3px 10px;width:fit-content}
+.kpi{background:none;border:0;gap:12px}
+.kpi>div:nth-child(n){border:2px solid #fff;border-radius:24px;padding:16px 18px;position:relative;transition:transform .25s cubic-bezier(.3,1.5,.5,1)}
+.kpi>div:hover{transform:translateY(-4px) rotate(-1deg)}
+.kpi>div:nth-child(1){background:#E0ECFF}.kpi>div:nth-child(2){background:#FFE9D6}.kpi>div:nth-child(3){background:#FFF4CC}.kpi>div:nth-child(4){background:#EFE6FF}
+.kpi>div::after{position:absolute;right:14px;top:10px;font-size:26px}
+.kpi>div:nth-child(1)::after{content:"🚗"}.kpi>div:nth-child(2)::after{content:"🛣️"}.kpi>div:nth-child(3)::after{content:"⏳"}.kpi>div:nth-child(4)::after{content:"🧑‍💼"}
+.card{border:2px solid #E6EBFB;border-radius:24px}
+.ln s{height:12px;border-radius:6px;background:#EEF1FB}.ln s i{border-radius:6px}
+.it{border-radius:20px;border:2px solid #E6EBFB}.av{box-shadow:0 0 0 3px var(--c,#E8EEFC)}
+.chip.ok{background:#D9F5E6}.chip.am{background:#FFE9C7}
+.chips button{border-width:2px;border-radius:999px;transition:transform .2s cubic-bezier(.3,1.5,.5,1),border-color .15s}.chips button:hover{transform:translateY(-2px)}
+.day{font-size:15px}.day::before{content:"📅"}
+.empty b{display:inline-block;animation:bob 3s ease-in-out infinite}
+input{border-width:2px;border-radius:999px;padding:0 18px}
+.dh{border-radius:0 0 28px 28px}.f{border-radius:16px}
+#tp,#toast{border-radius:999px}
+@keyframes cloud{from{transform:translateX(0)}to{transform:translateX(120vw)}}
+@keyframes bob{50%{transform:translateY(6px) rotate(6deg)}}
+@keyframes wig{25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
 </style>
 </head>
 <body>
-<header class="hero"><div class="w"><div><div class="eye">FLEET LOGBOOK</div><h1>สมุดบันทึกการใช้รถ</h1><p class="mut" id="upd">กำลังโหลด...</p></div><div class="sp"></div><div class="seg" id="per" role="group" aria-label="ช่วงเวลา"><i class="pl"></i><button data-d="7">7 วัน</button><button data-d="30" aria-pressed="true">30 วัน</button><button data-d="90">90 วัน</button><button data-d="0">ทั้งหมด</button></div><button class="btn ghost" id="rf">รีเฟรช</button><button class="btn" id="ex">ส่งออก CSV</button><div class="road" aria-hidden="true"><div class="dash"></div><span class="cr">🚗</span></div></div></header>
+<header class="hero"><span class="sun" aria-hidden="true">☀️</span><span class="cloud cl1" aria-hidden="true">☁️</span><span class="cloud cl2" aria-hidden="true">☁️</span><div class="w"><div><div class="eye">✨ FLEET LOGBOOK</div><h1>สมุดบันทึกการใช้รถ</h1><p class="mut" id="upd">กำลังโหลด...</p></div><div class="sp"></div><div class="seg" id="per" role="group" aria-label="ช่วงเวลา"><i class="pl"></i><button data-d="7">7 วัน</button><button data-d="30" aria-pressed="true">30 วัน</button><button data-d="90">90 วัน</button><button data-d="0">ทั้งหมด</button></div><button class="btn ghost" id="rf">รีเฟรช</button><button class="btn" id="ex">ส่งออก CSV</button><div class="road" aria-hidden="true"><div class="dash"></div><span class="cr">🚗</span></div></div></header>
 <main class="w" style="padding-bottom:56px">
 <section class="sec"><h2>ตอนนี้ <small>สถานะรถแต่ละคัน</small></h2><div class="fleet" id="fl"></div></section>
 <section class="sec"><div class="kpi"><div><div class="n" id="k1">-</div><div class="l">จำนวนเที่ยว</div></div><div><div class="n" id="k2">-</div><div class="l">ระยะทางรวม (กม.)</div></div><div><div class="n" id="k3">-</div><div class="l">กำลังใช้งานอยู่ (คัน)</div></div><div><div class="n" id="k4">-</div><div class="l">ผู้ใช้งาน (คน)</div></div></div></section>
@@ -99,7 +135,7 @@ input{height:44px;border:1.5px solid #CBD5E1;border-radius:12px;padding:0 14px;f
 <div id="sp"></div><button id="tp" aria-label="กลับขึ้นบน">↑</button><div id="toast" role="status"></div>
 <script>
 const $=id=>document.getElementById(id),STEP=25;
-const CARS=[['Nissan','ผอ 5757','#2563EB'],['Mazda','ยค 3777','#D9480F'],['MG','งบ 255','#0F766E'],['Click','จงจ 222','#7C3AED'],['Fino','งธท 222','#B45309']];
+const CARS=[['Nissan','ผอ 5757','#2563EB','🚙'],['Mazda','ยค 3777','#D9480F','🚗'],['MG','งบ 255','#0F766E','🚕'],['Click','จงจ 222','#7C3AED','🛵'],['Fino','งธท 222','#B45309','🛵']];
 let all=[],base=[],list=[],days=30,carF='',stF='',q='',shown=STEP;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nm=r=>String(r.car||'').split(':')[0].trim(),pl=r=>String(r.car||'').split(':')[1]?.trim()||'—';
@@ -112,15 +148,15 @@ function av(r){const n=r.name||'?',a=document.createElement('span');a.className=
 function count(el,to,dec){const t0=performance.now(),f=x=>{const p=Math.min(1,(x-t0)/700),v=to*(1-Math.pow(1-p,3));el.textContent=v.toLocaleString('th-TH',{maximumFractionDigits:dec||0,minimumFractionDigits:dec||0});if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
 async function load(){try{const d=await fetch('/get-records').then(r=>{if(!r.ok)throw 0;return r.json()});all=d.records||[];fleet();heat();recalc();$('upd').textContent='อัปเดตล่าสุด '+hm(new Date())+' น. · '+all.length+' รายการ'}
 catch{$('fd').innerHTML='<div class="empty"><b>⚠️</b>โหลดข้อมูลไม่สำเร็จ กรุณากดรีเฟรช</div>';$('upd').textContent='โหลดไม่สำเร็จ'}}
-function fleet(){$('fl').innerHTML=CARS.map(([n,p,c],i)=>{const a=all.find(r=>nm(r)===n&&!done(r));return `<div class="fc${a?' bz':''}" style="--c:${c};animation-delay:${i*60}ms"><div class="fh"><b>${n}</b><span class="plate">${p}</span></div>${a?`<div class="busy"><i></i>กำลังใช้ · ${esc(a.name||'—')}</div><div class="mut sm">ตั้งแต่ ${ymd(a.timestamp)===ymd(new Date())?'':new Date(a.timestamp).toLocaleDateString('th-TH',{day:'numeric',month:'short'})+' '}${hm(a.timestamp)} น.</div>`:`<div class="free"><i></i>ว่าง พร้อมใช้</div><div class="mut sm">&nbsp;</div>`}</div>`}).join('')}
+function fleet(){$('fl').innerHTML=CARS.map(([n,p,c,e],i)=>{const a=all.find(r=>nm(r)===n&&!done(r));return `<div class="fc${a?' bz':''}" style="--c:${c};animation-delay:${i*60}ms"><div class="fh"><b><span class="em">${e}</span> ${n}</b><span class="plate">${p}</span></div>${a?`<div class="busy"><i></i>กำลังใช้ · ${esc(a.name||'—')}</div><div class="mut sm">ตั้งแต่ ${ymd(a.timestamp)===ymd(new Date())?'':new Date(a.timestamp).toLocaleDateString('th-TH',{day:'numeric',month:'short'})+' '}${hm(a.timestamp)} น.</div>`:`<div class="free"><i></i>ว่าง พร้อมใช้ ✨</div><div class="mut sm">&nbsp;</div>`}</div>`}).join('')}
 function heat(){const cnt={};all.forEach(r=>{if(r.timestamp){const k=ymd(r.timestamp);cnt[k]=(cnt[k]||0)+1}});const now=new Date(),end=new Date(now.getFullYear(),now.getMonth(),now.getDate()),start=new Date(end);start.setDate(end.getDate()-end.getDay()-12*7);
 const mx=Math.max(1,...Object.values(cnt));let h='';for(let i=0;i<91;i++){const d=new Date(start);d.setDate(start.getDate()+i);if(d>end){h+='<i class="x"></i>';continue}const k=ymd(d),n=cnt[k]||0,l=n?Math.min(4,Math.ceil(n/mx*4)):0;h+=`<i class="${l?'l'+l:''}" title="${d.toLocaleDateString('th-TH',{day:'numeric',month:'short'})}: ${n} เที่ยว" style="animation-delay:${i*6}ms"></i>`}$('ht').innerHTML=h}
 function recalc(){const lim=days?Date.now()-days*864e5:0;base=all.filter(r=>!lim||(r.timestamp&&new Date(r.timestamp)>=lim));
 count($('k1'),base.length);count($('k2'),base.reduce((s,r)=>s+(+r.totalDistance||0),0),1);count($('k3'),all.filter(r=>!done(r)).length);count($('k4'),new Set(base.map(r=>r.userId||r.name)).size);
-const per=CARS.map(([n,p,c])=>{const rs=base.filter(r=>nm(r)===n);return{n,c,t:rs.length,km:rs.reduce((s,r)=>s+(+r.totalDistance||0),0)}}),mx=Math.max(1,...per.map(x=>x.t));
-$('ln').innerHTML=per.map(x=>`<div style="--c:${x.c}"><b>${x.n}<em>${x.t} เที่ยว · ${x.km.toLocaleString('th-TH',{maximumFractionDigits:0})} กม.</em></b><s><i style="width:0" data-w="${x.t/mx*100}"></i></s></div>`).join('');
+const per=CARS.map(([n,p,c,e])=>{const rs=base.filter(r=>nm(r)===n);return{n,c,e,t:rs.length,km:rs.reduce((s,r)=>s+(+r.totalDistance||0),0)}}),mx=Math.max(1,...per.map(x=>x.t));
+$('ln').innerHTML=per.map(x=>`<div style="--c:${x.c}"><b><span>${x.e} ${x.n}</span><em>${x.t} เที่ยว · ${x.km.toLocaleString('th-TH',{maximumFractionDigits:0})} กม.</em></b><s><i style="width:0" data-w="${x.t/mx*100}"></i></s></div>`).join('');
 requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('[data-w]').forEach(e=>e.style.width=e.dataset.w+'%')));
-$('cc').innerHTML='<button data-c="" aria-pressed="'+(carF===''?'true':'false')+'">ทุกคัน</button>'+CARS.map(([n,p,c])=>`<button data-c="${n}" style="--c:${c}" aria-pressed="${carF===n}"><i></i>${n}</button>`).join('');
+$('cc').innerHTML='<button data-c="" aria-pressed="'+(carF===''?'true':'false')+'">ทุกคัน</button>'+CARS.map(([n,p,c,e])=>`<button data-c="${n}" style="--c:${c}" aria-pressed="${carF===n}">${e} ${n}</button>`).join('');
 $('cc').querySelectorAll('button').forEach(b=>b.onclick=()=>{carF=b.dataset.c;recalc()});filt()}
 function filt(){const s=q.toLowerCase();list=base.filter(r=>(!carF||nm(r)===carF)&&(!stF||(stF==='returned')===done(r))&&(!s||[r.name,r.car,r.reason,r.department].some(v=>String(v||'').toLowerCase().includes(s))));shown=STEP;feed()}
 function dayLabel(k){const t=ymd(new Date()),y=ymd(new Date(Date.now()-864e5));return k===t?'วันนี้':k===y?'เมื่อวาน':new Date(k+'T00:00').toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'long'})}
