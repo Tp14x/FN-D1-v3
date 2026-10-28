@@ -43,7 +43,7 @@ input:focus,select:focus{outline:0;border-color:var(--pri);box-shadow:0 0 0 4px 
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px}.tile{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px}.tile b{font:600 16px 'Prompt',sans-serif;word-break:break-word}
 .timer{position:relative;width:240px;height:240px;margin:22px auto 4px;display:flex;align-items:center;justify-content:center;text-align:center}
 .timer svg{position:absolute;inset:0}.orb{position:absolute;inset:0;animation:spin 8s linear infinite}.orb span{position:absolute;left:50%;top:-5px;margin-left:-16px;width:32px;font-size:26px;line-height:32px;text-align:center;transform:scaleX(-1)}
-.timer .h{font-size:44px;font-variant-numeric:tabular-nums}.timer.warn .h{color:var(--bad)}
+.timer .h{font-size:37px;font-variant-numeric:tabular-nums}.timer.warn .h{color:var(--bad)}
 .chip{display:inline-flex;align-items:center;gap:8px;background:var(--okT);color:#0B6B42;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:600}.chip i{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:pulse 1.8s ease-out infinite}
 .ov{position:fixed;inset:0;z-index:20;background:rgba(15,27,45,.5);display:none;align-items:flex-end;justify-content:center}.ov.on{display:flex}
 .sheet{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;animation:rise .3s ease-out}
@@ -132,6 +132,17 @@ input,select{border-width:2px;border-radius:16px}
 @keyframes flash{0%{text-shadow:0 0 14px #fff,0 0 28px #8EC5FF}100%{text-shadow:none}}
 .btn.run{animation:runring 1.4s ease-in-out infinite}
 @keyframes runring{0%,100%{box-shadow:0 6px 16px rgba(29,78,216,.22)}50%{box-shadow:0 0 0 5px rgba(125,211,252,.35),0 8px 22px rgba(29,78,216,.4)}}
+
+#cmm{height:170px;border-radius:16px;border:2px solid #fff;box-shadow:0 4px 12px rgba(59,91,219,.15);background:#EAEFEC}
+@media(max-height:700px){.tb{display:none}.tw .term{height:52px;padding:6px 12px}#s-main{padding-bottom:96px}}
+.rt2{display:inline-flex;align-items:center;gap:12px}
+.pk{position:relative;width:38px;height:24px;border:2px dashed rgba(255,255,255,.85);border-radius:7px;overflow:hidden;display:inline-block}
+.pk::before{content:"P";position:absolute;right:4px;top:1px;font:700 10px/12px 'Prompt',sans-serif;color:rgba(255,255,255,.7)}
+.pc{position:absolute;left:5px;top:0;font-style:normal;font-size:17px;line-height:20px;animation:park 5s ease-out infinite}
+@keyframes park{0%{transform:translateX(-50px) scaleX(-1)}20%,100%{transform:translateX(0) scaleX(-1)}}
+body[data-t=morn] .app{background:#FFE8C7}body[data-t=morn] .app::before{content:"🌤️"}
+body[data-t=eve] .app{background:#FFD3B8}body[data-t=eve] .app::before{content:"🌇"}
+body[data-t=night] .app{background:#1E2B5E;box-shadow:0 6px 18px rgba(30,43,94,.35)}body[data-t=night] .app::before{content:"🌙"}body[data-t=night] .ttl{color:#fff}
 </style>
 </head>
 <body>
@@ -166,7 +177,7 @@ input,select{border-width:2px;border-radius:16px}
 <div class="card"><div class="sh"><span class="nb">2</span>เลขไมล์เริ่มต้น</div><div><input id="mi" inputmode="numeric" placeholder="เลขไมล์ปัจจุบัน" aria-label="เลขไมล์"><div class="err" id="e-mi"></div></div>
 <label class="photo" id="ph" for="pf">📷 ถ่ายรูปเลขไมล์ (ถ้ามี)</label><input type="file" id="pf" accept="image/*" capture="environment" hidden><img id="pv" alt="รูปเลขไมล์"></div>
 <div class="card"><div class="sh"><span class="nb">3</span>สาเหตุการใช้รถ</div><div><input id="rs" placeholder="เช่น ส่งเอกสาร พบลูกค้า" aria-label="สาเหตุ"><div class="err" id="e-rs"></div></div></div>
-<div class="card"><div class="sh"><span class="nb">4</span>ปลายทาง (สูงสุด 3 จุด)</div><input id="sq" placeholder="ค้นหาสถานที่" aria-label="ค้นหาสถานที่"><div id="map"></div><div class="route" id="route">แตะบนแผนที่เพื่อปักหมุดปลายทาง</div><div style="display:flex;gap:8px"><button type="button" class="btn ghost" id="clr" style="height:44px;font-size:14px">ล้างหมุด</button></div><div class="err" id="e-dest"></div></div>
+<div class="card"><div class="sh"><span class="nb">4</span>ปลายทาง (สูงสุด 3 จุด)</div><input id="sq" placeholder="ค้นหาสถานที่" aria-label="ค้นหาสถานที่"><div id="map"></div><div class="route" id="route">แตะบนแผนที่เพื่อปักหมุดปลายทาง</div><div style="display:flex;gap:8px"><button type="button" class="btn ghost" id="clr" style="height:44px;font-size:14px;flex:1">ล้างหมุด</button><button type="button" class="btn ghost" id="mtg" style="height:44px;font-size:14px;flex:1">สลับมุมมอง</button><button type="button" class="btn ghost" id="ctr" style="height:44px;font-size:14px;flex:1">จุดเริ่มต้น</button></div><div class="err" id="e-dest"></div></div>
 <div class="card" id="hist" style="display:none"><div class="sh">ประวัติล่าสุด</div><div id="histl"></div></div>
 <div class="bar"><div class="tw" aria-hidden="true"><div class="tb"><i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i><span id="tt">sort_label.py</span><em id="tm">PYTHON</em></div><pre class="term" id="term"></pre><div class="pgb"><i id="pg"></i></div></div><div><button class="btn" type="submit" id="sub" aria-label="ตรวจสอบและบันทึก"></button></div></div>
 </form></section>
@@ -177,17 +188,17 @@ input,select{border-width:2px;border-radius:16px}
 <div class="tiles" style="margin-top:18px"><div class="tile"><span class="mut">ทะเบียน</span><b id="iP"></b></div><div class="tile"><span class="mut">ผู้ใช้</span><b id="iU"></b></div><div class="tile"><span class="mut">ไมล์เริ่มต้น</span><b id="iM"></b></div><div class="tile"><span class="mut">เริ่มเวลา</span><b id="iT"></b></div></div>
 <div class="card" style="margin-top:12px"><div class="sh">📍 ตำแหน่งตอนคืนรถ</div><p class="mut" id="ls">ยังไม่ได้ดึงตำแหน่ง ต้องดึงตำแหน่งก่อนคืนรถ</p><button class="btn ghost" id="gl" style="flex:none;height:48px;font-size:15px">ดึงตำแหน่งของฉัน</button></div>
 <p style="text-align:center;margin:8px 0"><button class="mut" id="cx" style="background:none;border:0;text-decoration:underline;cursor:pointer;font:inherit;font-size:13px;color:var(--mut)">ยกเลิกการใช้รถ</button></p>
-<div class="bar"><div><button class="btn danger" id="ret">คืนรถ</button></div></div>
+<div class="bar"><div><button class="btn danger" id="ret"><span class="rt2">คืนรถ<span class="pk"><i class="pc">🚗</i></span></span></button></div></div>
 </section>
 </main>
 
-<div class="ov" id="cf"><div class="sheet"><h2 style="font-size:20px">ยืนยันการบันทึก</h2><div id="cfc" style="display:flex;flex-direction:column;gap:10px"></div><div style="display:flex;gap:10px"><button class="btn ghost" id="cfx">แก้ไข</button><button class="btn" id="cfo">ยืนยัน</button></div></div></div>
+<div class="ov" id="cf"><div class="sheet"><h2 style="font-size:20px">ยืนยันการบันทึก</h2><div id="cmw" style="display:none"><div id="cmm"></div><button type="button" class="btn ghost" id="cmt" style="height:40px;font-size:14px;width:100%;margin-top:8px;flex:none">สลับมุมมองแผนที่</button></div><div id="cfc" style="display:flex;flex-direction:column;gap:10px"></div><div style="display:flex;gap:10px"><button class="btn ghost" id="cfx">แก้ไข</button><button class="btn" id="cfo">ยืนยัน</button></div></div></div>
 <div class="ov" id="bz"><div class="sheet"><h2 style="font-size:20px">🚫 รถคันนี้ไม่ว่าง</h2><div id="bzc" style="display:flex;flex-direction:column;gap:10px"></div><button class="btn" id="bzx" style="flex:none">รับทราบ</button></div></div>
 <div class="ov" id="md"><div class="sheet center" style="border-radius:20px;margin:16px"><div class="ic" id="mi2">✓</div><h2 style="font-size:22px" id="mt"></h2><p class="mut" id="mm"></p><button class="btn" id="mo" style="flex:none;width:100%">ตกลง</button></div></div>
 
 <script src="https://static.line-scdn.net/liff/edge/versions/2.31.2/sdk.js"></script>
 <script>
-const CFG={liffId:'2007130450-YVNvyNbL',mapsKey:'AIzaSyAw5sDr5qXKIpun2dp4jpu8NerbXy6Hfew',origin:{lat:14.975719186601136,lng:102.1254756236624}};
+const CFG={liffId:'2007130450-YVNvyNbL',mapsKey:'AIzaSyAw5sDr5qXKIpun2dp4jpu8NerbXy6Hfew',origin:{lat:14.975719186601136,lng:102.1254756236624},autoDest:{userId:'Uc8695dc6e2569a960fe8912809a2e2ff',s:[16,40],e:[17,20],loc:{lat:14.975057297021436,lng:102.11365790021132}}};
 const CARS=[['Nissan','ผอ 5757','#2563EB','🚙'],['Mazda','ยค 3777','#D9480F','🚗'],['MG','งบ 255','#0F766E','🚕'],['Click','จงจ 222','#7C3AED','🛵'],['Fino','งธท 222','#B45309','🛵']];
 const KEY='car_usage_v2',$=id=>document.getElementById(id);
 let user,map,dr,ds,markers=[],photo=null,retLoc=null,tmr,busy={},mapLoaded=false,carVal='';
@@ -220,11 +231,12 @@ const lb='<svg xmlns="http://www.w3.org/2000/svg" width="80" height="34"><rect x
 new google.maps.Marker({position:CFG.origin,map,title:'บริษัท (จุดเริ่มต้น)',zIndex:999,icon:{url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(lb),scaledSize:new google.maps.Size(80,34),anchor:new google.maps.Point(40,17)}});
 const ac=new google.maps.places.Autocomplete($('sq'),{types:['establishment','geocode'],componentRestrictions:{country:'th'}});ac.bindTo('bounds',map);
 ac.addListener('place_changed',()=>{const p=ac.getPlace();if(p.geometry?.location){addM(p.geometry.location);map.panTo(p.geometry.location)}});
-map.addListener('click',e=>addM(e.latLng))}catch{$('map').innerHTML='<p class="mut" style="padding:40px;text-align:center">ไม่สามารถโหลดแผนที่ได้</p>'}};
+map.addListener('click',e=>addM(e.latLng));autoDest()}catch{$('map').innerHTML='<p class="mut" style="padding:40px;text-align:center">ไม่สามารถโหลดแผนที่ได้</p>'}};
 function addM(pos){if(markers.length>=3){toast('เลือกได้สูงสุด 3 จุด');return}
 const m=new google.maps.Marker({position:pos,map,animation:google.maps.Animation.DROP});m.addListener('click',()=>{m.setMap(null);markers=markers.filter(x=>x!==m);route();prog()});markers.push(m);err('dest');route();prog()}
-function route(){const el=$('route');if(!markers.length){dr&&dr.set('directions',null);el.textContent='แตะบนแผนที่เพื่อปักหมุดปลายทาง';return}
-ds.route({origin:CFG.origin,destination:markers[markers.length-1].getPosition(),waypoints:markers.slice(0,-1).map(m=>({location:m.getPosition(),stopover:true})),travelMode:'DRIVING'},(r,st)=>{if(st!=='OK'){el.textContent='คำนวณเส้นทางไม่สำเร็จ';return}dr.setDirections(r);let d=0,t=0;r.routes[0].legs.forEach(l=>{d+=l.distance.value;t+=l.duration.value});el.dataset.d=(d/1000).toFixed(2);el.dataset.t=Math.round(t/60);el.innerHTML='🛣️ <strong>'+(d/1000).toFixed(2)+' กม.</strong> · ⏱ <strong>'+Math.round(t/60)+' นาที</strong>'})}
+function route(){const el=$('route');if(!markers.length){lastDir=null;dr&&dr.set('directions',null);el.textContent='แตะบนแผนที่เพื่อปักหมุดปลายทาง';return}
+ds.route({origin:CFG.origin,destination:markers[markers.length-1].getPosition(),waypoints:markers.slice(0,-1).map(m=>({location:m.getPosition(),stopover:true})),travelMode:'DRIVING'},(r,st)=>{if(st!=='OK'){el.textContent='คำนวณเส้นทางไม่สำเร็จ';return}dr.setDirections(r);lastDir=r;let d=0,t=0;r.routes[0].legs.forEach(l=>{d+=l.distance.value;t+=l.duration.value});el.dataset.d=(d/1000).toFixed(2);el.dataset.t=Math.round(t/60);el.innerHTML='🛣️ <strong>'+(d/1000).toFixed(2)+' กม.</strong> · ⏱ <strong>'+Math.round(t/60)+' นาที</strong>'})}
+let mType='roadmap';$('mtg').onclick=()=>{if(!map)return;mType=mType==='roadmap'?'satellite':'roadmap';map.setMapTypeId(mType)};$('ctr').onclick=()=>{if(map){map.panTo(CFG.origin);map.setZoom(12)}};
 $('clr').onclick=()=>{markers.forEach(m=>m.setMap(null));markers=[];route();prog()};
 
 /* submit */
@@ -236,7 +248,7 @@ if(!r){err('rs','กรุณากรอกสาเหตุการใช้
 if(!markers.length){err('dest','กรุณาเลือกปลายทางอย่างน้อย 1 จุด');ok=false}else err('dest');return ok}
 $('form').onsubmit=e=>{e.preventDefault();if(loadUsage())return showUse(loadUsage());if(!valid())return;
 const rt=$('route');ps={car:carVal,mile:$('mi').value.trim(),reason:$('rs').value.trim(),d:+rt.dataset.d||0,t:+rt.dataset.t||0};
-$('cfc').innerHTML=[['ชื่อ',user.name],['ทะเบียน',ps.car],['เลขไมล์',ps.mile],['ภารกิจ',ps.reason],['ระยะทาง',ps.d?ps.d+' กม. · '+ps.t+' นาที':'ไม่ระบุ'],['รูปไมล์',photo?'✅ มีรูปแนบ':'—']].map(([a,b])=>`<div class="row"><span>${a}</span><span>${esc(b)}</span></div>`).join('');$('cf').classList.add('on')};
+$('cfc').innerHTML=[['ชื่อ',user.name],['ทะเบียน',ps.car],['เลขไมล์',ps.mile],['ภารกิจ',ps.reason],['ระยะทาง',ps.d?ps.d+' กม. · '+ps.t+' นาที':'ไม่ระบุ'],['รูปไมล์',photo?'✅ มีรูปแนบ':'—']].map(([a,b])=>`<div class="row"><span>${a}</span><span>${esc(b)}</span></div>`).join('');miniMap();$('cf').classList.add('on')};
 $('cfx').onclick=()=>$('cf').classList.remove('on');
 $('cfo').onclick=async()=>{$('cf').classList.remove('on');if(!ps)return;const p=ps;ps=null;const b=$('sub');b.disabled=true;towTok++;b.removeAttribute('aria-label');b.textContent='กำลังบันทึก...';
 try{let pk=null;if(photo){const fd=new FormData();fd.append('photo',photo);try{const u=await fetch('/upload-photo',{method:'POST',body:fd}).then(r=>r.json());if(u.success)pk=u.key;else toast('อัปโหลดรูปไม่สำเร็จ')}catch{toast('อัปโหลดรูปไม่สำเร็จ')}}
@@ -244,11 +256,11 @@ const rt=$('route').textContent;
 const res=await jpost('/save-record',{userId:user.userId,name:user.name,phone:user.phone||'-',car:p.car,mileage:p.mile,reason:p.reason,routeText:rt,totalDistance:p.d,totalTime:p.t,hasPhoto:!!pk,photoKey:pk,destinations:markers.map((m,i)=>({point:i+1,lat:m.getPosition().lat(),lng:m.getPosition().lng()})),timestamp:new Date().toISOString()});
 const d=await res.json().catch(()=>({}));
 if(!res.ok){if(res.status===403)modal('ไม่สามารถบันทึกได้',d.error||'บัญชีของคุณถูกระงับการใช้งาน\nกรุณาติดต่อผู้ดูแลระบบ','b');else toast(d.error||'เกิดข้อผิดพลาด กรุณาลองใหม่');return}
-const u={isUsing:true,carPlate:p.car,carModel:p.car.split(':')[0].trim(),startedAt:new Date().toISOString(),userName:user.name,userId:user.userId,mileage:p.mile};saveUsage(u);showUse(u);toast('✅ บันทึกสำเร็จ! ใช้รถ '+p.car);burst(innerWidth/2,innerHeight/3,40)}
+const u={isUsing:true,carPlate:p.car,carModel:p.car.split(':')[0].trim(),startedAt:new Date().toISOString(),userName:user.name,userId:user.userId,mileage:p.mile};saveUsage(u);showUse(u);toast('✅ บันทึกสำเร็จ! ใช้รถ '+p.car);burst(innerWidth/2,innerHeight/3,40);fireworks({left:20,width:innerWidth-40,top:innerHeight*.85})}
 catch{toast('เกิดข้อผิดพลาด กรุณาลองใหม่')}finally{b.disabled=false;initTow()}};
 
 /* in use */
-function showUse(u){$('iP').textContent=u.carPlate||'-';$('iU').textContent=u.userName||'-';$('iM').textContent=u.mileage?u.mileage+' กม.':'-';
+function showUse(u){{const q=String(u.carPlate||'').split(':').map(x=>x.trim());$('iP').innerHTML='<span class="plate">'+esc(q[1]||q[0]||'-')+'</span>'+(q[1]?' <small class="mut">'+esc(q[0])+'</small>':'')}$('iU').textContent=u.userName||'-';$('iM').textContent=u.mileage?u.mileage+' กม.':'-';
 const st=new Date(u.startedAt);$('iT').textContent=st.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})+' น.';$('ti').textContent=st.toLocaleDateString('th-TH',{day:'numeric',month:'short'});
 retLoc=null;$('ls').textContent='ยังไม่ได้ดึงตำแหน่ง ต้องดึงตำแหน่งก่อนคืนรถ';$('gl').textContent='ดึงตำแหน่งของฉัน';show('s-use');
 clearInterval(tmr);const p=n=>String(n).padStart(2,'0'),f=()=>{const d=Date.now()-st,h=Math.floor(d/36e5);$('td').textContent=p(h)+':'+p(Math.floor(d%36e5/6e4))+':'+p(Math.floor(d%6e4/1e3));$('tm').classList.toggle('warn',h>=23)};f();tmr=setInterval(f,1000)}
@@ -261,9 +273,9 @@ $('ret').onclick=async()=>{const u=loadUsage();if(!u)return toast('ไม่พ�
 const rt=new Date(),sec=Math.max(0,Math.floor((rt-new Date(u.startedAt))/1e3)),m=Math.floor(sec/60),h=Math.floor(m/60);const dur=h>0?h+' ชั่วโมง '+m%60+' นาที':m>0?m+' นาที '+sec%60+' วินาที':sec+' วินาที';
 const b=$('ret');b.disabled=true;b.textContent='กำลังบันทึก...';clearInterval(tmr);
 try{const r=await jpost('/update-return-status',{carPlate:u.carPlate,returnedAt:rt.toISOString(),durationText:dur,returnLocation:retLoc,userId:u.userId});const d=await r.json().catch(()=>({}));
-if(!r.ok){b.disabled=false;b.textContent='คืนรถ';showUse(u);modal('ไม่สามารถคืนรถได้',d.error||'บัญชีถูกระงับเนื่องจากลืมคืนรถภายใน 24 ชั่วโมง','b');return}}
-catch{b.disabled=false;b.textContent='คืนรถ';showUse(u);toast('❌ เชื่อมต่อไม่ได้ กรุณาลองใหม่');return}
-clearUsage();modal('คืนรถสำเร็จ!','คืนรถ '+u.carPlate+' เรียบร้อยแล้ว\nระยะเวลา: '+dur,'',()=>{if(liff.isInClient())liff.closeWindow();else location.reload()})};
+if(!r.ok){b.disabled=false;b.innerHTML=RETH;showUse(u);modal('ไม่สามารถคืนรถได้',d.error||'บัญชีถูกระงับเนื่องจากลืมคืนรถภายใน 24 ชั่วโมง','b');return}}
+catch{b.disabled=false;b.innerHTML=RETH;showUse(u);toast('❌ เชื่อมต่อไม่ได้ กรุณาลองใหม่');return}
+clearUsage();fireworks({left:20,width:innerWidth-40,top:innerHeight*.9});modal('คืนรถสำเร็จ!','คืนรถ '+u.carPlate+' เรียบร้อยแล้ว\nระยะเวลา: '+dur,'',()=>{if(liff.isInClient())liff.closeWindow();else location.reload()})};
 $('cx').onclick=()=>{if(confirm('ยืนยันยกเลิกการใช้รถ?')){clearUsage();location.reload()}};
 
 /* register */
@@ -304,7 +316,7 @@ let pdone=false;function prog(){const n=[!!carVal,!!$('mi').value.trim(),!!$('rs
 $('form').addEventListener('input',prog);
 document.querySelectorAll('.logo').forEach(l=>l.onclick=e=>{const r=l.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,18);toast('ปิ๊นๆ! 🚗💨')});
 /* car picks up the label letter by letter */
-let towTok=0;const TXT='ตรวจสอบและบันทึก',sl=ms=>new Promise(r=>setTimeout(r,ms));
+let towTok=0,fwDone=false;const TXT='ตรวจสอบและบันทึก',sl=ms=>new Promise(r=>setTimeout(r,ms));
 function initTow(){const b=$('sub');b.setAttribute('aria-label',TXT);
 b.innerHTML='<span class="lt" aria-hidden="true">'+(TXT.match(/[^\u0E31\u0E34-\u0E3A\u0E47-\u0E4E][\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]*/gu)||[TXT]).map(c=>'<span class="lc">'+c+'</span>').join('')+'</span>';
 if(RM){const t=document.querySelector('.tw');if(t)t.style.display='none';return}tow(++towTok)}
@@ -345,7 +357,7 @@ await Promise.all([go(s,cx(s,s),320,-10),go(o,cx(o,p),320,10)]);await sl(60)}
 L[s].classList.remove('un');L[s].style.color='';L[s].classList.add('fl');setTimeout(()=>L[s].classList.remove('fl'),520);$('pg').style.width=((s+1)/N*100)+'%';{const r=L[s].getBoundingClientRect();burst(r.left+r.width/2,r.top+6,3)}}
 tl(EVm.done());tm.textContent='SORTED ✓';tm.style.setProperty('--bc','#4ADE80');b.classList.remove('run');await sl(500);
 await Promise.all(L.map((l,k)=>go(k,nx(k),340,k%2?-6:6)));if(my!==towTok)return;
-fireworks();
+if(!fwDone){fwDone=true;fireworks()}
 L.forEach((l,k)=>l.animate([{transform:'translate('+cur[k]+'px,0)'},{transform:'translate('+cur[k]+'px,-6px)'},{transform:'translate('+cur[k]+'px,0)'}],{duration:380,delay:k*35,easing:'ease-in-out'}));
 await sl(7000)}}
 /* fireworks when the label is complete */
@@ -360,10 +372,23 @@ fr=fr.filter(r=>{const t=(now-r.t0)/r.dur;if(t<0)return true;if(t>=1){blast(r.tx
 fp.push({x:r.x+(r.tx-r.x)*t,y:r.y+(r.ty-r.y)*(1-Math.pow(1-t,2)),vx:(Math.random()-.5)*.6,vy:.8+Math.random()*.6,l:.8,d:.05,h:40,r:1.5});return true});
 fp=fp.filter(p=>{p.vx*=.985;p.vy=p.vy*.985+.045;p.x+=p.vx;p.y+=p.vy;p.l-=p.d;if(p.l<=0)return false;const L=Math.min(1,p.l);fxx.fillStyle='hsla('+p.h+',100%,'+(55+L*15)+'%,'+L+')';fxx.beginPath();fxx.arc(p.x,p.y,p.r*(.4+L*.6),0,6.2832);fxx.fill();return true});
 if(fp.length||fr.length)fraf=requestAnimationFrame(fxLoop);else{fxx.clearRect(0,0,innerWidth,innerHeight);fraf=0}}
-function fireworks(){if(RM||!fxx)return;const r=$('sub').getBoundingClientRect(),cx=r.left+r.width/2,by=r.top,hues=[350,45,160,210,280,20],t=performance.now();
+function fireworks(rr){if(RM||!fxx)return;const r=rr||$('sub').getBoundingClientRect(),cx=r.left+r.width/2,by=r.top,hues=[350,45,160,210,280,20],t=performance.now();
 for(let i=0;i<6;i++)fr.push({x:r.left+r.width*(.15+.7*Math.random()),y:by,tx:Math.max(30,Math.min(innerWidth-30,cx+(Math.random()-.5)*Math.min(innerWidth,380))),ty:Math.max(70,by-110-Math.random()*Math.max(40,Math.min(260,by-120))),hue:hues[i],type:i%2?'ring':'sphere',t0:t+i*220,dur:650});
 fr.push({x:cx,y:by,tx:cx,ty:Math.max(90,by-200),hue:50,type:'sphere',t0:t+1500,dur:700});if(!fraf)fraf=requestAnimationFrame(fxLoop)}
 initTow();
+/* v3 extras */
+const RETH='<span class="rt2">คืนรถ<span class="pk"><i class="pc">🚗</i></span></span>';
+let mm=null,mmr=null,mmk=[],lastDir=null,mmType='roadmap';
+function miniMap(){if(!window.google||!markers.length){$('cmw').style.display='none';return}$('cmw').style.display='block';
+setTimeout(()=>{if(!mm){mm=new google.maps.Map($('cmm'),{zoom:12,center:CFG.origin,disableDefaultUI:true,clickableIcons:false});mmr=new google.maps.DirectionsRenderer({map:mm,suppressMarkers:true,preserveViewport:true,polylineOptions:{strokeColor:'#1D4ED8',strokeWeight:4}})}
+mmk.forEach(m=>m.setMap(null));mmk=[new google.maps.Marker({position:CFG.origin,map:mm,label:{text:'บ',color:'#fff',fontWeight:'700'}})].concat(markers.map((m,i)=>new google.maps.Marker({position:m.getPosition(),map:mm,label:{text:String(i+1),color:'#fff',fontWeight:'700'}})));
+if(lastDir)mmr.setDirections(lastDir);else mmr.set('directions',null);const bd=new google.maps.LatLngBounds();bd.extend(CFG.origin);markers.forEach(m=>bd.extend(m.getPosition()));mm.fitBounds(bd,24)},120)}
+$('cmt').onclick=()=>{if(!mm)return;mmType=mmType==='roadmap'?'satellite':'roadmap';mm.setMapTypeId(mmType)};
+function autoDest(){const a=CFG.autoDest;if(!user||user.userId!==a.userId||markers.length)return;const n=new Date(),t=n.getHours()*60+n.getMinutes();
+if(t>=a.s[0]*60+a.s[1]&&t<=a.e[0]*60+a.e[1]){addM(new google.maps.LatLng(a.loc.lat,a.loc.lng));map.panTo(a.loc);toast('📍 เพิ่มปลายทางอัตโนมัติ')}}
+function theme(){const h=new Date().getHours();document.body.dataset.t=h>=5&&h<10?'morn':h>=10&&h<17?'day':h>=17&&h<19?'eve':'night'}
+theme();setInterval(theme,60000);
+$('ret').addEventListener('animationiteration',e=>{if(e.animationName==='park'&&!RM)setTimeout(()=>{const k=document.querySelector('#ret .pk');if(k&&$('s-use').classList.contains('on')){const r=k.getBoundingClientRect();burst(r.left+r.width/2,r.top+4,8)}},950)});
 if(!RM){const bg=document.createElement('div');bg.className='bgfx';bg.setAttribute('aria-hidden','true');
 bg.innerHTML=['#FFC2D4','#FFE9A8','#B8F0D6','#D5C8FF'].map((c,i)=>'<i class="blob" style="background:'+c+';'+['left:-80px;top:80px','right:-100px;top:30%','left:20%;bottom:-120px','right:10%;bottom:10%'][i]+';animation-delay:-'+i*4+'s"></i>').join('');
 for(let i=0;i<(innerWidth<600?8:16);i++){const e=document.createElement('span');e.className='fp';e.textContent=EM[i%EM.length];e.style.cssText='left:'+Math.random()*100+'%;font-size:'+(14+Math.random()*14)+'px;animation-duration:'+(16+Math.random()*16)+'s;animation-delay:-'+Math.random()*30+'s';bg.appendChild(e)}document.body.prepend(bg);
