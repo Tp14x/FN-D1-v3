@@ -143,6 +143,7 @@ input,select{border-width:2px;border-radius:16px}
 body[data-t=morn] .app{background:#FFE8C7}body[data-t=morn] .app::before{content:"🌤️"}
 body[data-t=eve] .app{background:#FFD3B8}body[data-t=eve] .app::before{content:"🌇"}
 body[data-t=night] .app{background:#1E2B5E;box-shadow:0 6px 18px rgba(30,43,94,.35)}body[data-t=night] .app::before{content:"🌙"}body[data-t=night] .ttl{color:#fff}
+.reqm{background:#FFE3EC;color:#C23B22;border-radius:999px;padding:0 9px;font-size:12px;margin-left:8px}
 </style>
 </head>
 <body>
@@ -171,11 +172,11 @@ body[data-t=night] .app{background:#1E2B5E;box-shadow:0 6px 18px rgba(30,43,94,.
 
 <section class="scr" id="s-main">
 <div class="app"><span class="logo">🚗</span><span class="ttl">บันทึกการใช้รถ</span><div class="av" id="av"></div></div>
-<div class="intro" style="padding-bottom:6px"><p class="mut" id="hi"></p><h1 style="font-size:24px" id="un"></h1><div class="pw"><div class="pb"><i id="pgf"></i></div><span class="mut" id="pgt">กรอกแล้ว 0/4 ✨</span></div></div>
+<div class="intro" style="padding-bottom:6px"><p class="mut" id="hi"></p><h1 style="font-size:24px" id="un"></h1><div class="pw"><div class="pb"><i id="pgf"></i></div><span class="mut" id="pgt">กรอกแล้ว 0/5 ✨</span></div></div>
 <form id="form" novalidate>
 <div class="card"><div class="sh"><span class="nb">1</span>เลือกรถ</div><div class="cars" id="cars"></div><div class="err" id="e-car"></div></div>
 <div class="card"><div class="sh"><span class="nb">2</span>เลขไมล์เริ่มต้น</div><div><input id="mi" inputmode="numeric" placeholder="เลขไมล์ปัจจุบัน" aria-label="เลขไมล์"><div class="err" id="e-mi"></div></div>
-<label class="photo" id="ph" for="pf">📷 ถ่ายรูปเลขไมล์ (ถ้ามี)</label><input type="file" id="pf" accept="image/*" capture="environment" hidden><img id="pv" alt="รูปเลขไมล์"></div>
+<label class="photo" id="ph" for="pf">📷 ถ่ายรูปเลขไมล์ <b class="reqm">จำเป็น</b></label><input type="file" id="pf" accept="image/*" capture="environment" hidden><img id="pv" alt="รูปเลขไมล์"><div class="err" id="e-ph"></div></div>
 <div class="card"><div class="sh"><span class="nb">3</span>สาเหตุการใช้รถ</div><div><input id="rs" placeholder="เช่น ส่งเอกสาร พบลูกค้า" aria-label="สาเหตุ"><div class="err" id="e-rs"></div></div></div>
 <div class="card"><div class="sh"><span class="nb">4</span>ปลายทาง (สูงสุด 3 จุด)</div><input id="sq" placeholder="ค้นหาสถานที่" aria-label="ค้นหาสถานที่"><div id="map"></div><div class="route" id="route">แตะบนแผนที่เพื่อปักหมุดปลายทาง</div><div style="display:flex;gap:8px"><button type="button" class="btn ghost" id="clr" style="height:44px;font-size:14px;flex:1">ล้างหมุด</button><button type="button" class="btn ghost" id="mtg" style="height:44px;font-size:14px;flex:1">สลับมุมมอง</button><button type="button" class="btn ghost" id="ctr" style="height:44px;font-size:14px;flex:1">จุดเริ่มต้น</button></div><div class="err" id="e-dest"></div></div>
 <div class="card" id="hist" style="display:none"><div class="sh">ประวัติล่าสุด</div><div id="histl"></div></div>
@@ -218,7 +219,7 @@ $('bzx').onclick=()=>$('bz').classList.remove('on');
 async function loadBusy(){try{const d=await fetch('/get-records?status=pending&limit=50').then(r=>r.json());busy={};(d.records||[]).forEach(r=>{if(r.car)busy[r.car]=r});drawCars()}catch{}}
 
 /* photo */
-$('pf').onchange=e=>{const f=e.target.files[0];photo=null;$('ph').classList.remove('has');$('pv').style.display='none';if(!f)return;
+$('pf').onchange=e=>{const f=e.target.files[0];photo=null;$('ph').classList.remove('has');$('ph').innerHTML=PH_HTML;$('pv').style.display='none';if(!f)return;
 if(!/^image\/(jpeg|png|gif|webp)$/.test(f.type)){toast('รองรับ JPG, PNG, WEBP เท่านั้น');e.target.value='';return}
 if(f.size>10*1024*1024){toast('ไฟล์ต้องไม่เกิน 10MB');e.target.value='';return}
 photo=f;$('ph').classList.add('has');$('ph').textContent='✅ '+f.name;const r=new FileReader();r.onload=()=>{$('pv').src=r.result;$('pv').style.display='block'};r.readAsDataURL(f)};
@@ -245,13 +246,13 @@ function valid(){let ok=true;const m=$('mi').value.trim(),r=$('rs').value.trim()
 if(!carVal){err('car','กรุณาเลือกทะเบียนรถ');ok=false}else err('car');
 if(!m||isNaN(m)||+m<0){err('mi','กรุณากรอกเลขไมล์ให้ถูกต้อง');ok=false}else err('mi');
 if(!r){err('rs','กรุณากรอกสาเหตุการใช้รถ');ok=false}else err('rs');
-if(!markers.length){err('dest','กรุณาเลือกปลายทางอย่างน้อย 1 จุด');ok=false}else err('dest');return ok}
-$('form').onsubmit=e=>{e.preventDefault();if(loadUsage())return showUse(loadUsage());if(!valid())return;
+if(!markers.length){err('dest','กรุณาเลือกปลายทางอย่างน้อย 1 จุด');ok=false}else err('dest');if(!photo){err('ph','กรุณาถ่ายรูปเลขไมล์ก่อนบันทึก');ok=false}else err('ph');return ok}
+$('form').onsubmit=e=>{e.preventDefault();if(loadUsage())return showUse(loadUsage());if(!valid()){const e=document.querySelector('#s-main .err.on');if(e)e.scrollIntoView({behavior:'smooth',block:'center'});return}
 const rt=$('route');ps={car:carVal,mile:$('mi').value.trim(),reason:$('rs').value.trim(),d:+rt.dataset.d||0,t:+rt.dataset.t||0};
-$('cfc').innerHTML=[['ชื่อ',user.name],['ทะเบียน',ps.car],['เลขไมล์',ps.mile],['ภารกิจ',ps.reason],['ระยะทาง',ps.d?ps.d+' กม. · '+ps.t+' นาที':'ไม่ระบุ'],['รูปไมล์',photo?'✅ มีรูปแนบ':'—']].map(([a,b])=>`<div class="row"><span>${a}</span><span>${esc(b)}</span></div>`).join('');miniMap();$('cf').classList.add('on')};
+$('cfc').innerHTML=[['ชื่อ',user.name],['ทะเบียน',ps.car],['เลขไมล์',ps.mile],['ภารกิจ',ps.reason],['ระยะทาง',ps.d?ps.d+' กม. · '+ps.t+' นาที':'ไม่ระบุ'],['รูปเลขไมล์','✅ แนบแล้ว']].map(([a,b])=>`<div class="row"><span>${a}</span><span>${esc(b)}</span></div>`).join('');miniMap();$('cf').classList.add('on')};
 $('cfx').onclick=()=>$('cf').classList.remove('on');
 $('cfo').onclick=async()=>{$('cf').classList.remove('on');if(!ps)return;const p=ps;ps=null;const b=$('sub');b.disabled=true;towTok++;b.removeAttribute('aria-label');b.textContent='กำลังบันทึก...';
-try{let pk=null;if(photo){const fd=new FormData();fd.append('photo',photo);try{const u=await fetch('/upload-photo',{method:'POST',body:fd}).then(r=>r.json());if(u.success)pk=u.key;else toast('อัปโหลดรูปไม่สำเร็จ')}catch{toast('อัปโหลดรูปไม่สำเร็จ')}}
+try{let pk=null;{const fd=new FormData();fd.append('photo',photo);let u=null;try{u=await fetch('/upload-photo',{method:'POST',body:fd}).then(r=>r.json())}catch{}if(!u||!u.success||!u.key){toast('อัปโหลดรูปไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');return}pk=u.key}
 const rt=$('route').textContent;
 const res=await jpost('/save-record',{userId:user.userId,name:user.name,phone:user.phone||'-',car:p.car,mileage:p.mile,reason:p.reason,routeText:rt,totalDistance:p.d,totalTime:p.t,hasPhoto:!!pk,photoKey:pk,destinations:markers.map((m,i)=>({point:i+1,lat:m.getPosition().lat(),lng:m.getPosition().lng()})),timestamp:new Date().toISOString()});
 const d=await res.json().catch(()=>({}));
@@ -312,8 +313,9 @@ else{const h=new Date().getHours();$('hi').textContent=(h<12?'อรุณสว
 const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,EM=['✨','⭐','💙','🌟','🎉','🚗','💛'],CLR=['#FF8FAB','#FFC857','#6EE7B7','#7AA2FF','#C4A1FF'];
 function burst(x,y,n){if(RM)return;for(let i=0;i<n;i++){const e=document.createElement('span');e.className='bp';const a=Math.random()*Math.PI*2,d=40+Math.random()*90;e.style.cssText='left:'+x+'px;top:'+y+'px;--dx:'+Math.cos(a)*d+'px;--dy:'+(Math.sin(a)*d-30)+'px;--r:'+(Math.random()*540-270)+'deg';
 if(Math.random()<.55){e.textContent=EM[i%EM.length];e.style.fontSize=(12+Math.random()*10)+'px'}else{e.style.width=e.style.height=(6+Math.random()*6)+'px';e.style.background=CLR[i%5];e.style.borderRadius=Math.random()<.5?'50%':'2px'}document.body.appendChild(e);setTimeout(()=>e.remove(),900)}}
-let pdone=false;function prog(){const n=[!!carVal,!!$('mi').value.trim(),!!$('rs').value.trim(),markers.length>0].filter(Boolean).length;$('pgf').style.width=n*25+'%';$('pgt').textContent=n===4?'พร้อมบันทึกแล้ว 🎉':'กรอกแล้ว '+n+'/4 ✨';if(n===4&&!pdone){pdone=true;burst(innerWidth/2,130,28)}if(n<4)pdone=false}
+const PH_HTML='📷 ถ่ายรูปเลขไมล์ <b class="reqm">จำเป็น</b>';let pdone=false;function prog(){const n=[!!carVal,!!$('mi').value.trim(),!!$('rs').value.trim(),markers.length>0,!!photo].filter(Boolean).length;$('pgf').style.width=n*20+'%';$('pgt').textContent=n===5?'พร้อมบันทึกแล้ว 🎉':'กรอกแล้ว '+n+'/5 ✨';if(n===5&&!pdone){pdone=true;burst(innerWidth/2,130,28)}if(n<5)pdone=false}
 $('form').addEventListener('input',prog);
+$('pf').addEventListener('change',()=>setTimeout(()=>{if(photo)err('ph');prog()},0));
 document.querySelectorAll('.logo').forEach(l=>l.onclick=e=>{const r=l.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,18);toast('ปิ๊นๆ! 🚗💨')});
 /* car picks up the label letter by letter */
 let towTok=0,fwDone=false;const TXT='ตรวจสอบและบันทึก',sl=ms=>new Promise(r=>setTimeout(r,ms));
