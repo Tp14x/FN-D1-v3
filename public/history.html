@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>บันทึกการใช้รถ</title>
+<title>สมุดบันทึกการใช้รถ</title>
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Prompt:wght@500;600;700&family=Mali:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--ink:#0F1B2D;--mut:#52627A;--line:#E2E8F0;--bg:#F3F5F8;--pri:#1D4ED8;--tint:#E8EEFC;--ok:#0E7A4B;--okT:#E3F4EB;--am:#9A5B00;--amT:#FFF0D6}
@@ -116,7 +116,7 @@ input{border-width:2px;border-radius:999px;padding:0 18px}
 .dh{border-radius:0 0 28px 28px}.f{border-radius:16px}
 #tp,#toast{border-radius:999px}
 @keyframes cloud{from{transform:translateX(0)}to{transform:translateX(120vw)}}
-@keyframes bob{50%{transform:translateY(6px) rotate(6deg)}}
+@keyframes kb{50%{transform:translateY(-5px)}}@keyframes bob{50%{transform:translateY(6px) rotate(6deg)}}
 @keyframes wig{25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
 
 :root{--bg:#EEF2FF}
@@ -134,7 +134,7 @@ body{background:#EEF2FF}
 .tk{position:absolute;font-size:18px;animation:tk 2.4s ease-in-out infinite;pointer-events:none}
 .fc{background:#fff;background:color-mix(in srgb,var(--c) 17%,#fff);position:relative;overflow:hidden}
 .fc::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.75) 50%,transparent 60%);transform:translateX(-120%);pointer-events:none}.fc:hover::after{transform:translateX(120%);transition:transform .8s}
-.kpi>div:nth-child(1){animation:bob 5s ease-in-out infinite}.kpi>div:nth-child(2){animation:bob 5s ease-in-out -1.2s infinite}.kpi>div:nth-child(3){animation:bob 5s ease-in-out -2.4s infinite}.kpi>div:nth-child(4){animation:bob 5s ease-in-out -3.6s infinite}
+.kpi>div:nth-child(1){animation:kb 5s ease-in-out infinite}.kpi>div:nth-child(2){animation:kb 5s ease-in-out -1.2s infinite}.kpi>div:nth-child(3){animation:kb 5s ease-in-out -2.4s infinite}.kpi>div:nth-child(4){animation:kb 5s ease-in-out -3.6s infinite}
 .pp{display:inline-block;animation:pp .5s cubic-bezier(.3,1.6,.5,1)}
 .two>.card:nth-child(1){background:#F0EAFF;border-color:#DCCFFF}.two>.card:nth-child(2){background:#E2F7EC;border-color:#BFE9D3}
 .heat i{background:#DFD4FA}.l1{background:#C4B0F7!important}.l2{background:#A184F0!important}.l3{background:#7C54E8!important}.l4{background:#5B2FD1!important}.lg i{background:#DFD4FA}
@@ -186,6 +186,16 @@ input{font-size:16px}
 }
 @media(max-width:560px){.ev{grid-template-columns:14px 1fr;gap:8px}.tm{display:none}}
 @media(max-width:360px){.kpi .n{font-size:21px}.fc{min-width:160px}.hero h1{font-size:23px}}
+
+.mini{height:36px;padding:0 14px;border-radius:999px;border:2px solid #CBD5E1;background:#fff;font:600 13px 'Anuphan',sans-serif;color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;cursor:pointer;transition:.15s}.mini:hover{border-color:var(--pri)}
+.dp{display:inline-block;background:#fff;border:1px solid var(--line);border-radius:999px;padding:0 8px;font-size:11px;color:var(--mut);vertical-align:1px}
+[data-car]{cursor:pointer}.ln [data-car]:hover b span{text-decoration:underline}
+.bars{display:flex;gap:8px;align-items:flex-end;height:96px;margin-top:8px}.bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%;font-size:11px;color:var(--mut)}.bars i{display:block;width:100%;border-radius:8px 8px 4px 4px;background:var(--c);min-height:4px;transition:height .6s cubic-bezier(.2,.8,.2,1)}.bars b{font-size:12px;color:var(--ink);font-weight:600}
+body[data-t=morn] .hero{background:#FFE8C7}body[data-t=eve] .hero{background:#FFD3B8}
+body[data-t=night] .hero{background:#1E2B5E}body[data-t=night] .hero h1,body[data-t=night] .hero .mut{color:#fff}body[data-t=night] .hero .eye{color:#A5B4FC}body[data-t=night] .cloud{opacity:.3}
+body[data-t=night] .road .dash{background:repeating-linear-gradient(90deg,#5E73B8 0 18px,transparent 18px 36px)}
+.fh b{white-space:nowrap}
+#tp{z-index:28}
 </style>
 </head>
 <body>
@@ -216,13 +226,13 @@ function av(r){const n=r.name||'?',a=document.createElement('span');a.className=
 function count(el,to,dec){const t0=performance.now(),f=x=>{const p=Math.min(1,(x-t0)/700),v=to*(1-Math.pow(1-p,3));el.textContent=v.toLocaleString('th-TH',{maximumFractionDigits:dec||0,minimumFractionDigits:dec||0});if(p<1)requestAnimationFrame(f);else{el.classList.remove("pp");void el.offsetWidth;el.classList.add("pp")}};requestAnimationFrame(f)}
 async function load(){try{const d=await fetch('/get-records').then(r=>{if(!r.ok)throw 0;return r.json()});all=d.records||[];fleet();heat();recalc();$('upd').textContent='อัปเดตล่าสุด '+hm(new Date())+' น. · '+all.length+' รายการ'}
 catch{$('fd').innerHTML='<div class="empty"><b>⚠️</b>โหลดข้อมูลไม่สำเร็จ กรุณากดรีเฟรช</div>';$('upd').textContent='โหลดไม่สำเร็จ'}}
-function fleet(){$('fl').innerHTML=CARS.map(([n,p,c,e],i)=>{const a=all.find(r=>nm(r)===n&&!done(r));return `<div class="fc${a?' bz':''}" style="--c:${c};animation-delay:${i*60}ms"><div class="fh"><b><span class="em">${e}</span> ${n}</b><span class="plate">${p}</span></div>${a?`<div class="busy"><i></i>กำลังใช้ · ${esc(a.name||'—')}</div><div class="mut sm">ตั้งแต่ ${ymd(a.timestamp)===ymd(new Date())?'':new Date(a.timestamp).toLocaleDateString('th-TH',{day:'numeric',month:'short'})+' '}${hm(a.timestamp)} น.</div>`:`<div class="free"><i></i>ว่าง พร้อมใช้ ✨</div><div class="mut sm">&nbsp;</div>`}</div>`}).join('')}
+function fleet(){$('fl').innerHTML=CARS.map(([n,p,c,e],i)=>{const a=all.find(r=>nm(r)===n&&!done(r));return `<div class="fc${a?' bz':''}" data-car="${n}" style="--c:${c};animation-delay:${i*60}ms"><div class="fh"><b><span class="em">${e}</span> ${n}</b><span class="plate">${p}</span></div>${a?`<div class="busy"><i></i>กำลังใช้ · ${esc(a.name||'—')}</div><div class="mut sm">ตั้งแต่ ${ymd(a.timestamp)===ymd(new Date())?'':new Date(a.timestamp).toLocaleDateString('th-TH',{day:'numeric',month:'short'})+' '}${hm(a.timestamp)} น.</div>`:`<div class="free"><i></i>ว่าง พร้อมใช้ ✨</div><div class="mut sm">&nbsp;</div>`}</div>`}).join('')}
 function heat(){const cnt={};all.forEach(r=>{if(r.timestamp){const k=ymd(r.timestamp);cnt[k]=(cnt[k]||0)+1}});const now=new Date(),end=new Date(now.getFullYear(),now.getMonth(),now.getDate()),start=new Date(end);start.setDate(end.getDate()-end.getDay()-12*7);
 const mx=Math.max(1,...Object.values(cnt));let h='';for(let i=0;i<91;i++){const d=new Date(start);d.setDate(start.getDate()+i);if(d>end){h+='<i class="x"></i>';continue}const k=ymd(d),n=cnt[k]||0,l=n?Math.min(4,Math.ceil(n/mx*4)):0;h+=`<i class="${l?'l'+l:''}" title="${d.toLocaleDateString('th-TH',{day:'numeric',month:'short'})}: ${n} เที่ยว" style="animation-delay:${i*6}ms"></i>`}$('ht').innerHTML=h}
 function recalc(){const lim=days?Date.now()-days*864e5:0;base=all.filter(r=>!lim||(r.timestamp&&new Date(r.timestamp)>=lim));
 count($('k1'),base.length);count($('k2'),base.reduce((s,r)=>s+(+r.totalDistance||0),0),1);count($('k3'),all.filter(r=>!done(r)).length);count($('k4'),new Set(base.map(r=>r.userId||r.name)).size);
 const per=CARS.map(([n,p,c,e])=>{const rs=base.filter(r=>nm(r)===n);return{n,c,e,t:rs.length,km:rs.reduce((s,r)=>s+(+r.totalDistance||0),0)}}),mx=Math.max(1,...per.map(x=>x.t));
-$('ln').innerHTML=per.map(x=>`<div style="--c:${x.c}"><b><span>${x.e} ${x.n}</span><em>${x.t} เที่ยว · ${x.km.toLocaleString('th-TH',{maximumFractionDigits:0})} กม.</em></b><s><i style="width:0" data-w="${x.t/mx*100}"></i></s></div>`).join('');
+$('ln').innerHTML=per.map(x=>`<div style="--c:${x.c}" data-car="${x.n}" role="button" tabindex="0"><b><span>${x.e} ${x.n}</span><em>${x.t} เที่ยว · ${x.km.toLocaleString('th-TH',{maximumFractionDigits:0})} กม.</em></b><s><i style="width:0" data-w="${x.t/mx*100}"></i></s></div>`).join('');
 requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('[data-w]').forEach(e=>e.style.width=e.dataset.w+'%')));
 $('cc').innerHTML='<button data-c="" aria-pressed="'+(carF===''?'true':'false')+'">ทุกคัน</button>'+CARS.map(([n,p,c,e])=>`<button data-c="${n}" style="--c:${c}" aria-pressed="${carF===n}">${e} ${n}</button>`).join('');
 $('cc').querySelectorAll('button').forEach(b=>b.onclick=()=>{carF=b.dataset.c;recalc()});filt()}
@@ -230,15 +240,15 @@ function filt(){const s=q.toLowerCase();list=base.filter(r=>(!carF||nm(r)===carF
 function dayLabel(k){const t=ymd(new Date()),y=ymd(new Date(Date.now()-864e5));return k===t?'วันนี้':k===y?'เมื่อวาน':new Date(k+'T00:00').toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'long'})}
 function feed(){$('cnt').textContent=list.length+' รายการ';if(!list.length){$('fd').innerHTML='<div class="empty"><b>📭</b>ไม่พบรายการที่ตรงกับตัวกรอง</div>';$('mo').style.display='none';return}
 const rs=list.slice(0,shown);let cur='',h='',di=0;rs.forEach((r,i)=>{const k=r.timestamp?ymd(r.timestamp):'—';if(k!==cur){cur=k;const n=rs.filter(x=>(x.timestamp?ymd(x.timestamp):'—')===k).length;h+=`<div class="day" style="--dc:${P[di++%5]}">${k==='—'?'ไม่ระบุวันที่':dayLabel(k)}<small>${n} เที่ยว</small></div>`}
-const c=col(nm(r));h+=`<div class="ev" style="animation-delay:${Math.min(i,12)*30}ms"><div class="tm">${hm(r.timestamp)}</div><div class="rail" style="--c:${c}"><i></i></div><button class="it" style="--c:${c}" data-e="${(CARS.find(x=>x[0]===nm(r))||[0,0,0,'🚗'])[3]}" data-i="${all.indexOf(r)}">${av(r)}<span style="min-width:0"><b>${esc(r.name||'—')}</b> <span class="plate" style="font-size:12px">${esc(pl(r))}</span><span class="mut"><span class="tin">${hm(r.timestamp)} น. · </span>${esc(r.reason||'—')}${r.totalDistance?' · '+(+r.totalDistance).toFixed(1)+' กม.':''}${done(r)&&r.durationText?' · '+esc(r.durationText):''}</span></span>${done(r)?'<span class="chip ok"><i></i>คืนแล้ว</span>':'<span class="chip am"><i></i>กำลังใช้อยู่</span>'}</button></div>`});
+const c=col(nm(r));h+=`<div class="ev" style="animation-delay:${Math.min(i,12)*30}ms"><div class="tm">${hm(r.timestamp)}</div><div class="rail" style="--c:${c}"><i></i></div><button class="it" style="--c:${c}" data-e="${(CARS.find(x=>x[0]===nm(r))||[0,0,0,'🚗'])[3]}" data-i="${all.indexOf(r)}">${av(r)}<span style="min-width:0"><b>${esc(r.name||'—')}</b> <span class="plate" style="font-size:12px">${esc(pl(r))}</span>${r.department?' <span class="dp">'+esc(r.department)+'</span>':''}<span class="mut"><span class="tin">${hm(r.timestamp)} น. · </span>${esc(r.reason||'—')}${r.totalDistance?' · '+(+r.totalDistance).toFixed(1)+' กม.':''}${done(r)&&r.durationText?' · '+esc(r.durationText):''}</span></span>${done(r)?'<span class="chip ok"><i></i>คืนแล้ว</span>':'<span class="chip am"><i></i>กำลังใช้อยู่</span>'}</button></div>`});
 $('fd').innerHTML=h;$('fd').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>detail(all[b.dataset.i]));const left=list.length-shown;$('mo').style.display=left>0?'block':'none';$('mo').textContent='แสดงเพิ่มอีก '+Math.min(STEP,left)+' รายการ'}
 $('mo').onclick=()=>{shown+=STEP;feed()};
 function detail(r){if(!r)return;const c=col(nm(r)),l=r.returnLocation,f=(a,b,w)=>`<div class="f${w?' w2':''}"><small>${a}</small><b>${b}</b></div>`;
 $('dr').style.setProperty('--c',c);$('dh').innerHTML=`<div style="flex:1"><h2>${esc(r.name||'—')}</h2><small>${esc(r.car||'—')}</small></div><button class="x" id="xx" aria-label="ปิด">✕</button>`;
-$('db').innerHTML=f('เบอร์โทร',esc(r.phone||'—'))+f('แผนก',esc(r.department||'—'))+f('เลขไมล์',esc(r.mileage||'—'))+f('สถานะ',done(r)?'คืนรถแล้ว':'กำลังใช้อยู่')+f('สาเหตุ',esc(r.reason||'—'),1)+f('เส้นทาง',esc(r.routeText||'—'),1)+f('เริ่มใช้รถ',dt(r.timestamp),1)+(done(r)?f('คืนรถเมื่อ',dt(r.returnedAt))+f('ระยะเวลา',esc(r.durationText||'—')):'')+
-(l&&l.lat!=null?f('ตำแหน่งตอนคืนรถ','<a href="https://www.google.com/maps?q='+encodeURIComponent(l.lat+','+l.lng)+'" target="_blank" rel="noopener" style="color:var(--pri)">ดูบนแผนที่ ±'+Math.round(l.accuracy||0)+' ม.</a>',1):'')+
+$('db').innerHTML=f('เบอร์โทร',esc(r.phone||'—'))+f('แผนก',esc(r.department||'—'))+f('เลขไมล์',esc(r.mileage||'—'))+f('สถานะ',done(r)?'คืนรถแล้ว':'กำลังใช้อยู่')+(r.totalDistance?f('ระยะทางที่วางแผน',(+r.totalDistance).toFixed(1)+' กม.')+f('เวลาเดินทางโดยประมาณ',(r.totalTime||'—')+' นาที'):'')+f('สาเหตุ',esc(r.reason||'—'),1)+f('เส้นทาง',esc(r.routeText||'—'),1)+f('เริ่มใช้รถ',dt(r.timestamp),1)+(done(r)?f('คืนรถเมื่อ',dt(r.returnedAt))+f('ระยะเวลา',esc(r.durationText||'—')):'')+
+(l&&l.lat!=null?'<div class="f w2"><small>ตำแหน่งตอนคืนรถ</small><b>'+(+l.lat).toFixed(6)+', '+(+l.lng).toFixed(6)+'</b><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center"><a class="mini" href="https://www.google.com/maps?q='+encodeURIComponent(l.lat+','+l.lng)+'" target="_blank" rel="noopener">เปิดแผนที่</a><button class="mini" type="button" data-cp="'+esc(l.lat+','+l.lng)+'">คัดลอกพิกัด</button><span class="chip ok" style="margin-left:auto">ความแม่นยำ ±'+Math.round(l.accuracy||0)+' ม.</span></div></div>':'')+
 (r.photoKey?'<div class="f w2"><small>รูปเลขไมล์ (แตะเพื่อขยาย)</small><img src="/get-photo?key='+encodeURIComponent(r.photoKey)+'" alt="รูปเลขไมล์" loading="lazy" onclick="this.style.maxHeight=this.style.maxHeight===\'none\'?\'280px\':\'none\'"></div>':'');
-$('dr').classList.add('on');$('ov').classList.add('on');document.body.style.overflow='hidden';$('xx').onclick=close;$('xx').focus()}
+$('db').querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{navigator.clipboard?navigator.clipboard.writeText(b.dataset.cp).then(()=>toast('คัดลอกพิกัดแล้ว 📋'),()=>toast('คัดลอกไม่สำเร็จ')):toast('เครื่องนี้ไม่รองรับการคัดลอก')});$('dr').classList.add('on');$('ov').classList.add('on');document.body.style.overflow='hidden';$('xx').onclick=close;$('xx').focus()}
 const close=()=>{$('dr').classList.remove('on');$('ov').classList.remove('on');document.body.style.overflow=''};$('ov').onclick=close;document.onkeydown=e=>{if(e.key==='Escape')close()};
 $('per').querySelectorAll('button').forEach(b=>b.onclick=()=>{days=+b.dataset.d;$('per').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));recalc()});
 $('sc').querySelectorAll('button').forEach(b=>b.onclick=()=>{stF=b.dataset.s;$('sc').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));filt()});
@@ -269,13 +279,28 @@ for(let i=0;i<(innerWidth<600?8:16);i++){const e=document.createElement('span');
 document.addEventListener('mousedown',e=>{if(e.target.closest('.btn,.chips button,.seg button,.more,.fc'))burst(e.clientX,e.clientY,10)});
 if(fh){let lt=0;addEventListener('mousemove',e=>{const n=performance.now();if(n-lt<45)return;lt=n;const t=document.createElement('span');t.className='tr';if(Math.random()<.5)t.textContent='✨';else{t.style.background=CLR[(Math.random()*5)|0];t.style.width=t.style.height='8px'}t.style.left=e.clientX+'px';t.style.top=e.clientY+'px';document.body.appendChild(t);setTimeout(()=>t.remove(),700)})}
 setInterval(()=>{const c=document.querySelectorAll('#ht i:not(.x)');if(!c.length)return;const e=c[(Math.random()*c.length)|0];e.classList.add('tw');setTimeout(()=>e.classList.remove('tw'),700)},500);
-document.querySelector('.sun').onclick=e=>{const r=e.target.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,40);toast('แดดดีจัง ☀️')};
+document.querySelector('.sun').onclick=e=>{const r=e.target.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,40);toast(({morn:'อรุณสวัสดิ์ 🌅',day:'แดดดีจัง ☀️',eve:'เย็นแล้วนะ 🌇',night:'ราตรีสวัสดิ์ 🌙'})[document.body.dataset.t]||'สวัสดี')};
 document.querySelector('.road .cr').onclick=e=>{const r=e.target.getBoundingClientRect();burst(r.left+r.width/2,r.top,18);e.target.classList.add('hn');setTimeout(()=>e.target.classList.remove('hn'),1200);toast('ปิ๊นๆ! 🚗💨')}}
 /* swipe down to close drawer on phones */
 (()=>{const dr=$('dr');let y0=0,dy=0,on=false;
 dr.addEventListener('touchstart',e=>{if(innerWidth>640||dr.scrollTop>0)return;y0=e.touches[0].clientY;on=true;dy=0;dr.style.transition='none'},{passive:true});
 dr.addEventListener('touchmove',e=>{if(!on)return;dy=Math.max(0,e.touches[0].clientY-y0);dr.style.transform='translateY('+dy+'px)'},{passive:true});
 dr.addEventListener('touchend',()=>{if(!on)return;on=false;dr.style.transition='';dr.style.transform='';if(dy>90)close()})})();
+/* v3 extras: theme + per-car stats */
+(()=>{const h=new Date().getHours(),t=h>=5&&h<10?'morn':h>=10&&h<17?'day':h>=17&&h<19?'eve':'night';document.body.dataset.t=t;const sun=document.querySelector('.sun');if(sun)sun.textContent=({morn:'🌅',day:'☀️',eve:'🌇',night:'🌙'})[t]})();
+function carStats(n){const rs=all.filter(r=>nm(r)===n),cr=CARS.find(x=>x[0]===n)||[n,'—','#52627A','🚗'],c=cr[2];
+const km=rs.reduce((s,r)=>s+(+r.totalDistance||0),0),dn=rs.filter(r=>done(r)&&r.timestamp&&r.returnedAt),avg=dn.length?dn.reduce((s,r)=>s+(new Date(r.returnedAt)-new Date(r.timestamp)),0)/dn.length/6e4:0;
+const us={};rs.forEach(r=>{const k=r.name||'—';us[k]=(us[k]||0)+1});const top=Object.entries(us).sort((a,b)=>b[1]-a[1])[0],last=rs.map(r=>r.timestamp).filter(Boolean).sort().pop();
+const now=new Date(),ms=[];for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);ms.push({k:d.getFullYear()+'-'+d.getMonth(),l:d.toLocaleDateString('th-TH',{month:'short'}),v:0})}
+rs.forEach(r=>{if(!r.timestamp)return;const d=new Date(r.timestamp),m=ms.find(x=>x.k===d.getFullYear()+'-'+d.getMonth());if(m)m.v++});const mx=Math.max(1,...ms.map(m=>m.v));
+const f=(a,b,w)=>'<div class="f'+(w?' w2':'')+'"><small>'+a+'</small><b>'+b+'</b></div>',fm=m=>m>=60?Math.floor(m/60)+' ชม. '+Math.round(m%60)+' นาที':Math.round(m)+' นาที';
+$('dr').style.setProperty('--c',c);$('dh').innerHTML='<div style="flex:1"><h2>'+cr[3]+' '+esc(n)+'</h2><small>'+esc(cr[1])+' · สถิติทั้งหมด</small></div><button class="x" id="xx" aria-label="ปิด">✕</button>';
+$('db').innerHTML=f('เที่ยวทั้งหมด',rs.length+' เที่ยว')+f('ระยะทางรวม',km.toLocaleString('th-TH',{maximumFractionDigits:1})+' กม.')+f('เฉลี่ยต่อเที่ยว',rs.length?(km/rs.length).toFixed(1)+' กม.':'—')+f('ใช้นานเฉลี่ย',dn.length?fm(avg):'—')+f('ผู้ใช้บ่อยสุด',top?esc(top[0])+' · '+top[1]+' เที่ยว':'—',1)+f('ใช้ล่าสุด',last?dt(last):'—',1)+
+'<div class="f w2" style="--c:'+c+'"><small>จำนวนเที่ยวรายเดือน (6 เดือนล่าสุด)</small><div class="bars">'+ms.map(m=>'<div><b>'+m.v+'</b><i style="height:0" data-h="'+(m.v/mx*100)+'%"></i>'+m.l+'</div>').join('')+'</div></div>';
+$('dr').classList.add('on');$('ov').classList.add('on');document.body.style.overflow='hidden';$('xx').onclick=close;$('xx').focus();
+requestAnimationFrame(()=>requestAnimationFrame(()=>$('db').querySelectorAll('[data-h]').forEach(e=>{e.style.height=e.dataset.h})))}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-car]');if(t)carStats(t.dataset.car)});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'){const t=e.target.closest&&e.target.closest('[data-car]');if(t)carStats(t.dataset.car)}});
 load();
 </script>
 </body>
