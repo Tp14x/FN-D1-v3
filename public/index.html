@@ -144,6 +144,7 @@ body[data-t=morn] .app{background:#FFE8C7}body[data-t=morn] .app::before{content
 body[data-t=eve] .app{background:#FFD3B8}body[data-t=eve] .app::before{content:"🌇"}
 body[data-t=night] .app{background:#1E2B5E;box-shadow:0 6px 18px rgba(30,43,94,.35)}body[data-t=night] .app::before{content:"🌙"}body[data-t=night] .ttl{color:#fff}
 .reqm{background:#FFE3EC;color:#C23B22;border-radius:999px;padding:0 9px;font-size:12px;margin-left:8px}
+.osb{display:flex;align-items:center;gap:12px;margin:0 16px 12px;padding:12px 14px;border-radius:14px;background:#FFF7E6;border:1px solid #F2D9A6;color:#8A5300}.osb[hidden]{display:none}.osb .osi{font-size:24px;flex:none}.osb b{display:block;font-size:14px;color:#7A4700}.osb span:not(.osi){display:block;font-size:12.5px;margin-top:2px;line-height:1.4}
 </style>
 </head>
 <body>
@@ -171,7 +172,7 @@ body[data-t=night] .app{background:#1E2B5E;box-shadow:0 6px 18px rgba(30,43,94,.
 <div class="sheet center" style="max-width:none;border-radius:0"><div class="ic b">🚫</div><h1 style="font-size:24px">บัญชีถูกระงับ</h1><p class="mut" id="sm">กรุณาติดต่อผู้ดูแลระบบ</p></div></section>
 
 <section class="scr" id="s-main">
-<div class="app"><span class="logo">🚗</span><span class="ttl">บันทึกการใช้รถ</span><div class="av" id="av"></div></div>
+<div class="app"><span class="logo">🚗</span><span class="ttl">บันทึกการใช้รถ</span><div class="av" id="av"></div></div><div class="osb" role="status" hidden><span class="osi">🧭</span><div><b>โหมดใช้งานรถต่างจังหวัดเปิดอยู่</b><span>คืนรถเกิน 24 ชั่วโมงได้ ไม่ถูกบล็อก และไม่มีแจ้งเตือนรถเกินกำหนด</span></div></div>
 <div class="intro" style="padding-bottom:6px"><p class="mut" id="hi"></p><h1 style="font-size:24px" id="un"></h1><div class="pw"><div class="pb"><i id="pgf"></i></div><span class="mut" id="pgt">กรอกแล้ว 0/5 ✨</span></div></div>
 <form id="form" novalidate>
 <div class="card"><div class="sh"><span class="nb">1</span>เลือกรถ</div><div class="cars" id="cars"></div><div class="err" id="e-car"></div></div>
@@ -184,7 +185,7 @@ body[data-t=night] .app{background:#1E2B5E;box-shadow:0 6px 18px rgba(30,43,94,.
 </form></section>
 
 <section class="scr" id="s-use">
-<div class="app"><span class="logo">🚗</span><span class="ttl">กำลังใช้รถ</span><span class="chip"><i></i>กำลังใช้งาน</span></div>
+<div class="app"><span class="logo">🚗</span><span class="ttl">กำลังใช้รถ</span><span class="chip"><i></i>กำลังใช้งาน</span></div><div class="osb" role="status" hidden><span class="osi">🧭</span><div><b>โหมดใช้งานรถต่างจังหวัดเปิดอยู่</b><span>คืนรถเกิน 24 ชั่วโมงได้ ไม่ถูกบล็อก และไม่มีแจ้งเตือนรถเกินกำหนด</span></div></div>
 <div class="timer" id="tm"><svg viewBox="0 0 240 240" fill="none"><circle cx="120" cy="120" r="111" stroke="#DCE3EE" stroke-width="8"/></svg><div class="orb"><svg viewBox="0 0 240 240" fill="none" style="transform:rotate(-90deg)"><circle cx="120" cy="120" r="111" stroke="#1D4ED8" stroke-width="8" stroke-linecap="round" stroke-dasharray="190 507" stroke-dashoffset="190"/></svg><span aria-hidden="true">🚗</span></div><div><div class="h" id="td">00:00:00</div><div class="mut" id="ti"></div></div></div>
 <div class="tiles" style="margin-top:18px"><div class="tile"><span class="mut">ทะเบียน</span><b id="iP"></b></div><div class="tile"><span class="mut">ผู้ใช้</span><b id="iU"></b></div><div class="tile"><span class="mut">ไมล์เริ่มต้น</span><b id="iM"></b></div><div class="tile"><span class="mut">เริ่มเวลา</span><b id="iT"></b></div></div>
 <div class="card" style="margin-top:12px"><div class="sh">📍 ตำแหน่งตอนคืนรถ</div><p class="mut" id="ls">ยังไม่ได้ดึงตำแหน่ง ต้องดึงตำแหน่งก่อนคืนรถ</p><button class="btn ghost" id="gl" style="flex:none;height:48px;font-size:15px">ดึงตำแหน่งของฉัน</button></div>
@@ -264,7 +265,7 @@ catch{toast('เกิดข้อผิดพลาด กรุณาลอง
 function showUse(u){{const q=String(u.carPlate||'').split(':').map(x=>x.trim());$('iP').innerHTML='<span class="plate">'+esc(q[1]||q[0]||'-')+'</span>'+(q[1]?' <small class="mut">'+esc(q[0])+'</small>':'')}$('iU').textContent=u.userName||'-';$('iM').textContent=u.mileage?u.mileage+' กม.':'-';
 const st=new Date(u.startedAt);$('iT').textContent=st.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})+' น.';$('ti').textContent=st.toLocaleDateString('th-TH',{day:'numeric',month:'short'});
 retLoc=null;$('ls').textContent='ยังไม่ได้ดึงตำแหน่ง ต้องดึงตำแหน่งก่อนคืนรถ';$('gl').textContent='ดึงตำแหน่งของฉัน';show('s-use');
-clearInterval(tmr);const p=n=>String(n).padStart(2,'0'),f=()=>{const d=Date.now()-st,h=Math.floor(d/36e5);$('td').textContent=p(h)+':'+p(Math.floor(d%36e5/6e4))+':'+p(Math.floor(d%6e4/1e3));$('tm').classList.toggle('warn',h>=23)};f();tmr=setInterval(f,1000)}
+clearInterval(tmr);const p=n=>String(n).padStart(2,'0'),f=()=>{const d=Date.now()-st,h=Math.floor(d/36e5);$('td').textContent=p(h)+':'+p(Math.floor(d%36e5/6e4))+':'+p(Math.floor(d%6e4/1e3));$('tm').classList.toggle('warn',h>=23&&!OS)};f();tmr=setInterval(f,1000)}
 $('gl').onclick=async()=>{const b=$('gl'),s=$('ls');if(!navigator.geolocation){s.textContent='❌ เบราว์เซอร์ไม่รองรับ GPS';return}
 b.disabled=true;b.textContent='กำลังดึงตำแหน่ง...';s.textContent='⏳ กำลังรับสัญญาณ GPS...';const pts=[];
 await new Promise(res=>{const w=navigator.geolocation.watchPosition(p=>{pts.push({lat:p.coords.latitude,lng:p.coords.longitude,accuracy:p.coords.accuracy});s.textContent='⏳ ปรับความแม่นยำ ±'+Math.round(p.coords.accuracy)+' ม.';if(p.coords.accuracy<=15){navigator.geolocation.clearWatch(w);res()}},()=>{navigator.geolocation.clearWatch(w);res()},{enableHighAccuracy:true,timeout:20000,maximumAge:0});setTimeout(()=>{navigator.geolocation.clearWatch(w);res()},8000)});
@@ -296,12 +297,13 @@ $('histl').innerHTML=rs.map(r=>`<div class="row"><span>${esc(r.car||'—')} · $
 
 /* init */
 function avatar(name,pic){const a=$('av');a.textContent='';if(pic){const i=new Image();i.src=pic;i.alt=name;i.onerror=()=>{a.textContent=name.charAt(0)};a.appendChild(i)}else a.textContent=name.charAt(0)}
+let OS=false;function osApply(v){OS=!!v;document.querySelectorAll('.osb').forEach(e=>e.hidden=!OS);const t=$('tm');if(t&&OS)t.classList.remove('warn')}
 (async()=>{try{await liff.init({liffId:CFG.liffId});if(!liff.isLoggedIn()){liff.login({redirectUri:location.href});return}
 const pr=await liff.getProfile();const um=await fetch('/get-user?userId='+encodeURIComponent(pr.userId)).then(r=>r.json()).catch(()=>({}));const db=um[pr.userId];
 user={userId:pr.userId,displayName:pr.displayName,pictureUrl:pr.pictureUrl,name:db?.name||pr.displayName,phone:db?.phone||'',department:db?.department||'รออนุมัติ',role:db?.role||'pending',status:db?.status||'pending'};
 if(db&&pr.pictureUrl!==db.pictureUrl)jpost('/update-user',{userId:pr.userId,pictureUrl:pr.pictureUrl}).catch(()=>{});
 jpost('/log-login',{userId:pr.userId}).catch(()=>{});$('load').style.display='none';
-const pd=await fetch('/get-pending-record?userId='+encodeURIComponent(pr.userId)).then(r=>r.json()).catch(()=>({}));let us=loadUsage();
+const pd=await fetch('/get-pending-record?userId='+encodeURIComponent(pr.userId)).then(r=>r.json()).catch(()=>({}));let us=loadUsage();osApply(pd.outstation);setInterval(()=>fetch('/get-pending-record?userId='+encodeURIComponent(pr.userId)).then(r=>r.json()).then(d=>osApply(d.outstation)).catch(()=>{}),300000);
 if(pd.record){const r=pd.record;if(!us){us={isUsing:true,carPlate:r.car,carModel:String(r.car).split(':')[0].trim(),startedAt:r.timestamp,userName:r.name,userId:pr.userId,mileage:r.mileage};saveUsage(us)}return showUse(us)}
 if(us)clearUsage();
 const{role,status}=user;
