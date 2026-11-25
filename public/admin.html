@@ -85,6 +85,8 @@ td{padding:12px 10px}th{padding:10px}.u{min-width:150px}
 @media(max-width:700px){.g4{gap:10px}.kpi{flex-direction:column;align-items:flex-start;gap:8px;padding:14px}.kpi .n{font-size:22px}.reqs{grid-template-columns:1fr}.top .b span{display:none}
 thead{display:none}table,tbody,tr,td{display:block}.tw{margin:0;padding:0;overflow:visible}tbody tr{border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:10px;background:#fff}td{border:0;padding:5px 0;display:flex;justify-content:space-between;gap:12px;align-items:center;text-align:right}td::before{content:attr(data-l);font-size:12px;color:var(--mut);flex:none;text-align:left}td.nl::before{display:none}td.nl{text-align:left}.f2{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.os{display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap}.os .t{flex:1;min-width:220px}.os .t b{font-size:15px}.os .t p{font-size:13px;color:var(--mut);margin-top:2px}.os.on{border-color:#F2D9A6;background:linear-gradient(135deg,#FFF9EC,#fff)}
+.sw{position:relative;width:54px;height:30px;border-radius:999px;background:#CBD5E1;border:0;cursor:pointer;transition:background .25s;flex:none}.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(15,27,45,.3);transition:transform .25s cubic-bezier(.3,1.4,.5,1)}.sw.on{background:var(--am)}.sw.on::after{transform:translateX(24px)}.sw:disabled{opacity:.6;cursor:wait}
 </style>
 </head>
 <body>
@@ -100,7 +102,8 @@ thead{display:none}table,tbody,tr,td{display:block}.tw{margin:0;padding:0;overfl
 <div class="me"><span class="av" id="mav">A</span><div><b id="mn">Administrator</b><span id="mi">—</span></div><button class="b s" data-a="logout" title="ออกจากระบบ" aria-label="ออกจากระบบ">⎋</button></div></aside>
 <main class="main"><div class="top"><div style="flex:1"><h1 id="pt">แดชบอร์ด</h1><div class="mut" id="ps"></div></div><button class="b" data-a="refresh">🔄 <span>รีเฟรช</span></button><button class="b p" data-a="csv" id="csvb" style="display:none">⬇ <span>ส่งออก CSV</span></button></div>
 
-<section class="pg on" id="p-dash"><div class="grid g4" id="kp"></div>
+<section class="pg on" id="p-dash"><div class="card os" id="os"><div style="font-size:30px">🧭</div><div class="t"><b>โหมดใช้งานรถต่างจังหวัด <span class="chip c-gray" id="osc">ปิดอยู่</span></b><p id="osp">ปิดอยู่: ถ้าใช้รถเกิน 24 ชั่วโมง ระบบจะบล็อกผู้ใช้และแจ้งเตือนอัตโนมัติ</p></div><button class="sw" id="osw" data-a="os" role="switch" aria-checked="false" aria-label="เปิด/ปิดโหมดใช้งานรถต่างจังหวัด"></button></div>
+<div class="grid g4" id="kp"></div>
 <div class="grid g2 mt"><div class="card"><div class="ch"><h2>จำนวนเที่ยวรายเดือน</h2><span class="chip c-gray">6 เดือนล่าสุด</span></div><div class="bars" id="mb"></div></div><div class="card"><div class="ch"><h2>สัดส่วนตามรถ</h2></div><div class="rows" id="cb"></div></div></div>
 <div class="grid g2 mt"><div class="card"><div class="ch"><h2>รถที่กำลังใช้งาน</h2><span class="chip c-am" id="ac"></span></div><div id="al"></div></div><div class="card"><div class="ch"><h2>รายการล่าสุด</h2><button class="b s" data-p="rec">ดูทั้งหมด</button></div><div id="rl"></div></div></div></section>
 
@@ -146,11 +149,13 @@ $('cok').onclick=async()=>{const f=pendingFn;closeM();if(f)await f()};
 /* login / load */
 $('lgf').onsubmit=e=>{e.preventDefault();const id=$('aid').value.trim();if(!id){$('lge').textContent='กรุณากรอก LINE User ID';return}A=id;$('lge').textContent='';try{$('rem').checked?localStorage.setItem('admin_id',id):localStorage.removeItem('admin_id')}catch{}load(true)};
 try{const s=localStorage.getItem('admin_id');if(s){$('aid').value=s;$('rem').checked=true}}catch{}
-async function load(first){try{const[m,r]=await Promise.all([api('load'),api('records')]);D.users=m.userMap||{};D.requests=m.requests||[];D.stats=m.stats||{};D.records=r.records||[];
+async function load(first){try{const[m,r]=await Promise.all([api('load'),api('records')]);D.users=m.userMap||{};D.requests=m.requests||[];D.stats=m.stats||{};D.records=r.records||[];D.os=!!m.outstation;
 const me=D.users[A];$('mn').textContent=me?.name||'Administrator';$('mi').textContent=A.slice(0,16)+'…';$('mav').innerHTML=av(me?.picture_url,me?.name||'A').replace(/^<span[^>]*>|<\/span>$/g,'');
 if(first){$('login').style.display='none';$('app').style.display='block'}renderAll()}
 catch(e){if(first){$('lge').textContent=e.message==='403'?'ไม่ใช่ Admin หรือไม่มีสิทธิ์เข้าถึง':'โหลดข้อมูลไม่สำเร็จ: '+e.message}else toast('โหลดข้อมูลไม่สำเร็จ: '+e.message,'bad')}}
-function renderAll(){dash();reqs();users();recFilter();proxyUsers();pa()}
+function osr(){const on=!!D.os,w=$('osw');$('os').classList.toggle('on',on);w.classList.toggle('on',on);w.setAttribute('aria-checked',on);const c=$('osc');c.className='chip '+(on?'c-am':'c-gray');c.textContent=on?'เปิดอยู่':'ปิดอยู่';$('osp').textContent=on?'เปิดอยู่: ทุกคนคืนรถเกิน 24 ชั่วโมงได้ ไม่บล็อก และไม่แจ้งเตือนรถเกินกำหนด จนกว่าจะคืนรถ':'ปิดอยู่: ถ้าใช้รถเกิน 24 ชั่วโมง ระบบจะบล็อกผู้ใช้และแจ้งเตือนอัตโนมัติ'}
+function osToggle(){const on=!D.os;ask({i:on?'🧭':'🔒',t:on?'เปิดโหมดต่างจังหวัด':'ปิดโหมดต่างจังหวัด',m:on?'เปิด<b>โหมดใช้งานรถต่างจังหวัด</b> สำหรับผู้ใช้ทุกคน?<br><span class="sm mut">คืนรถเกิน 24 ชม. ได้ ไม่บล็อก และไม่แจ้งเตือนรถเกินกำหนด</span>':'ปิดโหมดต่างจังหวัด กลับไปใช้กติกา 24 ชั่วโมงตามเดิม?<br><span class="sm mut">รถที่ค้างเกิน 24 ชม. จะถูกนับเป็นเกินกำหนดอีกครั้ง</span>',c:on?'a':'p',ok:on?'เปิดโหมด':'ปิดโหมด'},async()=>{const w=$('osw');w.disabled=true;try{const d=await api('set-outstation',{enabled:on});if(d.success){D.os=!!d.outstation;osr();toast(on?'เปิดโหมดต่างจังหวัดแล้ว':'ปิดโหมดต่างจังหวัดแล้ว','ok')}}catch(e){toast(e.message,'bad')}w.disabled=false})}
+function renderAll(){osr();dash();reqs();users();recFilter();proxyUsers();pa()}
 
 /* nav */
 function go(p){page=p;document.querySelectorAll('.pg').forEach(s=>s.classList.toggle('on',s.id==='p-'+p));document.querySelectorAll('.nv').forEach(b=>b.classList.toggle('on',b.dataset.p===p));$('pt').textContent=TITLES[p][0];$('ps').textContent=TITLES[p][1];$('csvb').style.display=p==='rec'?'':'none';scrollTo({top:0})}
@@ -231,7 +236,7 @@ document.addEventListener('click',e=>{const p=e.target.closest('[data-p]');if(p)
 const pg=e.target.closest('[data-pg]');if(pg){rpg=+pg.dataset.pg;recs();return}
 const b=e.target.closest('[data-a]');if(!b)return;const id=b.dataset.id,n=b.dataset.n;
 ({logout:()=>{A='';$('app').style.display='none';$('login').style.display='flex'},refresh:()=>{load();toast('รีเฟรชแล้ว')},csv,rst:()=>{['qs','qt','qc','qd'].forEach(i=>$(i).value='');recFilter()},x:closeM,
-ap:()=>approve(id),rj:()=>reject(id),eu:()=>editUser(id),'save-user':saveUser,tg:()=>toggleU(id),ub:()=>unblock(id),rl:()=>resetLiff(id),er:()=>editRec(id),'save-rec':saveRec,fr:()=>forceRet(id,n),dr:()=>delRec(id,n),ph:()=>photo(id),proxy,pa:()=>{pa();toast('รีเฟรชแล้ว')},pr:()=>proxyRet(id,n)})[b.dataset.a]?.()});
+ap:()=>approve(id),rj:()=>reject(id),eu:()=>editUser(id),'save-user':saveUser,tg:()=>toggleU(id),ub:()=>unblock(id),rl:()=>resetLiff(id),er:()=>editRec(id),'save-rec':saveRec,fr:()=>forceRet(id,n),dr:()=>delRec(id,n),ph:()=>photo(id),proxy,os:osToggle,pa:()=>{pa();toast('รีเฟรชแล้ว')},pr:()=>proxyRet(id,n)})[b.dataset.a]?.()});
 document.querySelectorAll('.ov').forEach(o=>o.addEventListener('mousedown',e=>{if(e.target===o)closeM()}));addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
 $('rf').onchange=reqs;let db;['us','ur'].forEach(i=>$(i).addEventListener('input',()=>{clearTimeout(db);db=setTimeout(users,180)}));['qs'].forEach(i=>$(i).addEventListener('input',()=>{clearTimeout(db);db=setTimeout(recFilter,200)}));['qt','qc','qd'].forEach(i=>$(i).addEventListener('change',recFilter));
 </script>
