@@ -1,9 +1,11 @@
-import { cors, ok, err, preflight } from './_shared.js';
+import { cors, ok, err, preflight, isOutstationMode } from './_shared.js';
 export async function onRequestOptions() { return preflight(); }
 /**
  * GET /get-car-status?secret=...
  * เรียกจาก selfbot คำสั่ง !cars
  * คืน list รถที่ pending + รถที่เกิน 24 ชั่วโมง
+ * ถ้าเปิด "โหมดใช้งานรถต่างจังหวัด" → ไม่มีรถ overdue (ทุกคันอยู่ใน active)
+ *   และส่ง outstation_mode:true กลับไปให้ selfbot ใช้งดแจ้งเตือน/งดบล็อก
  */
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -21,17 +23,20 @@ export async function onRequestGet(context) {
       WHERE r.return_status = 'pending'
       ORDER BY r.timestamp ASC
     `).all();
+    const outstation = await isOutstationMode(env);
     const active = [];
     const overdue = [];
     for (const rec of results) {
       const hoursElapsed = rec.hours_elapsed || 0;
-      if (rec.user_status === 'blocked' || hoursElapsed >= 24) {
+      if (outstation) {
+        active.push({ ...rec, hoursElapsed });
+      } else if (rec.user_status === 'blocked' || hoursElapsed >= 24) {
         overdue.push({ ...rec, hoursElapsed });
       } else {
         active.push({ ...rec, hoursElapsed });
       }
     }
-    return ok({ active, overdue }, o);
+    return ok({ active, overdue, outstation_mode: outstation }, o);
   } catch (e) {
     return err(e.message, 500, o);
   }
