@@ -1,4 +1,4 @@
-import { cors, ok, err, preflight } from './_shared.js';
+import { cors, ok, err, preflight, getSetting, setSetting, isOutstationMode } from './_shared.js';
 
 export async function onRequestOptions() { return preflight(); }
 
@@ -32,7 +32,20 @@ export async function onRequestPost(context) {
       ]);
       const userMap = {};
       for (const u of usersRes.results) userMap[u.user_id] = u;
-      return ok({ userMap, requests: reqRes.results, stats: statsRes }, o);
+      const outstation = await isOutstationMode(env);
+      return ok({ userMap, requests: reqRes.results, stats: statsRes, outstation }, o);
+    }
+
+    // ── โหมดใช้งานรถต่างจังหวัด (มีผลกับผู้ใช้ทุกคน) ──
+    if (action === 'get-outstation') {
+      return ok({ success: true, outstation: await isOutstationMode(env) }, o);
+    }
+
+    if (action === 'set-outstation') {
+      const on = body.enabled === true || body.enabled === 1 || body.enabled === '1';
+      await setSetting(env, 'outstation_mode', on ? '1' : '0', requestingUserId || 'selfbot');
+      await setSetting(env, 'outstation_changed_at', new Date().toISOString(), requestingUserId || 'selfbot');
+      return ok({ success: true, outstation: on }, o);
     }
 
     if (action === 'approve') {
