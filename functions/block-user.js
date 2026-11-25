@@ -1,4 +1,4 @@
-import { ok, err, preflight } from './_shared.js';
+import { ok, err, preflight, isOutstationMode } from './_shared.js';
 
 export async function onRequestOptions() { return preflight(); }
 
@@ -9,6 +9,11 @@ export async function onRequestPost(context) {
     const { userId, secret } = await request.json();
     if (secret !== env.SELFBOT_SECRET) return err('Unauthorized', 403, o);
     if (!userId) return err('Missing userId', 400, o);
+
+    // โหมดใช้งานรถต่างจังหวัด: ห้ามบล็อกอัตโนมัติจากการใช้รถเกิน 24 ชม.
+    if (await isOutstationMode(env)) {
+      return ok({ success: false, skipped: true, outstation_mode: true, message: 'เปิดโหมดใช้งานรถต่างจังหวัดอยู่ ไม่บล็อกผู้ใช้' }, o);
+    }
 
     const now = new Date().toISOString();
     const result = await env.DB.prepare(`
