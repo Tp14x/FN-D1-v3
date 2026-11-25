@@ -43,8 +43,39 @@ export async function onRequestPost(context) {
 
     if (action === 'set-outstation') {
       const on = body.enabled === true || body.enabled === 1 || body.enabled === '1';
+      const was = await isOutstationMode(env);
       await setSetting(env, 'outstation_mode', on ? '1' : '0', requestingUserId || 'selfbot');
       await setSetting(env, 'outstation_changed_at', new Date().toISOString(), requestingUserId || 'selfbot');
+
+      // แจ้งเตือนเข้ากลุ่ม LINE เมื่อสถานะเปลี่ยน (เฉพาะสั่งจากหน้าเว็บ admin;
+      // ถ้าสั่งจากไลน์ผ่าน selfbot ด้วย secret → selfbot ส่งประกาศเองอยู่แล้ว จึงไม่ส่งซ้ำ)
+      const fromSelfbot = secret === env.SELFBOT_SECRET;
+      if (on !== was && !fromSelfbot && env.SELFBOT_WEBHOOK_URL) {
+        let adminName = 'ผู้ดูแลระบบ';
+        try {
+          const u = await env.DB.prepare('SELECT nickname, name FROM users WHERE user_id = ?').bind(requestingUserId).first();
+          if (u && (u.nickname || u.name)) adminName = u.nickname || u.name;
+        } catch (e) {}
+        const payload = {
+          type: 'announce',
+          record: {
+            level: on ? 'warning' : 'success',
+            icon: '🧭',
+            title: on ? 'เปิดโหมดใช้งานรถต่างจังหวัด' : 'ปิดโหมดใช้งานรถต่างจังหวัด',
+            message: on
+              ? 'ขณะนี้เปิดโหมดใช้งานรถต่างจังหวัดอยู่ คืนรถเกิน 24 ชั่วโมงได้ ไม่ถูกบล็อก และจะไม่มีการแจ้งเตือนรถเกินกำหนด จนกว่าจะคืนรถ'
+              : 'ปิดโหมดใช้งานรถต่างจังหวัดแล้ว กลับมาใช้กติกา 24 ชั่วโมงตามเดิม (เตือนก่อนครบ 1 ชม. และบล็อกอัตโนมัติเมื่อเกินเวลา)',
+            sender: adminName
+          }
+        };
+        context.waitUntil(
+          fetch(env.SELFBOT_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Selfbot-Secret': env.SELFBOT_SECRET || '' },
+            body: JSON.stringify(payload)
+          }).catch(() => {})
+        );
+      }
       return ok({ success: true, outstation: on }, o);
     }
 
