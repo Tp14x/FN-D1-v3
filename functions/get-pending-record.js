@@ -1,4 +1,4 @@
-import { ok, err, preflight } from './_shared.js';
+import { ok, err, preflight, isOutstationMode } from './_shared.js';
 
 export async function onRequestOptions() { return preflight(); }
 
@@ -18,7 +18,8 @@ export async function onRequestGet(context) {
       LIMIT 1
     `).bind(userId).first();
 
-    return ok({ record: record || null }, o);
+    const outstation = await isOutstationMode(env);
+    return ok({ record: record || null, outstation }, o);
   } catch (e) {
     return err(e.message, 500, o);
   }
