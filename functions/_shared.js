@@ -25,3 +25,34 @@ export function preflight() {
     }
   });
 }
+
+// ── Settings (global, key/value) ──
+// ตาราง settings จะถูกสร้างอัตโนมัติถ้ายังไม่มี (ไม่ต้องรัน migration เอง)
+export async function ensureSettings(env) {
+  await env.DB.prepare(
+    "CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT, updated_at TEXT, updated_by TEXT)"
+  ).run();
+}
+
+export async function getSetting(env, key, fallback = null) {
+  try {
+    await ensureSettings(env);
+    const row = await env.DB.prepare('SELECT value FROM settings WHERE key = ?').bind(key).first();
+    return row ? row.value : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+
+export async function setSetting(env, key, value, by) {
+  await ensureSettings(env);
+  await env.DB.prepare(`
+    INSERT INTO settings (key, value, updated_at, updated_by) VALUES (?, ?, ?, ?)
+    ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at, updated_by=excluded.updated_by
+  `).bind(key, String(value), new Date().toISOString(), by || null).run();
+}
+
+// โหมดใช้งานรถต่างจังหวัด: เปิด = ไม่บล็อก/ไม่แจ้งเตือนเกิน 24 ชม.
+export async function isOutstationMode(env) {
+  return (await getSetting(env, 'outstation_mode', '0')) === '1';
+}
